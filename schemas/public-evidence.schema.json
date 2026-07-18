@@ -1,0 +1,43 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://tmcoconsulting.github.io/evidenceops/schemas/public-evidence.schema.json",
+  "title": "EvidenceOps public evidence package",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "synthetic", "source_type", "summary", "controls"],
+  "properties": {
+    "schema_version": { "const": "1.0" },
+    "synthetic": { "type": "boolean" },
+    "source_type": { "enum": ["curated-synthetic-fixture", "sanitized-live-collection"] },
+    "summary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "evaluated_controls",
+        "compliant_controls",
+        "drifted_controls",
+        "approved_exceptions"
+      ],
+      "properties": {
+        "evaluated_controls": { "type": "integer", "minimum": 0 },
+        "compliant_controls": { "type": "integer", "minimum": 0 },
+        "drifted_controls": { "type": "integer", "minimum": 0 },
+        "approved_exceptions": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "controls": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["control_ref", "title", "status", "evidence_kind"],
+        "properties": {
+          "control_ref": { "type": "string", "pattern": "^SYN-[A-Z]+-[0-9]{3}$" },
+          "title": { "type": "string", "minLength": 1 },
+          "status": { "enum": ["compliant", "drifted", "approved-exception"] },
+          "evidence_kind": { "const": "deterministic" }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,69 @@
+[build-system]
+requires = ["hatchling==1.31.0"]
+build-backend = "hatchling.build"
+
+[project]
+name = "evidenceops"
+version = "0.1.0"
+description = "Deterministic, sanitized compliance evidence for endpoint-management teams."
+readme = "README.md"
+requires-python = ">=3.12"
+license = "Apache-2.0"
+authors = [{ name = "TMCO Consulting, LLC" }]
+classifiers = [
+  "Development Status :: 2 - Pre-Alpha",
+  "License :: OSI Approved :: Apache Software License",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.12",
+  "Typing :: Typed",
+]
+dependencies = []
+
+[project.optional-dependencies]
+dev = [
+  "bandit==1.9.4",
+  "mkdocs==1.6.1",
+  "mkdocs-material==9.7.7",
+  "mypy==2.3.0",
+  "pip-audit==2.10.1",
+  "pre-commit==4.6.0",
+  "pytest==9.1.1",
+  "pytest-cov==7.1.0",
+  "ruff==0.15.22",
+]
+
+[project.urls]
+Documentation = "https://tmcoconsulting.github.io/evidenceops/"
+Issues = "https://github.com/tmcoconsulting/evidenceops/issues"
+Repository = "https://github.com/tmcoconsulting/evidenceops"
+
+[tool.hatch.build.targets.wheel]
+packages = ["evidenceops"]
+
+[tool.ruff]
+target-version = "py312"
+line-length = 100
+extend-exclude = ["site"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "N", "S", "UP", "B", "A", "C4", "DTZ", "PIE", "PT", "RET", "SIM"]
+ignore = ["S101"]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = ["S101"]
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+files = ["evidenceops", "scripts", "tests"]
+exclude = ["site"]
+
+[tool.pytest.ini_options]
+addopts = "--strict-config --strict-markers --cov=evidenceops --cov-report=term-missing --cov-fail-under=90"
+testpaths = ["tests"]
+
+[tool.coverage.run]
+branch = true
+
+[tool.bandit]
+exclude_dirs = ["tests", ".venv", "site"]

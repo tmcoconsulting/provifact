@@ -1,0 +1,34 @@
+{
+  "schema_version": "1.0",
+  "fixture_notice": "SYNTHETIC_TEST_DATA_ONLY",
+  "provider": "synthetic-intune",
+  "tenant_id": "11111111-2222-4333-8444-555555555555",
+  "devices": [
+    {
+      "managed_device_id": "10000000-0000-4000-8000-000000000001",
+      "device_name": "RAW_FIXTURE_MARKER_DEVICE_ALPHA",
+      "serial_number": "SYNTH-SERIAL-ALPHA",
+      "user_principal_name": "synthetic.alpha@example.invalid",
+      "group_id": "20000000-0000-4000-8000-000000000001",
+      "group_name": "RAW_FIXTURE_MARKER_ENGINEERING_GROUP",
+      "ip_address": "192.0.2.10",
+      "platform": "macOS",
+      "os_version": "15.5",
+      "compliance_state": "compliant"
+    },
+    {
+      "managed_device_id": "10000000-0000-4000-8000-000000000002",
+      "device_name": "RAW_FIXTURE_MARKER_DEVICE_BETA",
+      "serial_number": "SYNTH-SERIAL-BETA",
+      "user_principal_name": "synthetic.beta@example.invalid",
+      "group_id": "20000000-0000-4000-8000-000000000001",
+      "group_name": "RAW_FIXTURE_MARKER_ENGINEERING_GROUP",
+      "ip_address": "192.0.2.11",
+      "platform": "macOS",
+      "os_version": "15.4",
+      "compliance_state": "noncompliant"
+    }
+  ],
+  "access_token": "SYNTHETIC_VALUE_MUST_BE_DROPPED",
+  "authorization": "SYNTHETIC_VALUE_MUST_BE_DROPPED"
+}

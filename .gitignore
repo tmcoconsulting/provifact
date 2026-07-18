@@ -1,0 +1,35 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.mypy_cache/
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Virtual environments and local configuration
+.venv/
+venv/
+.env
+.env.*
+!.env.example
+
+# Documentation output
+site/
+
+# Editors and operating systems
+.DS_Store
+.idea/
+.vscode/
+
+# Sensitive or local collection artifacts
+artifacts/
+raw/
+exports/
+*.pem
+*.key
+*.p12
+*.pfx
+*.cer
+*.crt
