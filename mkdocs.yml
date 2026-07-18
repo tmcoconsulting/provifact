@@ -1,0 +1,80 @@
+site_name: EvidenceOps
+site_description: Continuous audit evidence for regulated endpoint-management teams
+site_url: https://tmcoconsulting.github.io/evidenceops/
+repo_url: https://github.com/tmcoconsulting/evidenceops
+repo_name: tmcoconsulting/evidenceops
+edit_uri: edit/main/docs/
+copyright: Copyright &copy; 2026 TMCO Consulting, LLC
+
+theme:
+  name: material
+  language: en
+  features:
+    - navigation.footer
+    - navigation.indexes
+    - navigation.sections
+    - navigation.tabs
+    - navigation.top
+    - search.highlight
+    - search.suggest
+    - content.code.copy
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: indigo
+      accent: cyan
+      toggle:
+        icon: material/weather-night
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: indigo
+      accent: cyan
+      toggle:
+        icon: material/weather-sunny
+        name: Switch to light mode
+
+nav:
+  - Overview: index.md
+  - Live Demo: live-demo.md
+  - Architecture: architecture.md
+  - Getting Started: getting-started.md
+  - Standard Operating Procedures:
+      - Demo Mode: operations/demo-mode.md
+      - Future Live Collection: operations/live-collection.md
+      - Incident Response: operations/incident-response.md
+  - Security and Data Handling:
+      - Security Model: security-model.md
+      - Data Handling: data-handling.md
+      - Threat Model: threat-model.md
+  - Audit Methodology: audit-methodology.md
+  - Evidence Dashboard: evidence-dashboard.md
+  - Videos: videos.md
+  - Build Week:
+      - Codex Collaboration: build-week/codex-collaboration.md
+      - Decision Log: build-week/decision-log.md
+      - Contribution Log: build-week/contribution-log.md
+      - Submission Checklist: build-week/submission-checklist.md
+  - Roadmap: roadmap.md
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - md_in_html
+  - tables
+  - toc:
+      permalink: true
+  - pymdownx.details
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
+
+extra_css:
+  - assets/stylesheets/extra.css
+
+plugins:
+  - search
+
+strict: true

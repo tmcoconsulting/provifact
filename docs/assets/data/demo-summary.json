@@ -1,0 +1,31 @@
+{
+  "schema_version": "1.0",
+  "synthetic": true,
+  "source_type": "curated-synthetic-fixture",
+  "summary": {
+    "evaluated_controls": 12,
+    "compliant_controls": 9,
+    "drifted_controls": 2,
+    "approved_exceptions": 1
+  },
+  "controls": [
+    {
+      "control_ref": "SYN-MAC-001",
+      "title": "Screen lock timeout",
+      "status": "compliant",
+      "evidence_kind": "deterministic"
+    },
+    {
+      "control_ref": "SYN-MAC-002",
+      "title": "Disk encryption required",
+      "status": "drifted",
+      "evidence_kind": "deterministic"
+    },
+    {
+      "control_ref": "SYN-MAC-003",
+      "title": "Operating system update window",
+      "status": "approved-exception",
+      "evidence_kind": "deterministic"
+    }
+  ]
+}

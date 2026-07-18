@@ -1,0 +1,122 @@
+:root {
+  --evidenceops-ink: #10233d;
+  --evidenceops-blue: #2358d7;
+  --evidenceops-cyan: #00a7bd;
+  --evidenceops-mist: #eef4fb;
+}
+
+.md-header {
+  background: linear-gradient(110deg, #172a57 0%, #234fbd 58%, #007e99 100%);
+}
+
+.evidence-hero {
+  padding: 3.6rem 2.4rem;
+  margin: 0 0 2rem;
+  border: 1px solid rgba(62, 112, 190, 0.28);
+  border-radius: 1.25rem;
+  color: var(--evidenceops-ink);
+  background:
+    radial-gradient(circle at 85% 16%, rgba(0, 167, 189, 0.22), transparent 30%),
+    linear-gradient(135deg, #f8fbff 0%, var(--evidenceops-mist) 100%);
+}
+
+.evidence-hero h1 {
+  margin: 0 0 0.8rem;
+  font-size: clamp(2.5rem, 6vw, 4.7rem);
+  line-height: 0.96;
+  letter-spacing: -0.045em;
+}
+
+.evidence-hero p {
+  max-width: 48rem;
+  font-size: 1.14rem;
+}
+
+.hero-kicker {
+  color: var(--evidenceops-blue);
+  font-weight: 750;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.8rem;
+  margin-top: 1.4rem;
+}
+
+.hero-actions a {
+  display: inline-block;
+  padding: 0.72rem 1.1rem;
+  border-radius: 0.65rem;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.hero-actions .primary {
+  color: white;
+  background: var(--evidenceops-blue);
+}
+
+.hero-actions .secondary {
+  color: var(--evidenceops-ink);
+  border: 1px solid rgba(16, 35, 61, 0.24);
+  background: white;
+}
+
+.evidence-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+  gap: 1rem;
+  margin: 1.25rem 0 2rem;
+}
+
+.evidence-card {
+  padding: 1.1rem 1.2rem;
+  border: 1px solid rgba(80, 110, 150, 0.2);
+  border-radius: 0.85rem;
+  background: rgba(246, 250, 255, 0.78);
+}
+
+.evidence-card h3 {
+  margin-top: 0;
+}
+
+.evidence-metric {
+  font-size: 2.2rem;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.evidence-label {
+  margin-top: 0.45rem;
+  color: #53657c;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+.synthetic-banner {
+  padding: 0.9rem 1rem;
+  border-left: 0.3rem solid var(--evidenceops-cyan);
+  border-radius: 0.35rem;
+  background: rgba(0, 167, 189, 0.09);
+  font-weight: 650;
+}
+
+[data-md-color-scheme="slate"] .evidence-hero,
+[data-md-color-scheme="slate"] .evidence-card {
+  color: #edf5ff;
+  background: rgba(27, 45, 72, 0.84);
+}
+
+[data-md-color-scheme="slate"] .hero-actions .secondary {
+  color: #edf5ff;
+  background: rgba(20, 36, 60, 0.92);
+}
+
+[data-md-color-scheme="slate"] .evidence-label {
+  color: #aebed1;
+}
