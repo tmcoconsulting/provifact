@@ -3,16 +3,18 @@
 ## Public-data rule
 
 Any public static artifact may contain only curated synthetic data or a live-derived package that
-passed schema validation, explicit field policy, reference validation, two content scans, and human
-publication review. This repository currently builds only synthetic data locally; no public hosting
-deployment is implemented in this checkpoint.
+passed schema validation, allowlist construction, reference validation, content and credential
+scans, and human publication review. The current Cloudflare deployment serves only the tracked
+synthetic Mission package.
 
 ## Collection minimization
 
-The Phase 1 adapter reads Intune configuration policies and assignments but normalizes only two
-macOS settings, modified time, assignment count, and assignment target kinds. Policy IDs are
-private-only. It excludes display names, descriptions, group/user/device data, tenant domains,
-managed-device inventory, network data, and raw response bodies.
+The expanded Apple adapter requests only fields needed for aggregate device posture, policy and
+setting normalization, assignment scope, application governance, compliance metadata, enrollment,
+and Apple service health. Device and source object IDs may exist only in the private normalized
+package when needed for deterministic joins. Device/user names, serials, hardware/network values,
+free-form descriptions, group names, tenant domains, tokens, certificates, and raw response bodies
+are not requested or are rejected before public construction.
 
 ## Prohibited or transformed values
 
@@ -34,11 +36,11 @@ runtime key material of at least 32 bytes. EvidenceOps never persists that key.
 | Stage | Location | Retention |
 | --- | --- | --- |
 | Graph response | Process memory | Request lifetime only |
-| Private normalized package | Operator-selected ignored directory | Explicit 1–90 days |
+| Private normalized package | Operator-selected ignored directory | Explicit 1–30 days for the expanded Apple slice |
 | Sanitized package | Reviewed workspace | Publication policy |
 | Public synthetic package | Tracked data/local static artifact | Repository/build policy |
 | Tokens/pseudonym key | Process environment/memory | Current operation only |
-| Future OpenAI production key | Cloudflare Worker secret | Platform-managed rotation policy |
+| OpenAI project service-account key | Cloudflare Worker secret | Operator-managed rotation and immediate revocation on incident |
 
 Private packages are written without overwrite at mode `0600` where supported. EvidenceOps records
 the deletion deadline but does not silently delete operator data; the operator must remove the

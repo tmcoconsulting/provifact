@@ -172,8 +172,7 @@ def _collection(*, previous: bool) -> AppleIntuneCollection:
                     "odata_type": "vppToken",
                     "platforms": ["macOS", "iOS", "iPadOS"],
                     "assignment_count": 0,
-                    # This is a synthetic service-health label, never token material.
-                    "token_state": "valid",  # nosec B105
+                    "status": "valid",
                 },
             ),
         ]

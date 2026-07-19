@@ -80,6 +80,7 @@ or proprietary material from `intune-apple-gitops` or any other repository.
 | 2026-07-18 | Runtime spend/log/egress hardening | `f8994d9` |
 | 2026-07-18 | Protected audit and deployment workflow support | `925e0f8` |
 | 2026-07-18 | Cloudflare/OpenAI egress fix and safe fixture production guard | `cfd9975` |
+| 2026-07-19 | Comprehensive Apple collector, pinned baseline, Mission Control, and bounded assistant | Pending review commit |
 
 Exact Phase 1 commands, results, limitations, and commit hashes are maintained in the
 [Phase 1 validation record](phase-1-validation.md).
@@ -93,4 +94,9 @@ secret, GitHub environment controls, and bounded synthetic external validation a
 The same thread later configured the exact Entra production-environment federation and required
 Graph application consent without making a tenant request or creating a client secret. It also
 added bounded, code-aware OpenAI 429 classification while keeping upstream bodies and messages out
-of responses and logs. These later changes remain pending TJ human review in draft PR #1.
+of responses and logs. Those changes were reviewed and merged through PR #1.
+
+The July 19 vertical slice was implemented in the same primary Codex task. Codex added the GET-only
+resource-family collector, baseline verification, deterministic Mission schema, synthetic package,
+dashboard, assistant boundary, tests, and documentation. TJ retains human review, external
+approval, merge, and public-submission authority. No Intune write or raw tenant export was added.

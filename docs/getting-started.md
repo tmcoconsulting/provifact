@@ -19,16 +19,19 @@ it.
 ## Three-minute synthetic demonstration
 
 ```bash
-python -m evidenceops run-demo --output-dir build/synthetic-demo
-python scripts/check_public_artifacts.py build/synthetic-demo
+python -m evidenceops run-mission-demo --output-dir build/mission-demo
+python scripts/check_public_artifacts.py build/mission-demo
+python -m evidenceops rebuild-static-demo
 mkdocs build --strict
 python scripts/check_public_artifacts.py site
 ```
 
-Open `site/live-demo/index.html`, then `site/evidence-dashboard/index.html`. The walkthrough shows
-four deterministic outcomes, machine-verified typed status claims, generated prose quarantined for
-human review, and an adversarial verdict rejected for an additional policy reason. The fixture
-demonstrates the GPT contract but is clearly labeled as not originating from a live model call.
+Open `site/evidence-dashboard/index.html`. Mission Control shows the approved 98-rule inventory,
+five mapped macOS settings, 20% technical alignment over the explicit five-rule denominator,
+FileVault/firewall/assignment/conflict drift, a Mac/iPhone/iPad posture, unmapped resources, one
+collection gap, previous-versus-current changes, framework crosswalks, and the bounded assistant.
+Every value comes from the tracked synthetic package; fixture assistant answers make no model
+request.
 
 To validate the same static artifact behind the local Cloudflare Worker boundary, install Node.js
 22 or later and run:
@@ -48,9 +51,12 @@ Fixture mode makes no OpenAI request. Stop the local process when the review is 
 ## Command boundary
 
 ```text
-run-demo                 credential-free synthetic end-to-end flow
-live-collect             GET-only Intune collection into ignored private storage
-publish                  validate, sanitize, scan, and emit a selected public package
+run-demo                 credential-free synthetic schema-v1 proof
+run-mission-demo         credential-free Apple Mission Control vertical slice
+live-collect             original narrow GET-only collection (backward compatible)
+live-collect-apple       expanded GET-only Apple collection into ignored private storage
+publish                  validate, sanitize, scan, and emit a schema-v1 package
+publish-mission          allowlist and scan an expanded private Apple collection
 generate-narrative       optional GPT-5.6 call using only the public package
 verify-narrative         deterministic acceptance or quarantine
 rebuild-static-demo      regenerate tracked synthetic static-build data
@@ -67,10 +73,11 @@ Live collection requires a separately approved Entra app and explicit authentica
 `OPENAI_API_KEY` and pins `gpt-5.6-terra` for the bounded cost-conscious runtime.
 
 No successful paid model call is required or claimed by the static demo. Production has a dedicated
-EvidenceOps Project key stored only as the encrypted Cloudflare Worker secret `OPENAI_API_KEY`.
-The value is not present in the repository or GitHub. Production remains in explicit fixture mode
-because the bounded OpenAI validation returned capacity unavailable. BYOK is deferred pending a
-separate browser-key threat model.
+EvidenceOps Project service-account key stored only as the encrypted Cloudflare Worker secret
+`OPENAI_API_KEY`; the value is absent from the repository and GitHub. Production remains in
+explicit fixture mode until one bounded live response passes the same deterministic verifier.
+Browser BYOK is rejected because it would create browser-storage, exfiltration, logging, and abuse
+risks without improving the server-side least-privilege boundary.
 
 EvidenceOps does not load `.env` files. Environment-variable names appear in `.env.example`, but
 operators must use a local process environment or managed secret store. Never add a real value to

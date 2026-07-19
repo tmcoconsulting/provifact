@@ -13,9 +13,11 @@
 </div>
 
 <div class="synthetic-banner">
-Phase 1 is a narrow read-only proof. The static demo is synthetic, live TMCO validation is still
-outstanding, and no production tenant data is present. The Cloudflare Worker serves this synthetic
-fixture at `evidenceops.tmcoconsulting.com`; fixture mode makes no OpenAI request.
+Phase 1 is a bounded read-only Apple evidence proof. Mission Control is generated from a clearly
+labeled synthetic Mac, iPhone, and iPad environment; no production tenant data is present. The
+expanded collector and permission manifest are implemented and mocked, while the protected live
+audit remains outstanding. Cloudflare serves this synthetic fixture at
+`evidenceops.tmcoconsulting.com`; fixture mode makes no OpenAI request.
 </div>
 
 ## The problem
@@ -58,11 +60,11 @@ EvidenceOps starts from a different thesis:
 
 | Layer | Authority | Phase 1 behavior |
 | --- | --- | --- |
-| Desired state and approvals | Git history and reviewed change | Versioned synthetic fixture |
-| Observed state | Read-only provider response | GET-only Intune adapter; live validation pending |
-| Drift result | Deterministic comparison | Implemented and tested |
+| Approved baseline and desired state | Git history, pinned mSCP revision, and TMCO demo approval | 98-rule macOS inventory; five rules mapped |
+| Observed state | Read-only provider response | Expanded GET-only Apple/Intune adapter; live validation pending |
+| Drift result | Deterministic comparison | Assignment, value, conflict, gap, and unsupported states |
 | Public artifact | Sanitization policy and policy gate | Implemented and tested |
-| Narrative | GPT-generated analysis grounded in evidence | Adapter/transport reached OpenAI; project capacity unavailable, so production is fixture mode |
+| Assistant | GPT-generated analysis grounded in prefiltered evidence | Deterministic fixture by default; fixed Terra model path is opt-in |
 | Narrative claims | Typed deterministic claim codes | Verified; free prose quarantined |
 | Acceptance | Human reviewer | Required boundary |
 
@@ -71,7 +73,7 @@ a finding, grant an exception, approve a control, or claim that an audit require
 
 ## Initial scope and vendor-neutral direction
 
-The first planned live integration is Microsoft Intune with managed Apple platforms. The core
+The first live integration is Microsoft Intune with managed Apple platforms. The core
 objects and provider interface do not contain Intune-specific write semantics, allowing later Jamf
 and Omnissa Workspace ONE adapters to normalize into the same evidence engine.
 
@@ -99,9 +101,11 @@ Read the [data-handling policy](data-handling.md), [threat model](threat-model.m
 
 - Live TMCO Microsoft Graph/Intune validation has not been performed.
 - The site uses generated evidence objects derived only from curated synthetic input.
-- Control mappings, exception persistence, signed manifests, and auditor exports are deferred.
+- Only five macOS rules have approved provider mappings; the remaining inventory is visible but unsupported.
+- iOS/iPadOS has no approved baseline and is deliberately not scored against macOS CIS.
+- Full exception persistence, signed manifests, and auditor exports are deferred.
 - Cloudflare same-origin API routes are operational in production with synthetic fixture data only.
-- The OpenAI path reached the API but returned capacity unavailable; no live narrative was accepted.
+- A new project service-account key is installed as a Worker secret; bounded live response validation remains outstanding.
 - GitHub Pages is disabled; local `site/` output is deployed as Cloudflare Workers Static Assets.
 - Phase 0 was validated on Python 3.14 locally and targets Python 3.12 in CI; neither result is a
   production-readiness or compliance certification.

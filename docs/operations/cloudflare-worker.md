@@ -68,10 +68,10 @@ Wrangler plain-text variable, GitHub public-CI secret, browser value, repository
 argument, or log field. The Worker logs only event code, request ID, method, route, and status. It
 does not log client IPs, headers, packages, prompts, model responses, or error bodies.
 
-The current control-plane session could verify that `OPENAI_API_KEY` exists as a Worker secret, but
-could not verify its present OpenAI owner. The last directly observed transfer used a
-project-scoped user-owned key. Service-account replacement and revocation of that temporary key
-must therefore remain open gates until the OpenAI project UI and Worker secret are both checked.
+The production `OPENAI_API_KEY` binding now contains the only active key owned by the dedicated
+EvidenceOps project service account. The service account is assigned the custom
+`evidenceops-responses-runtime` role, which grants only Responses API model capability. The value is
+not in GitHub, the repository, documentation, or browser state.
 
 The `global_fetch_strictly_public` compatibility flag forces the fixed OpenAI hostname through its
 public route rather than treating it as an implicit Worker-to-Worker service binding. No arbitrary
@@ -90,26 +90,22 @@ was returned to fixture mode.
 
 Remaining:
 
-1. sign in to **OpenAI Platform → EvidenceOps project → Service accounts**; create or verify
-   `evidenceops-cloudflare-runtime`, create one restricted project key, transfer it directly to the
-   existing Worker secret, verify service-account ownership, and revoke the temporary user-owned
-   key;
-2. in **EvidenceOps project → Limits**, set a `$5` monthly soft budget with 50%, 80%, and 100%
-   alerts, allow only `gpt-5.6-terra` where supported, and set at most 5 RPM and 25,000 TPM (or the
-   lowest accepted values); verify usable billing. The budget is an alert, not a hard cap;
-3. independently verify that the token stored as the protected GitHub environment secret
+1. make one bounded synthetic live request with the service-account key and verify structured
+   output, typed claims, references, prose quarantine, and safe logs. The configured `$5` monthly
+   project budget is an alert, not a hard cap;
+2. independently verify that the token stored as the protected GitHub environment secret
    `CLOUDFLARE_API_TOKEN` is restricted to the TMCO Consulting account with Account `Workers
    Scripts Edit`; do not add zone, route, DNS, KV, R2, account-settings, membership, user-details,
    billing, or unrelated-account access. The workflow supplies the exact account ID, so it does not
    need membership discovery. The secret exists by name, but its value and scope have not been
    retrieved or claimed as verified;
-4. keep `CLOUDFLARE_DEPLOY_ENABLED=false` until the token scope is validated against the exact
+3. keep `CLOUDFLARE_DEPLOY_ENABLED=false` until the token scope is validated against the exact
    workflow, then enable deployment only after review;
-5. review Cloudflare observability/alert retention in the dashboard;
-6. after merge, manually run the protected GET-only Intune audit and retain only sanitized counts;
-7. use `wrangler deployments list --env production` and
+4. review Cloudflare observability/alert retention in the dashboard;
+5. after merge, manually run the protected expanded GET-only Intune audit and retain only sanitized counts;
+6. use `wrangler deployments list --env production` and
    `wrangler rollback <known-good-version> --env production` for rollback; and
-8. enable OpenAI mode only after a single bounded request succeeds and the dashboard label is
+7. enable OpenAI mode only after a single bounded request succeeds and the dashboard label is
    revalidated.
 
 The current workflow uses `wrangler deploy` while the custom domain remains declarative in

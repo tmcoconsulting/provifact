@@ -40,7 +40,7 @@
       "system_settings_firewall_enable",
       "system_settings_screensaver_password_enforce"
     ],
-    "previous_snapshot_id": "mission-b076e4bc731c1f6010392998",
+    "previous_snapshot_id": "mission-c2d426449e0647fd3825630b",
     "resolved_drift": []
   },
   "collection": {
@@ -166,7 +166,7 @@
       "source_endpoint_key": "app-protection-policies"
     }
   ],
-  "content_fingerprint": "sha256:b9cb9441006a139f09b40abad37ebead561a0aa76cb2182eb2db06da6b121468",
+  "content_fingerprint": "sha256:953ca0d2a6ad4326bfd06eb13a0d8c9f07322c9d8d928444453e01cc655603a0",
   "data_mode": "SYNTHETIC DEMO DATA",
   "devices": {
     "by_compliance_state": {
@@ -2355,7 +2355,7 @@
   "resources": [
     {
       "assignment_count": 0,
-      "fingerprint": "sha256:53f4c236ff9ef967c71292900a30b112ed37a17e02d8e7f3c7372ca500719007",
+      "fingerprint": "sha256:4055001768785391b074c38da90ea3f3e5ce349e8ba63ec70e2fad1682d70c37",
       "platforms": [
         "macOS",
         "iOS",
@@ -2365,7 +2365,7 @@
       "resource_ref": "resource-c06d58435644089bc48c",
       "resource_type": "vppToken",
       "source_api_version": "v1.0",
-      "source_evidence_id": "apple-53f4c236ff9ef967c7129290",
+      "source_evidence_id": "apple-4055001768785391b074c38d",
       "state": "valid",
       "title": "Apple Apps And Books 9bc48c"
     },
@@ -2641,11 +2641,11 @@
     }
   ],
   "schema_version": "2.0.0",
-  "snapshot_id": "mission-b9cb9441006a139f09b40aba",
+  "snapshot_id": "mission-953ca0d2a6ad4326bfd06eb1",
   "unmapped_objects": [
     {
       "assignment_count": 0,
-      "fingerprint": "sha256:53f4c236ff9ef967c71292900a30b112ed37a17e02d8e7f3c7372ca500719007",
+      "fingerprint": "sha256:4055001768785391b074c38da90ea3f3e5ce349e8ba63ec70e2fad1682d70c37",
       "platforms": [
         "macOS",
         "iOS",
@@ -2655,7 +2655,7 @@
       "resource_ref": "resource-c06d58435644089bc48c",
       "resource_type": "vppToken",
       "source_api_version": "v1.0",
-      "source_evidence_id": "apple-53f4c236ff9ef967c7129290",
+      "source_evidence_id": "apple-4055001768785391b074c38d",
       "state": "valid",
       "title": "Apple Apps And Books 9bc48c"
     },

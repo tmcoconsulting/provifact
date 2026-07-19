@@ -17,7 +17,7 @@
   "mscp_source_revision": "11b5896e4f12f43410686024f543792742562c91",
   "organization": "TMCO Consulting",
   "platform": "macOS",
-  "repository_commit": "containing-git-commit",
+  "repository_commit": "3dd8902a609c6be177cdc913c731fbd378f075a4",
   "rule_count": 98,
   "schema_version": "1.0.0",
   "scope": "macOS technical configuration evidence only",

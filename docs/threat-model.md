@@ -4,8 +4,9 @@ This Phase 1 model covers the public repository, unprivileged CI, local static b
 adapter, private evidence writer, sanitizer, OpenAI boundary, deterministic verifier, and
 synthetic demo, and the deployed Cloudflare Worker/static-assets runtime. The public custom domain,
 encrypted OpenAI secret binding, fixture API behavior, TLS, headers, and rate limits are in scope.
-The environment-bound Entra trust and Graph application consent are configured. Live Intune
-execution and successful model-generated output remain outside the validated state.
+The environment-bound Entra trust and expanded four-permission application consent are configured
+and independently re-read. Live Intune execution and successful model-generated output remain
+outside the validated state.
 
 ## Assets
 
@@ -36,10 +37,10 @@ execution and successful model-generated output remain outside the validated sta
 | Private package reaches static/public assets | Re-identification | Separate writer, MkDocs exclusion, path/content scan | Signed publication manifest |
 | Graph adds a sensitive field | Silent disclosure | Explicit normalization and unknown-field publication failure | Live canary contract monitoring |
 | Fork obtains collection credential | Tenant disclosure | Manual main-only workflow, protected environment, exact OIDC subject, no client secret | Post-merge runbook validation and environment reviewer |
-| Graph permission or verb expands | Endpoint mutation | One read permission and GET-only transport/tests | Dedicated manifest/AST policy gate |
+| Graph permission or verb expands | Excess disclosure or mutation | Exact four-read-permission manifest, GET-only transport, source/workflow tests | Independent consent review and trusted-main live validation |
 | Narrative omits/duplicates evidence | Audit error | Exact unique finding-ID set equality | Broader evaluation corpus |
 | Narrative reverses status in prose | Audit error | Typed claims only; all prose quarantined | Explicit human approval workflow |
-| OpenAI receives private data | Tenant disclosure | Validated public shape plus repeated shared content/credential scan; size bound; no tools | Worker egress policy |
+| OpenAI receives private data | Tenant disclosure | Fresh intent-specific context, validated public shape, repeated content/credential scan, context bound, no tools | Operational egress audit sample |
 | Device-code token persists | Tenant access | In-memory MSAL cache; no token logging | Managed workstation controls |
 | Pseudonym correlation leaks identity | Re-identification | Runtime-only key and content scans | Key rotation/mapping governance |
 | Action dependency compromised | Build compromise | Immutable action SHAs and least privilege | Organization dependency review |
@@ -47,6 +48,7 @@ execution and successful model-generated output remain outside the validated sta
 | Public client floods narrative route | Cost or availability loss | Native rate binding, request bound, one attempt, timeout | Account budget alerts, WAF/abuse telemetry, authenticated tier if needed |
 | Model or upstream returns oversized/hostile JSON | Resource exhaustion or false evidence | Response bound, strict schema, shared scanner, deterministic verifier | Production alerting and evaluation corpus |
 | Logs disclose input or secret | Data or credential exposure | Structured allowlisted metadata only; stored invocation logs disabled | Administrative live tail exposes platform metadata; restrict access and retention |
+| Sanitized history becomes a shadow tenant store | Re-identification and retention risk | Demo uses two code-owned synthetic snapshots; no database added | Separate storage/access/retention design before live history persistence |
 
 ## Abuse cases covered by tests
 
@@ -59,6 +61,8 @@ execution and successful model-generated output remain outside the validated sta
 - Any supported GitHub token family appears in publication, repository, static, or model-egress
   content.
 - An operator chooses a nonignored private directory or attempts to overwrite an artifact.
+- An assistant question requests identity, unsupported evidence, or a stale/tampered snapshot; the
+  request is rejected or receives the exact insufficient-evidence response without raw fallback.
 
 ## Assumptions and exclusions
 

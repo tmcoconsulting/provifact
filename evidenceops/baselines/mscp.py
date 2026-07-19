@@ -257,7 +257,7 @@ APPROVAL_RECORD: Final[dict[str, JsonValue]] = {
         "iOS and iPadOS are outside this macOS baseline and are not scored against it.",
         "Organizational, procedural, interview, and assessor evidence remain required.",
     ],
-    "repository_commit": "containing-git-commit",
+    "repository_commit": "3dd8902a609c6be177cdc913c731fbd378f075a4",
     "rule_count": 98,
     "license": "CC-BY-4.0 (upstream mSCP metadata; Apple vendor descriptions excluded)",
 }

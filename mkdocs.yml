@@ -59,6 +59,8 @@ nav:
       - Contribution Log: build-week/contribution-log.md
       - Phase 1 Validation: build-week/phase-1-validation.md
       - Worker Validation: build-week/cloudflare-worker-validation.md
+      - Build Week Slice Validation: build-week/build-week-slice-validation.md
+      - Demo Package: build-week/demo-package.md
       - Submission Checklist: build-week/submission-checklist.md
   - Roadmap: roadmap.md
 
@@ -80,6 +82,7 @@ extra_css:
   - assets/stylesheets/extra.css
 
 extra_javascript:
+  - assets/javascripts/mission-control.js
   - assets/javascripts/evidenceops-api.js
 
 plugins:

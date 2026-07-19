@@ -18,19 +18,23 @@ Collection is privileged even when it is read-only.
 ## Read-only integration boundary
 
 The Intune transport implements one network method, `GET`, restricted to HTTPS on
-`graph.microsoft.com` and `/v1.0/`. Pagination follows same-host `@odata.nextLink` values as opaque
-URLs. Bounded retry honors `Retry-After` for 429 and backs off transient 5xx responses. There is no
-create, update, delete, assign, sync, rollback, remediation, or apply method.
+`graph.microsoft.com` and explicitly allowed `v1.0` or isolated `beta` paths. Pagination follows
+same-host, same-version `@odata.nextLink` values. Bounded retry honors `Retry-After`, adds jitter,
+and backs off transient 5xx responses. There is no create, update, delete, assign, sync, rollback,
+remediation, or apply method.
 
-The sole Graph permission is `DeviceManagementConfiguration.Read.All`. Neither
-`Directory.Read.All`, managed-device inventory scope, nor any write scope is requested. See the
+The expanded Apple slice uses exactly `DeviceManagementConfiguration.Read.All`,
+`DeviceManagementManagedDevices.Read.All`, `DeviceManagementApps.Read.All`, and
+`DeviceManagementServiceConfig.Read.All`. It does not request `Directory.Read.All`, user/group
+permissions, privileged device operations, or any write scope. The one beta dependency is Settings
+Catalog; its version and collection gap are explicit. See the
 [permission and setup guide](operations/live-collection.md).
 
 ## Private-to-public boundary
 
 Private packages contain normalized traceability metadata, not bulk raw Graph responses. They can
 exist only in a selected Git-ignored repository directory and are written without overwrite or
-symlink following. Operators set retention from 1–90 days and remain responsible for secure
+symlink following. The expanded Apple command permits 1–30 day retention; operators remain responsible for secure
 deletion at expiry. EvidenceOps does not persist the pseudonymization key.
 
 Publication applies `evidenceops-publication-v1.0.0`. Every field is allow, drop, or pseudonymize;
@@ -60,14 +64,15 @@ not grant approval. Human assessors retain final judgment.
 Public CI uses only repository content and read-only `contents` permission. The privileged GitHub
 Pages workflow/site and its `pages: write`/deployment OIDC permissions were removed. Executable
 actions are pinned to immutable commit SHAs. Separate main-only workflows target the protected
-`production` environment; Cloudflare deployment is disabled until its narrow token exists, and the
-manual Intune audit has an exact environment-scoped Entra FIC plus consented read-only application
-permission. It remains unexecuted until reviewed code reaches `main`; no client secret exists.
+`production` environment. The manual Intune audit has an exact environment-scoped Entra FIC and is
+restricted to trusted `main`. The expanded four-permission application grant is consented and was
+independently re-read; its first live audit must still succeed before live collection is described
+as operational. No client secret exists.
 
 The public Worker runtime is deployed in fixture mode. It uses Worker-first routing only for
 `/api/*`, exact methods, same-origin checks, a 64 KiB request bound, compressed-body rejection,
-native client and global rate limiting, a 20-second OpenAI timeout, a 256 KiB upstream-response
-bound, one non-retrying model request, and generic error responses. Logs contain request IDs,
+native client and global rate limiting, a 20-second OpenAI timeout, bounded model context/output,
+a 256 KiB upstream-response bound, one non-retrying model request, and generic error responses. Logs contain request IDs,
 method, route, status, and event code—not headers, IP addresses, evidence, prompts, responses, or
 secrets. Cloudflare's privileged live-tail transport includes platform request metadata, so tail
 access is administrative and stored invocation logs are disabled. Static assets carry
