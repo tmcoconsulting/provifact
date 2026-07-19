@@ -184,3 +184,18 @@ and passed the public-artifact scan. No deployment was made for this continuatio
   disabled through `CLOUDFLARE_DEPLOY_ENABLED=false`.
 - No production rollback was executed because earlier versions used live model mode; the CLI
   deployment history and rollback command were verified instead.
+
+## 2026-07-19 post-merge operational update
+
+After TJ reviewed PR #2 through `0220b2cf19a5dd019f1d18f90a2e45acc99242df`, the reviewed Worker
+and static assets were deployed to the production custom domain in explicit fixture mode. HTTPS,
+status, readiness, static assets, TLS, and repository-controlled browser security headers passed.
+
+Exactly one bounded synthetic request was then made in fixed `gpt-5.6-terra` mode. It returned HTTP
+success, parsed under the strict schema, accepted two deterministic typed claims and rejected none,
+quarantined every generated prose field, and retained the human-review requirement. The response
+text, prompt, evidence values, key, and upstream body were not printed or retained. Production was
+immediately redeployed from the reviewed configuration and independently verified in fixture mode.
+
+This later success supersedes only the earlier capacity-unavailable operational result. It does not
+alter the historical validation record or make generated analysis authoritative.

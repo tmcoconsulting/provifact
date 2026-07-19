@@ -305,3 +305,14 @@ deployment identity, or build step.
 `disabled` after a repository-API enable request, so EvidenceOps does not claim those controls are
 active. Provider secret scanning, push protection, the shared credential catalog, and fail-closed
 repository/public-artifact scans remain enabled requirements.
+
+## 2026-07-19 — Keep Graph type fallbacks inside a closed public taxonomy
+
+**Decision:** Normalize a missing Microsoft Graph `@odata.type` to `unknown`, not the dotted SDK
+namespace fallback `microsoft.graph.unknown`. Keep the public domain detector unchanged.
+
+**Why:** The first protected-main live audit completed GET-only collection, but the publication
+boundary correctly rejected the dotted fallback as a domain-shaped value. Dotted provider
+namespaces are unnecessary in the public resource summary. Reducing the fallback to the existing
+closed taxonomy retains useful resource-family evidence without allowlisting an arbitrary domain
+pattern or exposing a tenant value.

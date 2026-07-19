@@ -90,6 +90,7 @@ or proprietary material from `intune-apple-gitops` or any other repository.
 | 2026-07-19 | Preview and CodeQL evidence record | `b58db77` |
 | 2026-07-19 | Browser-proven responsive Mission Control containment | `73d6b2b` |
 | 2026-07-19 | Responsive desktop/mobile browser evidence record | `214f1bf` |
+| 2026-07-19 | Reviewed Mission Control slice squash merge | `7d7f8bca0ac7b652e515a360755b534af99c0b46` |
 
 Exact Phase 1 commands, results, limitations, and commit hashes are maintained in the
 [Phase 1 validation record](phase-1-validation.md).
@@ -115,3 +116,9 @@ repository code. Production and live-tenant state were left unchanged pending hu
 An authenticated desktop/mobile browser pass then found and remediated a narrow-screen overflow in
 the preview. The table remains locally scrollable, the page itself fits the mobile viewport, and a
 regression guard preserves the required grid containment and versioned stylesheet reference.
+TJ subsequently reviewed the final PR #2 head and merged it through protected `main`. The primary
+task deployed the reviewed fixture to production, accepted one bounded Terra response only after
+typed-claim verification and prose quarantine, and restored fixture mode. A protected-main OIDC
+audit completed private GET-only collection but correctly failed public publication on a
+domain-shaped fallback value; cleanup removed the ephemeral evidence. The follow-up normalization
+fix preserves the detector and requires separate human review.

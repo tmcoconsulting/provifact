@@ -609,7 +609,8 @@ def _model_family(model: str | None) -> str:
 
 
 def _safe_odata_type(value: str) -> str:
-    cleaned = value.removeprefix("#microsoft.graph.")
+    cleaned = value.removeprefix("#")
+    cleaned = cleaned.removeprefix("microsoft.graph.")
     if (
         not cleaned
         or len(cleaned) > 160

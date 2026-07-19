@@ -7,6 +7,7 @@ from typing import cast
 import pytest
 
 from evidenceops.domain import JsonValue
+from evidenceops.evidence import build_public_mission_snapshot
 from evidenceops.providers import (
     ENDPOINTS,
     AppleIntuneProvider,
@@ -221,6 +222,31 @@ def test_comprehensive_provider_collects_every_family_and_normalizes_joins() -> 
     assert any(gap["reason"] == "unsupported_resource_type" for gap in result.collection_gaps)
 
 
+def test_missing_odata_type_uses_public_safe_unknown_taxonomy() -> None:
+    reader, paths = _catalog()
+    reader.objects[paths["apns-certificate"]].pop("@odata.type")
+
+    collection = AppleIntuneProvider(reader, max_concurrency=1, now=lambda: NOW).collect()
+    apns = next(
+        item
+        for item in collection.records
+        if item["resource_family"] == "apple_push_notification_service"
+    )
+    assert cast(dict[str, JsonValue], apns["properties"])["odata_type"] == "unknown"
+
+    public = build_public_mission_snapshot(
+        collection,
+        pseudonym_key=b"public-safe-test-pseudonym-key!!",
+        synthetic=False,
+        source_git_commit="a" * 40,
+    )
+    resources = cast(list[dict[str, JsonValue]], public["resources"])
+    public_apns = next(
+        item for item in resources if item["resource_family"] == "apple_push_notification_service"
+    )
+    assert public_apns["resource_type"] == "unknown"
+
+
 def test_partial_graph_and_schema_failures_become_collection_gaps() -> None:
     reader, paths = _catalog()
     reader.failures[paths["app-protection-policies"]] = GraphProviderError(
@@ -275,6 +301,7 @@ def test_changed_managed_device_field_shapes_fail_record_closed(
 
 
 def test_normalizer_rejects_unsafe_enums_types_and_times() -> None:
+    assert apple_module._safe_odata_type("microsoft.graph.unknown") == "unknown"
     with pytest.raises(ValueError, match="unsafe enumerated"):
         apple_module._safe_enum("contains spaces")
     with pytest.raises(ValueError, match="unsafe OData"):

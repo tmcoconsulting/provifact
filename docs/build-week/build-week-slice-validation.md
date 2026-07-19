@@ -20,9 +20,13 @@
 - `b58db77` — preview and CodeQL evidence record
 - `73d6b2b` — browser-proven responsive Mission Control containment
 - `214f1bf` — responsive desktop/mobile browser evidence record
+- `c328e4b` — green responsive-head validation record
+- `3cd611d` — assistant, audit-reporting, and device-code review fixes
+- `0220b2c` — fail-closed duplicate public-artifact filename detection
 
-These commits and this validation-record update remain pending TJ's review in PR #2. No commit in
-the PR uses a `Human-Reviewed` trailer.
+TJ reviewed PR #2 through `0220b2cf19a5dd019f1d18f90a2e45acc99242df`. PR #2 was squash-merged
+through protected `main` as `7d7f8bca0ac7b652e515a360755b534af99c0b46`. The follow-up live
+publication fix described below is a separate human-review gate.
 
 ## Implemented and locally verified
 
@@ -134,7 +138,9 @@ generated bindings, and all three Wrangler dry-runs passed.
 - Allowed model: only `gpt-5.6-terra`.
 - Model limits: 5 RPM and 25,000 TPM.
 - Monthly project budget: `$5` soft threshold with 50%, 80%, and 100% alerts. It is not a hard cap.
-- A bounded live response has not yet been accepted; public production remains fixture mode.
+- One bounded synthetic request reached fixed `gpt-5.6-terra`, returned HTTP success, accepted two
+  deterministic typed claims with none rejected, and kept generated prose quarantined. Production
+  was immediately returned to fixture mode.
 
 ### Microsoft Entra
 
@@ -144,15 +150,19 @@ generated bindings, and all three Wrangler dry-runs passed.
   read, managed-app read, and service-configuration read.
 - Eight pre-existing delegated permissions remain unchanged; the application-only workflow does
   not use them.
-- No Microsoft Graph request or Intune write occurred on this branch.
+- The protected post-merge audit acquired an application token through OIDC and completed GET-only
+  collection. Publication failed closed before producing public evidence, and cleanup completed.
+  No Intune write occurred.
 
 ### Cloudflare and GitHub
 
 - Production Worker secret name `OPENAI_API_KEY` is present.
 - Protected GitHub environment secret name `CLOUDFLARE_API_TOKEN` is present; its value was not
   retrieved. `CLOUDFLARE_DEPLOY_ENABLED` remains `false`.
-- PR #2 is pushed, mergeable, ready for TJ review, and has a successful required CI run.
-- The existing production custom domain and fixture deployment were not changed in this milestone.
+- PR #2 passed required CI and CodeQL, was reviewed by TJ, and was squash-merged through protected
+  `main`.
+- The reviewed static/Worker revision is deployed at the production custom domain in explicit
+  fixture mode.
 - The authenticated Cloudflare session was reverified and the scanned fixture assets from PR head
   `1c057c7` were deployed only to the credential-free preview Worker. `/`, `/api/health`,
   `/api/ready`, `/api/status`, and fixture `/api/ask` returned HTTPS success. Readiness verified the
@@ -170,18 +180,31 @@ generated bindings, and all three Wrangler dry-runs passed.
   in its 341-pixel horizontal-scroll wrapper. Mobile rendering and both browser consoles then
   passed. Production remained unchanged.
 
+## Post-merge operational validation
+
+The production fixture deployment returned HTTPS success for the dashboard, status, and readiness
+routes with the expected CSP, HSTS, frame, MIME, referrer, permissions, and cross-origin headers.
+The one authorized Terra request used only the tracked synthetic snapshot. Structured output
+parsed, deterministic typed-claim verification passed, generated prose remained quarantined, and
+human review remained required. The Worker was then redeployed from its reviewed configuration and
+independently reported `fixture` mode.
+
+Protected-main audit run `29700668896` proved GitHub environment-scoped OIDC, Entra token exchange,
+and GET-only collection. The private normalized package was written only to the ephemeral ignored
+directory. Public construction then rejected a domain-shaped value, emitted no public package, and
+the always-run cleanup step succeeded. The failure was traced to the closed Graph-type fallback:
+an absent `@odata.type` normalized as `microsoft.graph.unknown`, which the public domain detector
+correctly refused. The follow-up changes that fallback to the non-domain taxonomy value `unknown`
+and adds an end-to-end regression test. The domain detector is not relaxed.
+
 ## Outstanding gates
 
-1. TJ reviews every commit and the complete PR #2 diff through the current head.
-2. After review, deploy the fixture revision to production and recheck the public custom domain,
-   TLS, headers, desktop, and mobile views. Keep the protected deployment workflow disabled until
-   the environment token's least-privilege Cloudflare scope is independently verified.
-3. Make at most one bounded synthetic `gpt-5.6-terra` request; accept it only if structured output,
-   references, typed claims, content scan, and prose quarantine pass. Return production to fixture
-   mode afterward.
-4. Merge reviewed code through the protected branch, then manually run the trusted-main Intune
-   audit. Retain only sanitized counts and delete ephemeral evidence.
-5. Run `/feedback` in the primary Codex task and preserve the Session ID privately.
+1. TJ reviews and merges the narrow live-publication normalization follow-up.
+2. Rerun the protected-main audit once. Accept completion only if publication, public scanning,
+   sanitized aggregate reporting, and ephemeral cleanup all succeed.
+3. Keep the Cloudflare deployment workflow disabled until the environment token's least-privilege
+   scope is independently verified.
+4. Run `/feedback` in the primary Codex task and preserve the Session ID privately.
 
 Phase 1 must not be called technically complete until the bounded model response and the protected
 post-merge expanded Intune audit both succeed.
