@@ -341,3 +341,21 @@ outside reviewed windows, and verify the exact deployed snapshot ID after upload
 activated the reviewed Worker/assets but could not inspect a zone route that routine code deployment
 does not need to manage. Separating these concerns preserves the narrow token, avoids DNS/route
 mutation authority, and makes a wrong or stale deployment fail the exact runtime status check.
+
+## 2026-07-19 — Preserve Bot Fight Mode during deployment verification
+
+**Decision:** Do not bypass or disable Cloudflare Bot Fight Mode for GitHub-hosted runners. Bind the
+expected Mission snapshot ID to the uploaded Worker version through Wrangler's version message,
+then re-read versions and deployments and require that exact version to be the sole version serving
+100% of traffic. Perform public HTTPS, status, header, and browser checks independently after the
+protected workflow.
+
+**Why:** The first route-isolated retry uploaded and activated the reviewed bundle, but its
+immediate curl was managed-challenged at the edge. Cloudflare Security Analytics correlated the
+exact timestamp and classified the event as Bot Fight Mode. Cloudflare documents that a Worker
+version captures code, static assets, bindings, and compatibility settings, while a deployment
+identifies the version receiving traffic. Control-plane verification proves activation without
+weakening an unrelated edge defense or granting the deployment token zone-security authority.
+
+**Source:** Cloudflare [Versions and deployments](https://developers.cloudflare.com/workers/versions-and-deployments/)
+and [Wrangler Worker commands](https://developers.cloudflare.com/workers/wrangler/commands/workers/).

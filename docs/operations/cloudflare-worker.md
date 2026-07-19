@@ -100,8 +100,8 @@ signal.
 
 Remaining:
 
-1. merge the routine-deployment fix that removes the already-provisioned custom domain from the
-   Wrangler upload configuration, then complete one green protected workflow retry;
+1. merge the control-plane deployment proof that preserves Bot Fight Mode, then complete one green
+   protected workflow retry and independent unauthenticated browser check;
 2. keep `CLOUDFLARE_DEPLOY_ENABLED=false` outside an explicitly reviewed deployment window;
 3. review Cloudflare observability/alert retention in the dashboard;
 4. use `wrangler deployments list --env production` and
@@ -118,6 +118,16 @@ custom domain remains a separately managed control-plane resource. Cloudflare sc
 write at the account, not an individual Worker, so manual main-only execution, the fixed Worker
 name, exact snapshot check, and protected environment are necessary residual controls.
 
+The first route-isolated protected retry uploaded the reviewed bundle successfully. Its immediate
+custom-domain curl received a Cloudflare Bot Fight Mode managed challenge because the caller was a
+cloud-hosted command-line runner; Cloudflare Security Analytics independently correlated the exact
+timestamp. The domain returned the correct snapshot and HTTPS/security headers from an independent
+network immediately afterward. EvidenceOps preserves Bot Fight Mode and instead attaches the
+reviewed snapshot ID as a Worker-version message, then verifies through Wrangler that the exact
+version is the sole active deployment at 100% traffic. Public HTTP, browser rendering, and header
+validation remain a separate unauthenticated post-run operator check.
+
 Cloudflare documents [Worker secrets](https://developers.cloudflare.com/workers/configuration/secrets/),
 [custom domains](https://developers.cloudflare.com/workers/configuration/routing/custom-domains/),
+[versions and deployments](https://developers.cloudflare.com/workers/versions-and-deployments/),
 and [rollbacks](https://developers.cloudflare.com/workers/configuration/versions-and-deployments/rollbacks/).

@@ -225,3 +225,13 @@ narrow token correctly denied it after activation. The pending routine-deploymen
 custom domain as a separately provisioned control-plane resource, removes route management from
 routine uploads, and adds an exact deployed-snapshot check. `CLOUDFLARE_DEPLOY_ENABLED` remains
 `false` outside the bounded retry window.
+
+PR #5 was later reviewed and squash-merged as
+`3e4954dfe50ddaaa06e5f38114abe26591fe10ea`. Its protected-main retry passed every validation and
+publication step and uploaded the reviewed bundle without route-management access. The final curl
+was managed-challenged by Bot Fight Mode; Cloudflare Security Analytics correlated the exact event
+and time. Independent HTTPS checks returned the exact expected live sanitized snapshot with the
+required headers. The follow-up does not weaken Bot Fight Mode: it binds the expected snapshot to
+the Worker version message and verifies that version is the sole active 100%-traffic deployment
+through the authenticated Cloudflare control plane. Public HTTP and browser verification remain an
+independent operator gate.

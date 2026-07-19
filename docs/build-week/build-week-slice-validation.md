@@ -26,6 +26,8 @@
 - `0220b2c` — fail-closed duplicate public-artifact filename detection
 - `b966cd0` — reviewed sanitized-publication handoff squash merge
 - `aa9c8fa` — routine deployment isolated from custom-domain management; review required
+- `3e4954d` — reviewed routine-deployment isolation squash merge
+- `18b94c3` — Bot-Fight-safe active-version proof; review required
 
 TJ reviewed PR #2 through `0220b2cf19a5dd019f1d18f90a2e45acc99242df`. PR #2 was squash-merged
 through protected `main` as `7d7f8bca0ac7b652e515a360755b534af99c0b46`. The follow-up live
@@ -294,12 +296,31 @@ Python tests with one credential-gated live test skipped and 91.16% branch cover
 tests; Ruff, Mypy, Bandit, both dependency audits, repository/public scans, strict MkDocs, generated
 bindings, deterministic rebuild comparison, all Wrangler dry-runs, and `git diff --check`.
 
+PR #5 was reviewed and squash-merged by TJ as
+`3e4954dfe50ddaaa06e5f38114abe26591fe10ea`. Protected-main deployment run `29702968021` passed
+the reviewed-window gate, complete validation, exact artifact download, repeated publication scans,
+snapshot pinning, and Worker upload. The environment flag was immediately restored and re-read as
+`false`. The final custom-domain curl received HTTP 403 at the exact activation timestamp.
+Cloudflare Security Analytics classified the corresponding request as a Bot Fight Mode managed
+challenge. An independent network then returned HTTP 200 for `/`, `/api/status`, and the exact
+reviewed live sanitized snapshot with the expected security headers. No route, DNS, secret, Graph,
+or Intune state changed during diagnosis.
+
+The control-plane proof adds a snapshot-bound Worker version message and rejects an absent message,
+wrong or partial active version, non-Wrangler source, invalid trigger, malformed UTC timestamp, or
+unexpected rollout. The workflow re-reads both versions and deployments inside the single
+secret-bearing step; Cloudflare metadata remains ephemeral and is neither logged nor uploaded.
+Local validation passed with 208 Python tests, one credential-gated local live test skipped, 91.16%
+branch coverage, 43 Worker tests, both dependency audits, Ruff, Mypy, Bandit, repository/public
+scans, deterministic rebuild, strict MkDocs, generated bindings, and all Wrangler dry-runs.
+
 ## Outstanding gate
 
-Review and merge the routine-deployment isolation fix, then complete one green protected-main
-deployment retry using the already reviewed audit run ID. Keep the environment enable flag false
-before and immediately after that bounded window. This review gate is separate from the completed
-GET-only audit and sanitized publication.
+Review and merge the Bot-Fight-safe control-plane deployment proof, then complete one green
+protected-main deployment retry using the already reviewed audit run ID. Keep the environment
+enable flag false before and immediately after that bounded window, then repeat the independent
+unauthenticated HTTP/browser checks. This review gate is separate from the completed GET-only audit,
+sanitized publication, and successful Worker activation.
 
 After the operational gate, run `/feedback` in the primary Codex task and preserve the Session ID
 privately.

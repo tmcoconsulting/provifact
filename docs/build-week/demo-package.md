@@ -5,7 +5,8 @@
 **0:00–0:20 — thesis.** Open EvidenceOps Mission Control. “Regulated endpoint teams should not
 reconstruct months of change history before an audit. EvidenceOps turns approved configuration,
 read-only observation, deterministic drift, and constrained AI explanation into one traceable
-evidence chain.” Point out the `SYNTHETIC DEMO DATA` badge.
+evidence chain.” Point out the `LIVE SANITIZED TENANT DATA` badge and explain that raw tenant data
+never crossed the publication boundary.
 
 **0:20–0:45 — approved baseline.** Show the 98-rule pinned macOS CIS Level 1 demo inventory, its
 mSCP revision and hashes, and the five-rule alignment denominator. Explain that the internal TMCO
@@ -23,7 +24,8 @@ against a macOS baseline and that unavailable evidence remains visible.
 **1:45–2:20 — constrained GPT-5.6.** Ask “What are the highest-severity findings?” Show cited
 evidence, typed-claim verification, prose quarantine, and human-review language. Ask an unsupported
 question and show the exact insufficient-evidence response. In fixture mode, say explicitly that
-no model call occurred.
+no model call occurred during the demonstration; the separately recorded bounded Terra validation
+proved the operational model path.
 
 **2:20–2:45 — security boundary.** Show `/api/status`, then summarize GET-only Graph, GitHub OIDC,
 private normalized evidence, allowlist publication, Cloudflare rate limits, server-side OpenAI
@@ -36,8 +38,8 @@ audit.”
 ## Click-by-click runbook
 
 1. Open `https://evidenceops.tmcoconsulting.com/evidence-dashboard/`.
-2. Confirm the data-mode badge says `SYNTHETIC DEMO DATA` and the banner does not indicate stale or
-   invalid evidence.
+2. Confirm the data-mode badge says `LIVE SANITIZED TENANT DATA`, the assistant says fixture mode,
+   and the banner does not indicate stale or invalid evidence.
 3. In Executive overview, point to Technical alignment, Drifted requirements, Managed Apple
    devices, Collection gaps, and AI service.
 4. Read the denominator explanation immediately below the cards.
@@ -74,7 +76,7 @@ framework crosswalks. A fail-closed allowlist creates the only public/model-visi
 Cloudflare Workers Static Assets serves the dashboard; `/api/ask` prefilters the sanitized package,
 calls only fixed `gpt-5.6-terra` with structured output and `store: false`, and rejects any answer
 whose typed claims or citations disagree with deterministic evidence. Public fixture mode requires
-no tenant or model credential.
+no model credential; production evidence is a separately reviewed live sanitized projection.
 
 ## How Codex was used
 
@@ -107,7 +109,7 @@ quarantined.
 
 ## Screenshot checklist
 
-- [ ] Mission Control header with synthetic mode badge
+- [ ] Mission Control header with live sanitized data badge and fixture narrative label
 - [ ] Executive overview and denominator explanation
 - [ ] FileVault traceability dialog
 - [ ] Assignment or conflict finding
@@ -117,7 +119,8 @@ quarantined.
 - [ ] Verified fixture assistant answer with citations
 - [ ] Insufficient-evidence answer
 - [ ] Mobile viewport showing responsive cards/table
-- [ ] `/api/status` fixture response, with no administrative metadata
+- [ ] `/api/status` live sanitized response with fixture narrative mode and no administrative
+      metadata
 
 ## Backup synthetic-demo procedure
 
