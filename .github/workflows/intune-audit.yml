@@ -2,6 +2,12 @@ name: Read-only Intune audit
 
 on:
   workflow_dispatch:
+    inputs:
+      prepare_publication:
+        description: Upload the scanned public Mission package for a separate reviewed deployment
+        required: true
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -69,6 +75,18 @@ jobs:
           unset EVIDENCEOPS_PSEUDONYM_KEY EVIDENCEOPS_GRAPH_ACCESS_TOKEN token
           python scripts/check_public_artifacts.py build/live-public
           python scripts/report_public_counts.py build/live-public/mission-control.json >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload scanned public Mission package for review
+        if: inputs.prepare_publication
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
+        with:
+          name: evidenceops-sanitized-mission-${{ github.run_id }}
+          path: build/live-public/mission-control.json
+          if-no-files-found: error
+          retention-days: 1
+          compression-level: 0
+          overwrite: false
+          include-hidden-files: false
 
       - name: Remove ephemeral live evidence
         if: always()

@@ -4,9 +4,15 @@ on:
   push:
     branches: [main]
   workflow_dispatch:
+    inputs:
+      sanitized_audit_run_id:
+        description: Optional successful Intune audit run containing the reviewed public Mission
+        required: false
+        type: string
 
 permissions:
   contents: read
+  actions: read
 
 concurrency:
   group: cloudflare-production
@@ -25,6 +31,7 @@ jobs:
       CLOUDFLARE_LOAD_DEV_VARS_FROM_DOT_ENV: "false"
       CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
       CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      SANITIZED_AUDIT_RUN_ID: ${{ inputs.sanitized_audit_run_id }}
     steps:
       - name: Check out trusted main
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
@@ -66,10 +73,46 @@ jobs:
           python scripts/check_public_artifacts.py site
           npm run validate:worker
 
+      - name: Validate live publication selector
+        if: inputs.sanitized_audit_run_id != ''
+        run: |
+          if [[ ! "$SANITIZED_AUDIT_RUN_ID" =~ ^[0-9]{1,20}$ ]]; then
+            echo "invalid sanitized audit run selector" >&2
+            exit 2
+          fi
+
+      - name: Download reviewed sanitized Mission package
+        if: inputs.sanitized_audit_run_id != ''
+        uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7
+        with:
+          name: evidenceops-sanitized-mission-${{ inputs.sanitized_audit_run_id }}
+          path: build/publication-handoff
+          github-token: ${{ github.token }}
+          repository: tmcoconsulting/evidenceops
+          run-id: ${{ inputs.sanitized_audit_run_id }}
+
+      - name: Revalidate and stage live sanitized dashboard
+        if: inputs.sanitized_audit_run_id != ''
+        run: |
+          test "$(find build/publication-handoff -maxdepth 1 -type f | wc -l | tr -d ' ')" = "1"
+          python scripts/promote_live_mission.py build/publication-handoff/mission-control.json
+          python scripts/check_public_artifacts.py build/publication-handoff
+          python scripts/check_secrets.py
+          mkdocs build --strict
+          python scripts/check_public_artifacts.py site
+
       - name: Deploy production Worker
         run: npm run deploy:production
 
       - name: Verify production status and static boundary
+        env:
+          EXPECTED_DATA_MODE: ${{ inputs.sanitized_audit_run_id != '' && 'LIVE SANITIZED TENANT DATA' || 'SYNTHETIC DEMO DATA' }}
         run: |
-          curl --fail --silent --show-error --retry 3 --max-time 15 https://evidenceops.tmcoconsulting.com/api/status >/dev/null
+          curl --fail --silent --show-error --retry 3 --max-time 15 \
+            --output "$RUNNER_TEMP/evidenceops-status.json" \
+            https://evidenceops.tmcoconsulting.com/api/status
+          python scripts/verify_runtime_status.py \
+            "$RUNNER_TEMP/evidenceops-status.json" \
+            --expected-data-mode "$EXPECTED_DATA_MODE" \
+            --expected-narrative-mode fixture
           curl --fail --silent --show-error --retry 3 --max-time 15 https://evidenceops.tmcoconsulting.com/ >/dev/null

@@ -68,6 +68,11 @@ def test_privileged_workflows_are_main_only_and_environment_protected() -> None:
     assert "--auth environment-token" in audit
     assert "store_private" not in audit
     assert "python -m pytest -o addopts=''" in audit
+    assert "if: inputs.prepare_publication" in audit
+    assert "actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f" in audit
+    assert "path: build/live-public/mission-control.json" in audit
+    assert "retention-days: 1" in audit
+    assert "path: artifacts/private" not in audit
 
     ci = (WORKFLOWS / "ci.yml").read_text(encoding="utf-8")
     assert "python -m pytest" in ci
@@ -81,6 +86,37 @@ def test_privileged_workflows_are_main_only_and_environment_protected() -> None:
     assert "secrets.CLOUDFLARE_API_TOKEN" in deploy
     assert "npm run deploy:production" in deploy
     assert "ref: main" in deploy
+    assert "actions: read" in deploy
+    assert "actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131" in deploy
+    assert "run-id: ${{ inputs.sanitized_audit_run_id }}" in deploy
+    assert "python scripts/promote_live_mission.py" in deploy
+    assert "python scripts/verify_runtime_status.py" in deploy
+    assert "python scripts/check_public_artifacts.py build/publication-handoff" in deploy
+
+
+def test_live_publication_handoff_cannot_retain_or_publish_private_evidence() -> None:
+    audit = (WORKFLOWS / "intune-audit.yml").read_text(encoding="utf-8")
+    deploy = (WORKFLOWS / "deploy-cloudflare.yml").read_text(encoding="utf-8")
+    combined = audit + deploy
+    assert "prepare_publication:" in audit
+    assert "default: false" in audit
+    assert "evidenceops-sanitized-mission-${{ github.run_id }}" in audit
+    assert "include-hidden-files: false" in audit
+    assert "compression-level: 0" in audit
+    assert "overwrite: false" in audit
+    assert "sanitized_audit_run_id:" in deploy
+    assert "repository: tmcoconsulting/evidenceops" in deploy
+    assert "evidenceops-sanitized-mission-${{ inputs.sanitized_audit_run_id }}" in deploy
+    assert "find artifacts/private -type f -delete" in audit
+    assert "find build/live-public -type f -delete" in audit
+    for prohibited in (
+        "upload-artifact@v",
+        "download-artifact@v",
+        "path: artifacts/private",
+        "path: artifacts/raw",
+        "retention-days: 90",
+    ):
+        assert prohibited not in combined
 
 
 def test_worker_static_assets_and_modes_are_explicit() -> None:

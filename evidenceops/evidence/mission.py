@@ -214,8 +214,7 @@ def validate_public_mission_snapshot(value: object) -> dict[str, JsonValue]:
     _exact_list_items(document, "resources", _resource_fields())
     _exact_list_items(document, "unmapped_objects", _resource_fields())
     _exact_list_items(document, "collection_gaps", _gap_fields())
-    if not isinstance(document["collection"], dict) or not isinstance(document["baseline"], dict):
-        raise ValueError("mission collection and baseline must be objects")
+    _validate_nested_public_objects(document)
     assert_public_safe(cast(JsonValue, document))
     return document
 
@@ -645,6 +644,181 @@ def _exact_list_items(
         raise ValueError(f"mission field {field} must be an array")
     if any(not isinstance(item, dict) or set(item) != expected for item in values):
         raise ValueError(f"mission field {field} contains an invalid object")
+
+
+def _validate_nested_public_objects(document: Mapping[str, JsonValue]) -> None:
+    collection = _exact_object(
+        document,
+        "collection",
+        {
+            "provider",
+            "provider_version",
+            "collected_at_utc",
+            "freshness",
+            "endpoint_statuses",
+            "source_git_commit",
+            "deterministic_algorithm_version",
+        },
+    )
+    _exact_object(
+        collection,
+        "freshness",
+        {"age_seconds_at_build", "maximum_age_seconds", "state"},
+    )
+    statuses = collection["endpoint_statuses"]
+    if not isinstance(statuses, list):
+        raise ValueError("mission collection endpoint_statuses must be an array")
+    endpoint_fields = {
+        "key",
+        "record_count",
+        "required_permission",
+        "resource_family",
+        "source_api_version",
+        "status",
+    }
+    if any(
+        not isinstance(item, dict)
+        or not endpoint_fields.issubset(item)
+        or not set(item).issubset(endpoint_fields | {"beta_reason"})
+        for item in statuses
+    ):
+        raise ValueError("mission collection contains an invalid endpoint status")
+    _exact_object(
+        document,
+        "baseline",
+        {
+            "name",
+            "platform",
+            "benchmark",
+            "benchmark_version",
+            "source_revision",
+            "source_artifact_sha256",
+            "extracted_baseline_sha256",
+            "approval_status",
+            "approver",
+            "approval_date",
+            "scope",
+            "limitations",
+            "rule_count",
+        },
+    )
+    _exact_object(
+        document,
+        "metrics",
+        {
+            "alignment_percent",
+            "alignment_denominator",
+            "alignment_denominator_explanation",
+            "aligned_requirements",
+            "drifted_requirements",
+            "high_severity_drift",
+            "baseline_rule_count",
+            "policies_evaluated",
+            "unmapped_objects",
+            "collection_gaps",
+            "outcome_counts",
+        },
+    )
+    devices = _exact_object(
+        document,
+        "devices",
+        {
+            "total",
+            "by_platform",
+            "by_compliance_state",
+            "by_encryption_state",
+            "by_supervision_state",
+        },
+    )
+    for field in (
+        "by_platform",
+        "by_compliance_state",
+        "by_encryption_state",
+        "by_supervision_state",
+    ):
+        if not isinstance(devices[field], dict):
+            raise ValueError(f"mission device field {field} must be an object")
+    _exact_object(
+        document,
+        "changes",
+        {
+            "previous_snapshot_id",
+            "alignment_change_points",
+            "new_drift",
+            "resolved_drift",
+            "changed_requirements",
+            "history_state",
+        },
+    )
+    frameworks = _exact_object(
+        document,
+        "framework_coverage",
+        {"CIS benchmark", "STIG", "NIST SP 800-171", "NIST SP 800-53", "CMMC"},
+    )
+    for field in frameworks:
+        _exact_object(
+            frameworks,
+            field,
+            {"technical_evidence_identifier_count", "identifiers", "assessment_conclusion"},
+        )
+    privacy = _exact_object(
+        document,
+        "privacy",
+        {
+            "publication_policy_version",
+            "allowlist_validation",
+            "raw_response_persisted",
+            "identifiers_public",
+            "openai_egress_class",
+            "redaction_telemetry",
+        },
+    )
+    _exact_object(
+        privacy,
+        "redaction_telemetry",
+        {"source_identifiers_pseudonymized", "private_display_names_omitted"},
+    )
+    _exact_object(
+        document,
+        "ai",
+        {
+            "model",
+            "mode",
+            "authoritative",
+            "output_label",
+            "verifier_required",
+            "insufficient_evidence_response",
+        },
+    )
+    allowed_mapping_fields = {
+        "cis_benchmark",
+        "nist_800_53r5",
+        "nist_800_171r3",
+        "stig",
+        "cmmc",
+    }
+    for list_field, mapping_field in (
+        ("requirements", "mappings"),
+        ("findings", "mapped_controls"),
+    ):
+        values = cast(list[dict[str, JsonValue]], document[list_field])
+        if any(
+            not isinstance(item[mapping_field], dict)
+            or not set(cast(dict[str, JsonValue], item[mapping_field])).issubset(
+                allowed_mapping_fields
+            )
+            for item in values
+        ):
+            raise ValueError(f"mission field {list_field} contains an invalid mapping")
+
+
+def _exact_object(
+    parent: Mapping[str, JsonValue], field: str, expected_fields: set[str]
+) -> dict[str, JsonValue]:
+    value = parent.get(field)
+    if not isinstance(value, dict) or set(value) != expected_fields:
+        raise ValueError(f"mission field {field} contains an unexpected or missing field")
+    return value
 
 
 def _requirement_fields() -> frozenset[str]:

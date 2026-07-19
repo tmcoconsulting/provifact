@@ -166,6 +166,33 @@ def test_mission_public_validator_rejects_unknown_and_tampered_fields() -> None:
     with pytest.raises(ValueError, match="invalid object"):
         validate_public_mission_snapshot(changed)
 
+    changed = copy.deepcopy(snapshot)
+    cast(dict[str, JsonValue], changed["collection"])["unexpected_private_metadata"] = "x"
+    unsigned = {
+        key: value
+        for key, value in changed.items()
+        if key not in {"snapshot_id", "content_fingerprint"}
+    }
+    digest = fingerprint(cast(JsonValue, unsigned))
+    changed["content_fingerprint"] = digest
+    changed["snapshot_id"] = f"mission-{digest[7:31]}"
+    with pytest.raises(ValueError, match="unexpected or missing"):
+        validate_public_mission_snapshot(changed)
+
+    changed = copy.deepcopy(snapshot)
+    privacy = cast(dict[str, JsonValue], changed["privacy"])
+    cast(dict[str, JsonValue], privacy["redaction_telemetry"])["unknown_counter"] = 1
+    unsigned = {
+        key: value
+        for key, value in changed.items()
+        if key not in {"snapshot_id", "content_fingerprint"}
+    }
+    digest = fingerprint(cast(JsonValue, unsigned))
+    changed["content_fingerprint"] = digest
+    changed["snapshot_id"] = f"mission-{digest[7:31]}"
+    with pytest.raises(ValueError, match="unexpected or missing"):
+        validate_public_mission_snapshot(changed)
+
 
 def test_mission_publication_requires_key_and_omits_private_names() -> None:
     with pytest.raises(ValueError, match="32 bytes"):
