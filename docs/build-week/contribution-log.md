@@ -89,6 +89,7 @@ or proprietary material from `intune-apple-gitops` or any other repository.
 | 2026-07-19 | Non-executing Python and JavaScript/TypeScript CodeQL analysis | `1c057c7` |
 | 2026-07-19 | Preview and CodeQL evidence record | `b58db77` |
 | 2026-07-19 | Browser-proven responsive Mission Control containment | `73d6b2b` |
+| 2026-07-19 | Responsive desktop/mobile browser evidence record | `214f1bf` |
 
 Exact Phase 1 commands, results, limitations, and commit hashes are maintained in the
 [Phase 1 validation record](phase-1-validation.md).

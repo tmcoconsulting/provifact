@@ -19,8 +19,10 @@
 - `1c057c7` — non-executing Python and JavaScript/TypeScript CodeQL analysis
 - `b58db77` — preview and CodeQL evidence record
 - `73d6b2b` — browser-proven responsive Mission Control containment
+- `214f1bf` — responsive desktop/mobile browser evidence record
 
-All nine commits remain pending TJ's review in PR #2. None uses a `Human-Reviewed` trailer.
+These commits and this validation-record update remain pending TJ's review in PR #2. No commit in
+the PR uses a `Human-Reviewed` trailer.
 
 ## Implemented and locally verified
 
@@ -106,13 +108,12 @@ The opt-in live Intune test remains the one skipped Python test. The Worker suit
 assistant, sanitized 429-classification, health/readiness, Mission-status, and security-header code
 changed.
 
-GitHub Actions CI run `29699259859` completed successfully for PR #2 head
-`b58db77dfc47bc3db12103b82ecff3d0d1ebb598`, including installation from both locks, Python tests,
+GitHub Actions CI run `29699786745` completed successfully for PR #2 head
+`214f1bfc7e0d18efab2eb9339892a90e9b8baa70`, including installation from both locks, Python tests,
 Worker tests, dependency audits, secret/public scans, strict documentation build, and all Wrangler
-dry-runs. CodeQL run `29699259854` completed successfully for both Python and
-JavaScript/TypeScript. GitHub's separate aggregate `CodeQL` check remains queued because default
-setup is `not-configured`; it is not a required branch-protection context and the PR remains
-mergeable. The checked-in workflow establishes the default-branch baseline after merge.
+dry-runs. CodeQL run `29699786705` completed successfully for both Python and
+JavaScript/TypeScript, and GitHub's separate aggregate CodeQL check also passed. The PR remained
+mergeable.
 
 The follow-up responsive fix at `73d6b2b` completed the same full local matrix with 188 passing
 Python tests, one credential-gated live test skipped, 91.13% branch coverage, and 43 passing Worker
@@ -171,7 +172,7 @@ generated bindings, and all three Wrangler dry-runs passed.
 
 ## Outstanding gates
 
-1. TJ reviews the nine commits and PR #2 diff.
+1. TJ reviews every commit and the complete PR #2 diff through the current head.
 2. After review, deploy the fixture revision to production and recheck the public custom domain,
    TLS, headers, desktop, and mobile views. Keep the protected deployment workflow disabled until
    the environment token's least-privilege Cloudflare scope is independently verified.
