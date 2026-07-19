@@ -289,3 +289,19 @@ typed claims, and prose quarantine. Continue to reject BYOK.
 
 **Why:** This proves history and grounded explanation without adding a persistence product or a
 browser credential boundary. Prefiltering is cheaper and safer than sending a whole package.
+
+## 2026-07-19 — Add non-executing CodeQL analysis
+
+**Decision:** Add an exact-commit-pinned CodeQL v4 workflow for Python and
+JavaScript/TypeScript. Both interpreted-language analyses use `build-mode: none`, so the scanner
+analyzes pull-request source without executing it. Keep CodeQL separate from the required CI gate
+and grant only repository/action read access plus `security-events: write` for analysis upload.
+
+**Why:** GitHub's code-scanning API reported that no analysis existed. CodeQL is supported for this
+public repository and adds data-flow analysis without giving untrusted pull-request code a secret,
+deployment identity, or build step.
+
+**Platform limitation:** GitHub's non-provider secret-pattern and secret-validity status remained
+`disabled` after a repository-API enable request, so EvidenceOps does not claim those controls are
+active. Provider secret scanning, push protection, the shared credential catalog, and fail-closed
+repository/public-artifact scans remain enabled requirements.

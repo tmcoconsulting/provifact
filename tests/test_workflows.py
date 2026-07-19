@@ -10,6 +10,7 @@ def test_executable_workflows_have_no_privileged_pages_chain() -> None:
     workflow_files = sorted((*WORKFLOWS.glob("*.yml"), *WORKFLOWS.glob("*.yaml")))
     assert [path.name for path in workflow_files] == [
         "ci.yml",
+        "codeql.yml",
         "deploy-cloudflare.yml",
         "intune-audit.yml",
     ]
@@ -45,6 +46,13 @@ def test_executable_workflow_actions_are_immutable_and_least_privilege() -> None
     assert "npm run worker:dry-run:preview" in ci
     assert "npm run worker:dry-run:production" in ci
     assert "npm run test:worker" in ci
+
+    codeql = (WORKFLOWS / "codeql.yml").read_text(encoding="utf-8")
+    assert "security-events: write" in codeql
+    assert "actions: read" in codeql
+    assert "build-mode: none" in codeql
+    assert "pull_request_target:" not in codeql
+    assert "persist-credentials: false" in codeql
 
 
 def test_privileged_workflows_are_main_only_and_environment_protected() -> None:

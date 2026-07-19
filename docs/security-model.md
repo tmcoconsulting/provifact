@@ -82,7 +82,10 @@ readiness routes prevent a running Worker from being mistaken for a usable evide
 
 Public CI installs exact-pinned Worker dependencies, runs workerd contract tests, checks generated
 bindings, and performs Wrangler dry-runs only. It has `contents: read` and no Cloudflare/OpenAI
-credential. The production OpenAI project key exists only as a Worker secret.
+credential. CodeQL separately analyzes Python and JavaScript/TypeScript in `build-mode: none` with
+immutable GitHub-owned action pins, so pull-request code is analyzed without being executed and the
+workflow receives only read access plus its code-scanning result permission. The production OpenAI
+project key exists only as a Worker secret.
 
 ## Residual risks
 
