@@ -4,9 +4,9 @@ import publicValueCatalog from "../../evidenceops/sanitization/public-value-patt
 
 import { isRecord, sha256 } from "./evidence";
 
-export const MAX_REQUEST_BYTES = 256 * 1024;
-export const MAX_UPSTREAM_BYTES = 1024 * 1024;
-export const OPENAI_TIMEOUT_MS = 30_000;
+export const MAX_REQUEST_BYTES = 64 * 1024;
+export const MAX_UPSTREAM_BYTES = 256 * 1024;
+export const OPENAI_TIMEOUT_MS = 20_000;
 
 interface CompiledPattern {
   label: string;

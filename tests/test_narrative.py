@@ -299,11 +299,11 @@ def test_openai_adapter_sends_only_sanitized_package_and_strict_schema() -> None
     request = transport.requests[0]
     assert request["store"] is False
     assert "tools" not in request
-    assert request["model"] == "gpt-5.6-sol"
+    assert request["model"] == "gpt-5.6-terra"
     assert "private_trace" not in cast(str, request["input"])
     assert "test-secret-never-in-request" not in json.dumps(request)
     assert transport.seen_keys == ["test-secret-never-in-request"]
-    assert narrative["model"] == "gpt-5.6-sol"
+    assert narrative["model"] == "gpt-5.6-terra"
     verification = verify_narrative(narrative, public)
     assert verification["accepted"] is False
     assert len(cast(list[str], verification["accepted_claims"])) == len(

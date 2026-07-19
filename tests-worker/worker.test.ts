@@ -56,17 +56,26 @@ function assetBinding(): StaticAssetBinding {
 
 function environment(
   mode: RuntimeMode = "fixture",
-  options: { apiKey?: string; rateLimitSuccess?: boolean } = {},
+  options: {
+    apiKey?: string;
+    globalRateLimitSuccess?: boolean;
+    rateLimitSuccess?: boolean;
+  } = {},
 ): WorkerEnv {
   return {
     ASSETS: assetBinding(),
     EVIDENCEOPS_MODE: mode,
+    NARRATIVE_GLOBAL_RATE_LIMITER: {
+      async limit(): Promise<{ success: boolean }> {
+        return { success: options.globalRateLimitSuccess ?? true };
+      },
+    },
     NARRATIVE_RATE_LIMITER: {
       async limit(): Promise<{ success: boolean }> {
         return { success: options.rateLimitSuccess ?? true };
       },
     },
-    OPENAI_MODEL: "gpt-5.6-sol",
+    OPENAI_MODEL: "gpt-5.6-terra",
     ...(options.apiKey === undefined ? {} : { OPENAI_API_KEY: options.apiKey }),
   };
 }
@@ -108,10 +117,42 @@ describe("Worker routes", () => {
     const status = JSON.parse(text);
     expect(status).toMatchObject({
       narrative_mode: "fixture",
+      narrative_available: true,
+      model_configured: true,
       byok_supported: false,
       intune_write_capability: false,
     });
     expect(status).not.toHaveProperty("ai_model_call_performed");
+  });
+
+  it("reports an unavailable live model without silently selecting fixture mode", async () => {
+    const response = await worker.fetch(
+      new Request(`${ORIGIN}/api/status`),
+      environment("openai"),
+    );
+    await expect(response.json()).resolves.toMatchObject({
+      narrative_mode: "openai",
+      narrative_available: false,
+      model_configured: false,
+    });
+  });
+
+  it("logs only allowlisted route and method labels", async () => {
+    const credential = `ghp_${"A".repeat(40)}`;
+    const log = vi.spyOn(console, "log").mockImplementation(() => undefined);
+    try {
+      const response = await worker.fetch(
+        new Request(`${ORIGIN}/${credential}`, { method: "PUT" }),
+        environment(),
+      );
+      expect(response.status).toBe(200);
+      const serializedLogs = log.mock.calls.flat().join(" ");
+      expect(serializedLogs).not.toContain(credential);
+      expect(serializedLogs).toContain('"method":"OTHER"');
+      expect(serializedLogs).toContain('"path":"static"');
+    } finally {
+      log.mockRestore();
+    }
   });
 
   it("serves static assets through the assets binding", async () => {
@@ -168,7 +209,7 @@ describe("Worker routes", () => {
     });
 
     const oversized = narrativeRequest();
-    oversized.headers.set("Content-Length", String(256 * 1024 + 1));
+    oversized.headers.set("Content-Length", String(64 * 1024 + 1));
     await expect(handleRequest(oversized, environment())).rejects.toMatchObject(
       {
         code: "request_too_large",
@@ -195,6 +236,17 @@ describe("Worker routes", () => {
     await expect(response.json()).resolves.toMatchObject({
       error: "rate_limited",
       human_review_required: true,
+    });
+  });
+
+  it("enforces the global narrative limiter before client-specific processing", async () => {
+    const response = await worker.fetch(
+      narrativeRequest({ should_not_be_read: true }),
+      environment("fixture", { globalRateLimitSuccess: false }),
+    );
+    expect(response.status).toBe(429);
+    await expect(response.json()).resolves.toMatchObject({
+      error: "rate_limited",
     });
   });
 
@@ -258,7 +310,12 @@ describe("Worker routes", () => {
           throw new Error("OpenAI request body was not JSON text");
         }
         const body = JSON.parse(init.body) as Record<string, unknown>;
-        expect(body).toMatchObject({ model: "gpt-5.6-sol", store: false });
+        expect(body).toMatchObject({
+          model: "gpt-5.6-terra",
+          store: false,
+          max_output_tokens: 1600,
+          reasoning: { effort: "low" },
+        });
         expect(body).not.toHaveProperty("tools");
         return Response.json(responseEnvelope(output));
       },

@@ -14,8 +14,8 @@ import {
 const EVIDENCE_ID = /^ev1-[0-9a-f]{24}$/;
 const FINGERPRINT = /^sha256:[0-9a-f]{64}$/;
 const GIT_SHA = /^(?:[0-9a-f]{40}|[0-9a-f]{64}|synthetic-[a-z0-9-]+)$/;
-const MAX_RECORDS = 100;
-const MAX_REFERENCES = 500;
+const MAX_RECORDS = 32;
+const MAX_REFERENCES = 160;
 
 const IDENTITY_KEYS = [
   "schema_version",

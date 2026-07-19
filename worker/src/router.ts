@@ -25,12 +25,18 @@ export async function handleRequest(
     if (request.method !== "GET") {
       return methodNotAllowed("GET");
     }
+    const mode = modeLabel(env.EVIDENCEOPS_MODE);
+    const modelConfigured =
+      mode === "fixture" ||
+      (typeof env.OPENAI_API_KEY === "string" && env.OPENAI_API_KEY.length > 0);
     return jsonResponse({
       schema_version: "1.0.0",
       service: "EvidenceOps narrative boundary",
       status: "ok",
-      narrative_mode: modeLabel(env.EVIDENCEOPS_MODE),
+      narrative_mode: mode,
       model: env.OPENAI_MODEL,
+      model_configured: modelConfigured,
+      narrative_available: modelConfigured,
       public_data_boundary: "synthetic-or-fail-closed-sanitized-only",
       human_review_required: true,
       live_intune_collection_performed: false,
@@ -43,6 +49,16 @@ export async function handleRequest(
       return methodNotAllowed("POST");
     }
     assertSameOrigin(request);
+    const globalResult = await env.NARRATIVE_GLOBAL_RATE_LIMITER.limit({
+      key: "narrative-global",
+    });
+    if (!globalResult.success) {
+      throw new HttpError(
+        429,
+        "rate_limited",
+        "narrative request rate limit exceeded",
+      );
+    }
     const { success } = await env.NARRATIVE_RATE_LIMITER.limit({
       key: await rateLimitKey(request),
     });

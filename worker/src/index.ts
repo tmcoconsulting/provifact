@@ -12,8 +12,8 @@ export default {
       securedResponse.headers.set("X-Request-ID", requestId);
       logEvent(
         requestId,
-        request.method,
-        url.pathname,
+        safeMethod(request.method),
+        safeRoute(url.pathname),
         response.status,
         "request_completed",
       );
@@ -22,8 +22,8 @@ export default {
       if (error instanceof HttpError) {
         logEvent(
           requestId,
-          request.method,
-          url.pathname,
+          safeMethod(request.method),
+          safeRoute(url.pathname),
           error.status,
           error.code,
         );
@@ -37,7 +37,13 @@ export default {
           { "X-Request-ID": requestId },
         );
       }
-      logEvent(requestId, request.method, url.pathname, 500, "unhandled_error");
+      logEvent(
+        requestId,
+        safeMethod(request.method),
+        safeRoute(url.pathname),
+        500,
+        "unhandled_error",
+      );
       return jsonResponse(
         {
           error: "internal_error",
@@ -67,4 +73,26 @@ function logEvent(
       status,
     }),
   );
+}
+
+function safeMethod(method: string): "GET" | "POST" | "OTHER" {
+  if (method === "GET" || method === "POST") {
+    return method;
+  }
+  return "OTHER";
+}
+
+function safeRoute(
+  path: string,
+): "api-narrative" | "api-other" | "api-status" | "static" {
+  if (path === "/api/narrative") {
+    return "api-narrative";
+  }
+  if (path === "/api/status") {
+    return "api-status";
+  }
+  if (path.startsWith("/api/")) {
+    return "api-other";
+  }
+  return "static";
 }

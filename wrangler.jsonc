@@ -15,23 +15,67 @@
   },
   "vars": {
     "EVIDENCEOPS_MODE": "fixture",
-    "OPENAI_MODEL": "gpt-5.6-sol",
+    "OPENAI_MODEL": "gpt-5.6-terra",
   },
   "ratelimits": [
     {
       "name": "NARRATIVE_RATE_LIMITER",
       "namespace_id": "11001",
       "simple": {
-        "limit": 5,
+        "limit": 3,
+        "period": 60,
+      },
+    },
+    {
+      "name": "NARRATIVE_GLOBAL_RATE_LIMITER",
+      "namespace_id": "11002",
+      "simple": {
+        "limit": 30,
         "period": 60,
       },
     },
   ],
   "observability": {
     "enabled": true,
-    "head_sampling_rate": 0.1,
+    "logs": {
+      "enabled": true,
+      "head_sampling_rate": 1,
+      "invocation_logs": false,
+      "persist": true,
+    },
+    "traces": {
+      "enabled": false,
+      "persist": false,
+    },
   },
   "env": {
+    "preview": {
+      "name": "evidenceops-preview",
+      "workers_dev": true,
+      "preview_urls": true,
+      "vars": {
+        "EVIDENCEOPS_MODE": "fixture",
+        "OPENAI_MODEL": "gpt-5.6-terra",
+      },
+      "ratelimits": [
+        {
+          "name": "NARRATIVE_RATE_LIMITER",
+          "namespace_id": "12001",
+          "simple": {
+            "limit": 3,
+            "period": 60,
+          },
+        },
+        {
+          "name": "NARRATIVE_GLOBAL_RATE_LIMITER",
+          "namespace_id": "12002",
+          "simple": {
+            "limit": 30,
+            "period": 60,
+          },
+        },
+      ],
+    },
     "production": {
       "name": "evidenceops",
       "workers_dev": false,
@@ -43,7 +87,7 @@
       ],
       "vars": {
         "EVIDENCEOPS_MODE": "openai",
-        "OPENAI_MODEL": "gpt-5.6-sol",
+        "OPENAI_MODEL": "gpt-5.6-terra",
       },
       "secrets": {
         "required": ["OPENAI_API_KEY"],
@@ -51,9 +95,17 @@
       "ratelimits": [
         {
           "name": "NARRATIVE_RATE_LIMITER",
-          "namespace_id": "11001",
+          "namespace_id": "21001",
           "simple": {
-            "limit": 5,
+            "limit": 3,
+            "period": 60,
+          },
+        },
+        {
+          "name": "NARRATIVE_GLOBAL_RATE_LIMITER",
+          "namespace_id": "21002",
+          "simple": {
+            "limit": 30,
             "period": 60,
           },
         },

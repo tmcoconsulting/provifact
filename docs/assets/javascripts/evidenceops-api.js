@@ -93,17 +93,27 @@
       const label =
         runtimeMode === "fixture"
           ? "Fixture runtime ready"
-          : "OpenAI runtime ready";
+          : status.narrative_available === true
+            ? "OpenAI runtime ready"
+            : "OpenAI runtime unavailable";
       const detail =
         runtimeMode === "fixture"
           ? "The Worker will return the tracked deterministic narrative without an API charge."
-          : "The Worker may call the configured EvidenceOps model after all publication gates pass.";
-      setStatus(label, detail, runtimeMode);
-      action.disabled = false;
+          : status.narrative_available === true
+            ? "The Worker may call the configured EvidenceOps model after all publication gates pass."
+            : "The Worker has no usable server-side model credential and will not fall back to fixture output.";
+      setStatus(
+        label,
+        detail,
+        status.narrative_available === true ? runtimeMode : "unavailable",
+      );
+      action.disabled = status.narrative_available !== true;
       action.textContent =
         runtimeMode === "fixture"
           ? "Run bounded fixture narrative"
-          : "Generate bounded narrative";
+          : status.narrative_available === true
+            ? "Generate bounded narrative"
+            : "Narrative unavailable";
     } catch {
       runtimeMode = "unavailable";
       setStatus(

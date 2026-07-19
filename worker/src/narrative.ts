@@ -23,7 +23,7 @@ import {
 
 const OPENAI_RESPONSES_ENDPOINT = "https://api.openai.com/v1/responses";
 const FIXTURE_MODEL = "deterministic-offline-fixture-not-a-model-call";
-const MAX_OUTPUT_TOKENS = 3000;
+const MAX_OUTPUT_TOKENS = 1600;
 
 export interface NarrativeApiResult {
   mode: RuntimeMode;
@@ -196,7 +196,7 @@ function openAIRequest(
     model,
     store: false,
     max_output_tokens: MAX_OUTPUT_TOKENS,
-    reasoning: { effort: "medium" },
+    reasoning: { effort: "low" },
     instructions:
       "Produce evidence-grounded analysis only. Preserve every deterministic status. " +
       "Do not declare compliance, certification, control satisfaction, an exception, risk " +
@@ -300,7 +300,7 @@ function runtimeMode(value: string): RuntimeMode {
 }
 
 function requireModel(value: string): string {
-  if (value !== "gpt-5.6-sol") {
+  if (value !== "gpt-5.6-terra") {
     throw new HttpError(
       503,
       "model_configuration_rejected",

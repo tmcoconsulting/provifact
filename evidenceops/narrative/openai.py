@@ -21,10 +21,10 @@ from evidenceops.domain import (
 )
 from evidenceops.sanitization import SensitiveValueError, assert_public_safe
 
-DEFAULT_OPENAI_MODEL: Final = "gpt-5.6-sol"
+DEFAULT_OPENAI_MODEL: Final = "gpt-5.6-terra"
 RESPONSES_ENDPOINT: Final = "https://api.openai.com/v1/responses"
-MAX_PACKAGE_BYTES: Final = 256 * 1024
-MAX_RESPONSE_BYTES: Final = 1024 * 1024
+MAX_PACKAGE_BYTES: Final = 64 * 1024
+MAX_RESPONSE_BYTES: Final = 256 * 1024
 MODEL_OUTPUT_SCHEMA_PATH: Final = Path(__file__).with_name("narrative-model-output.schema.json")
 
 
@@ -43,7 +43,7 @@ class ResponsesTransport(Protocol):
 class OpenAIResponsesTransport:
     """Standard-library HTTPS transport with a bounded response and timeout."""
 
-    timeout_seconds: float = 30.0
+    timeout_seconds: float = 20.0
 
     def create(self, *, api_key: str, request: dict[str, JsonValue]) -> dict[str, JsonValue]:
         if not api_key:
@@ -147,7 +147,8 @@ class OpenAINarrativeAdapter:
         return {
             "model": self.model,
             "store": False,
-            "reasoning": {"effort": "medium"},
+            "max_output_tokens": 1600,
+            "reasoning": {"effort": "low"},
             "instructions": (
                 "Produce evidence-grounded analysis only. Preserve every deterministic status. "
                 "Do not declare compliance, certification, control satisfaction, an exception, or "
