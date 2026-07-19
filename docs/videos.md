@@ -1,16 +1,24 @@
-# Videos
+# Videos and Demonstration Media
 
-No project video is published in Phase 0.
+No public EvidenceOps video is linked from this repository at the current Phase 1 checkpoint. The
+live application and the reviewed demo runbook are available; media production remains an operator
+submission task rather than a product capability.
 
-Planned recordings will use synthetic data and will clearly distinguish implemented behavior from
-roadmap concepts:
+## Recommended recording sequence
 
-1. A short product problem and thesis overview
-2. A deterministic drift and evidence-fingerprint walkthrough
-3. A sanitizer fail-closed demonstration
-4. A future read-only collection architecture explanation
-5. A Build Week development and Codex collaboration summary
+1. Product problem and evidence-lifecycle thesis
+2. Mission Control overview using the `LIVE SANITIZED TENANT DATA` label
+3. Settings and baseline matrix, including FileVault expected/observed values and required change
+4. Deterministic finding trace, fingerprint, Git attribution, and public-safe evidence references
+5. Bounded assistant answer, typed-claim verification, prose quarantine, and insufficient-evidence response
+6. GET-only Graph, publication allowlist, Cloudflare runtime, and no-write boundary
+7. Build Week development and Codex collaboration summary
 
-Recordings must be reviewed frame by frame for notifications, account names, repository secrets,
-tenant identifiers, device data, browser history, terminal output, and private submission metadata
-before publication.
+Recordings must distinguish live sanitized evidence from the tracked synthetic package and state
+whether the assistant is in fixture or OpenAI mode. Do not imply that a matrix row is a framework
+certification or that EvidenceOps changes Intune.
+
+Before publication, review every frame for notifications, account names, repository secrets, tenant
+identifiers, policy names, device data, browser history, terminal output, private submission
+metadata, and third-party media rights. Use the [demo package](build-week/demo-package.md) and
+[submission checklist](build-week/submission-checklist.md) as the review record.
