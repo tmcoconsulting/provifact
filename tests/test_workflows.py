@@ -10,6 +10,7 @@ def test_executable_workflows_have_no_privileged_pages_chain() -> None:
     workflow_files = sorted((*WORKFLOWS.glob("*.yml"), *WORKFLOWS.glob("*.yaml")))
     assert [path.name for path in workflow_files] == [
         "ci.yml",
+        "codeql.yml",
         "deploy-cloudflare.yml",
         "intune-audit.yml",
     ]
@@ -45,6 +46,13 @@ def test_executable_workflow_actions_are_immutable_and_least_privilege() -> None
     assert "npm run worker:dry-run:preview" in ci
     assert "npm run worker:dry-run:production" in ci
     assert "npm run test:worker" in ci
+
+    codeql = (WORKFLOWS / "codeql.yml").read_text(encoding="utf-8")
+    assert "security-events: write" in codeql
+    assert "actions: read" in codeql
+    assert "build-mode: none" in codeql
+    assert "pull_request_target:" not in codeql
+    assert "persist-credentials: false" in codeql
 
 
 def test_privileged_workflows_are_main_only_and_environment_protected() -> None:
@@ -111,11 +119,17 @@ def test_browser_boundary_does_not_store_or_accept_byok() -> None:
     browser = (REPOSITORY_ROOT / "docs/assets/javascripts/evidenceops-api.js").read_text(
         encoding="utf-8"
     )
+    mission_browser = (REPOSITORY_ROOT / "docs/assets/javascripts/mission-control.js").read_text(
+        encoding="utf-8"
+    )
     router = (REPOSITORY_ROOT / "worker/src/security.ts").read_text(encoding="utf-8")
     for prohibited in ("localStorage", "sessionStorage", "innerHTML", "X-OpenAI-Key"):
         assert prohibited not in browser
     assert 'request.headers.has("X-OpenAI-Key")' in router
     assert 'request.headers.has("Authorization")' in router
+    verifier_gate = mission_browser.index('"insufficient_evidence", "typed_claims_verified"')
+    answer_render = mission_browser.index('appendLine("Answer", payload.answer.direct_answer)')
+    assert verifier_gate < answer_render
 
 
 def test_static_asset_headers_set_core_browser_controls() -> None:
@@ -125,7 +139,20 @@ def test_static_asset_headers_set_core_browser_controls() -> None:
         "frame-ancestors 'none'",
         "Permissions-Policy:",
         "Referrer-Policy: no-referrer",
+        "Strict-Transport-Security: max-age=31536000",
         "X-Content-Type-Options: nosniff",
         "X-Frame-Options: DENY",
     ):
         assert expected in headers
+
+
+def test_mission_control_bounds_grid_content_on_narrow_viewports() -> None:
+    stylesheet = (REPOSITORY_ROOT / "docs" / "assets" / "stylesheets" / "extra.css").read_text(
+        encoding="utf-8"
+    )
+    assert ".mission-shell > *," in stylesheet
+    assert ".mission-summary-grid > *" in stylesheet
+    assert "min-width: 0;" in stylesheet
+    assert ".mission-table-wrap {\n  overflow-x: auto;" in stylesheet
+    mkdocs = (REPOSITORY_ROOT / "mkdocs.yml").read_text(encoding="utf-8")
+    assert "assets/stylesheets/extra.css?v=20260719-responsive" in mkdocs

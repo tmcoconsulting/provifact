@@ -80,6 +80,16 @@ or proprietary material from `intune-apple-gitops` or any other repository.
 | 2026-07-18 | Runtime spend/log/egress hardening | `f8994d9` |
 | 2026-07-18 | Protected audit and deployment workflow support | `925e0f8` |
 | 2026-07-18 | Cloudflare/OpenAI egress fix and safe fixture production guard | `cfd9975` |
+| 2026-07-19 | Comprehensive GET-only Apple collector | `ce4522d` |
+| 2026-07-19 | Pinned baseline, Mission Control, and bounded assistant | `3dd8902` |
+| 2026-07-19 | Controls, demo package, and validation documentation | `2d57a5f` |
+| 2026-07-19 | Review-record anchoring | `b4a042c` |
+| 2026-07-19 | Fail-closed health/readiness and HSTS hardening | `c1fca86` |
+| 2026-07-19 | Hardened PR checkpoint validation record | `b071a89` |
+| 2026-07-19 | Non-executing Python and JavaScript/TypeScript CodeQL analysis | `1c057c7` |
+| 2026-07-19 | Preview and CodeQL evidence record | `b58db77` |
+| 2026-07-19 | Browser-proven responsive Mission Control containment | `73d6b2b` |
+| 2026-07-19 | Responsive desktop/mobile browser evidence record | `214f1bf` |
 
 Exact Phase 1 commands, results, limitations, and commit hashes are maintained in the
 [Phase 1 validation record](phase-1-validation.md).
@@ -93,4 +103,15 @@ secret, GitHub environment controls, and bounded synthetic external validation a
 The same thread later configured the exact Entra production-environment federation and required
 Graph application consent without making a tenant request or creating a client secret. It also
 added bounded, code-aware OpenAI 429 classification while keeping upstream bodies and messages out
-of responses and logs. These later changes remain pending TJ human review in draft PR #1.
+of responses and logs. Those changes were reviewed and merged through PR #1.
+
+The July 19 vertical slice was implemented in the same primary Codex task. Codex added the GET-only
+resource-family collector, baseline verification, deterministic Mission schema, synthetic package,
+dashboard, assistant boundary, tests, and documentation. TJ retains human review, external
+approval, merge, and public-submission authority. No Intune write or raw tenant export was added.
+The same task then deployed the scanned fixture revision to the credential-free Cloudflare preview,
+validated its health/readiness/status/assistant boundaries, and added CodeQL without executing
+repository code. Production and live-tenant state were left unchanged pending human review.
+An authenticated desktop/mobile browser pass then found and remediated a narrow-screen overflow in
+the preview. The table remains locally scrollable, the page itself fits the mobile viewport, and a
+regression guard preserves the required grid containment and versioned stylesheet reference.

@@ -163,20 +163,22 @@ and passed the public-artifact scan. No deployment was made for this continuatio
   `CLOUDFLARE_DEPLOY_ENABLED` is `false`, and the secret name `CLOUDFLARE_API_TOKEN` is present.
   The secret value was not retrieved, printed, or stored, and its Cloudflare scope remains
   unverified.
-- Re-read the production Worker secret names: `OPENAI_API_KEY` is present, but its current OpenAI
-  owner cannot be verified from Cloudflare. The last observed key was project-scoped and user-owned;
-  service-account replacement and temporary-key revocation remain unverified.
+- Re-read the production Worker secret names: `OPENAI_API_KEY` is present. The operator replaced
+  its value with the only active key belonging to the project service account
+  `evidenceops-cloudflare-production`; no key value was exposed to Codex, GitHub, or the repository.
 
 ## External validation not performed
 
 - No Microsoft Graph or Intune request was made. The trust and permission are now configured, but
   the workflow remains restricted to protected `main` and must not run from this feature branch.
-- OpenAI project budget alerts and per-model limits could not be inspected or changed because the
-  Platform administrative UI still requires sign-in. Service-account ownership, temporary-key
-  revocation, model allowlisting, 5 RPM/25,000 TPM limits, `$5` budget alerts, and usable billing are
-  unverified. A budget would be a soft alert, not a hard cap.
-- No second OpenAI request was made: the service-account and project-control gates were not proven,
-  and production remains fixture-only.
+- OpenAI project controls were later verified in the authenticated Platform UI: the service account
+  is the only nonhuman project member, the project allows only `gpt-5.6-terra`, the model limit is
+  5 RPM/25,000 TPM, the monthly soft budget is `$5`, and alerts exist at 50%, 80%, and 100%.
+  A project budget is a soft alert—not a hard spending cap. One bounded live response remains a
+  separate validation gate.
+- The service account is assigned only the custom `evidenceops-responses-runtime` role. That role
+  grants Responses API model capability and no file, assistant, thread, eval, fine-tuning, vector,
+  project-administration, usage-export, or key-management permission.
 - The protected GitHub environment contains `CLOUDFLARE_API_TOKEN` by name only. Its ownership,
   validity, and Cloudflare resource scope have not been independently verified; deployment remains
   disabled through `CLOUDFLARE_DEPLOY_ENABLED=false`.

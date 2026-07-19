@@ -6,3 +6,18 @@ Licensed under the Apache License, Version 2.0.
 EvidenceOps does not include or claim ownership of third-party security baselines, proprietary
 endpoint-management repositories, or vendor documentation. Any future third-party material must
 retain its own notices and license terms.
+
+The EvidenceOps Build Week demonstration includes a derived inventory of rule identifiers, section
+labels, expected configuration values, and selected deterministic framework identifiers from the
+macOS Security Compliance Project (mSCP), copyright its contributors and licensed under Creative
+Commons Attribution 4.0 International (CC BY 4.0):
+
+  https://github.com/usnistgov/macos_security
+  Revision: 11b5896e4f12f43410686024f543792742562c91
+  Source profile: src/mscp/data/baselines/macos/cis_lvl1_macos_26.0.yaml
+
+Apple-authored vendor descriptions are not copied into this repository. CIS, NIST, DoD, CMMC, and
+Apple trademarks and referenced standards remain the property of their respective owners. The
+derived baseline is an internally approved TMCO demonstration baseline for technical drift
+detection; it is not certification, assessor authorization, or a statement of organizational
+compliance.

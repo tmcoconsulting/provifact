@@ -33,7 +33,7 @@ interface UpstreamErrorMetadata {
   type: string | null;
 }
 
-type UpstreamFailure =
+export type UpstreamFailure =
   | "capacity"
   | "configuration"
   | "model"
@@ -231,7 +231,7 @@ async function createOpenAINarrative(
   };
 }
 
-function classifyUpstreamFailure(
+export function classifyUpstreamFailure(
   status: number,
   metadata: UpstreamErrorMetadata,
 ): UpstreamFailure {
@@ -270,7 +270,7 @@ function classifyUpstreamFailure(
   return "service";
 }
 
-async function readUpstreamErrorMetadata(
+export async function readUpstreamErrorMetadata(
   response: Response,
 ): Promise<UpstreamErrorMetadata> {
   if (response.body === null) {

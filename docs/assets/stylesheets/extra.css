@@ -16,7 +16,11 @@
   border-radius: 1.25rem;
   color: var(--evidenceops-ink);
   background:
-    radial-gradient(circle at 85% 16%, rgba(0, 167, 189, 0.22), transparent 30%),
+    radial-gradient(
+      circle at 85% 16%,
+      rgba(0, 167, 189, 0.22),
+      transparent 30%
+    ),
     linear-gradient(135deg, #f8fbff 0%, var(--evidenceops-mist) 100%);
 }
 
@@ -170,4 +174,456 @@
 
 [data-md-color-scheme="slate"] .evidence-label {
   color: #aebed1;
+}
+
+.mission-shell {
+  --mission-border: rgba(63, 91, 130, 0.22);
+  --mission-surface: rgba(247, 250, 255, 0.9);
+  display: grid;
+  gap: 2rem;
+}
+
+/* Let grid children shrink so the drift table scrolls inside its own wrapper on narrow screens. */
+.mission-shell > *,
+.mission-header > *,
+.mission-section-heading > *,
+.mission-metrics > *,
+.mission-summary-grid > * {
+  min-width: 0;
+}
+
+.mission-banner {
+  padding: 0.78rem 1rem;
+  border: 1px solid rgba(0, 126, 153, 0.35);
+  border-radius: 0.7rem;
+  background: rgba(0, 167, 189, 0.09);
+  font-size: 0.82rem;
+  font-weight: 800;
+  letter-spacing: 0.045em;
+}
+
+.mission-banner[data-state="stale"],
+.mission-banner[data-state="error"] {
+  border-color: rgba(188, 98, 38, 0.48);
+  background: rgba(236, 142, 55, 0.12);
+}
+
+.mission-banner[data-state="live"] {
+  border-color: rgba(20, 132, 91, 0.45);
+  background: rgba(20, 132, 91, 0.1);
+}
+
+.mission-header,
+.mission-section-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.mission-header h2,
+.mission-section-heading h2 {
+  margin: 0.25rem 0;
+}
+
+.mission-eyebrow {
+  color: var(--evidenceops-cyan);
+  font-size: 0.72rem;
+  font-weight: 850;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.mission-mode,
+.mission-count {
+  padding: 0.5rem 0.7rem;
+  border-radius: 999px;
+  color: #fff;
+  background: var(--evidenceops-ink);
+  font-size: 0.72rem;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.mission-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  padding-bottom: 0.8rem;
+  border-bottom: 1px solid var(--mission-border);
+}
+
+.mission-nav a {
+  padding: 0.45rem 0.68rem;
+  border-radius: 0.5rem;
+  color: inherit;
+  font-size: 0.78rem;
+  font-weight: 750;
+  text-decoration: none;
+}
+
+.mission-nav a:hover,
+.mission-nav a:focus-visible {
+  color: var(--evidenceops-blue);
+  background: var(--evidenceops-mist);
+}
+
+.mission-metrics {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(10.5rem, 1fr));
+  gap: 0.75rem;
+}
+
+.mission-metric,
+.mission-panel,
+.mission-assistant {
+  padding: 1rem;
+  border: 1px solid var(--mission-border);
+  border-radius: 0.85rem;
+  background: var(--mission-surface);
+}
+
+.mission-metric {
+  display: grid;
+  gap: 0.32rem;
+  border-top: 0.22rem solid var(--evidenceops-blue);
+}
+
+.mission-tone-good {
+  border-top-color: #14845b;
+}
+
+.mission-tone-warning {
+  border-top-color: #c17322;
+}
+
+.mission-tone-danger {
+  border-top-color: #b84444;
+}
+
+.mission-metric-label,
+.mission-metric-detail {
+  color: #5b6c82;
+  font-size: 0.73rem;
+}
+
+.mission-metric-label {
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.mission-metric-value,
+.mission-platform-value,
+.mission-change-value {
+  font-size: 1.65rem;
+  line-height: 1.05;
+}
+
+.mission-denominator {
+  margin-top: 0.65rem;
+  color: #5b6c82;
+  font-size: 0.78rem;
+}
+
+.mission-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+  gap: 0.85rem;
+  margin-top: 1rem;
+}
+
+.mission-panel h3 {
+  margin-top: 0;
+}
+
+.mission-panel dl,
+.mission-panel [data-privacy-summary] {
+  display: grid;
+  grid-template-columns: minmax(6rem, 0.7fr) 1.3fr;
+  gap: 0.45rem 0.7rem;
+  margin: 0;
+}
+
+.mission-panel dt {
+  color: #5b6c82;
+  font-size: 0.75rem;
+  font-weight: 750;
+}
+
+.mission-panel dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+  font-size: 0.78rem;
+}
+
+.mission-stat-row,
+.mission-quality-row,
+.mission-gap,
+.mission-resource {
+  display: grid;
+  gap: 0.15rem;
+  padding: 0.58rem 0;
+  border-bottom: 1px solid var(--mission-border);
+  font-size: 0.78rem;
+}
+
+.mission-stat-row:last-child,
+.mission-quality-row:last-child,
+.mission-gap:last-child,
+.mission-resource:last-child {
+  border-bottom: 0;
+}
+
+.mission-filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: 0.7rem;
+  margin: 1rem 0;
+}
+
+.mission-filters label {
+  display: grid;
+  gap: 0.25rem;
+  color: #5b6c82;
+  font-size: 0.72rem;
+  font-weight: 750;
+}
+
+.mission-filters select,
+.mission-filters button,
+.mission-assistant button {
+  min-height: 2.2rem;
+  padding: 0.45rem 0.62rem;
+  border: 1px solid var(--mission-border);
+  border-radius: 0.5rem;
+  color: inherit;
+  background: var(--mission-surface);
+  font: inherit;
+  font-size: 0.78rem;
+}
+
+.mission-filters button,
+.mission-assistant > button {
+  cursor: pointer;
+  font-weight: 750;
+}
+
+.mission-assistant > button {
+  width: fit-content;
+  color: #fff;
+  background: var(--evidenceops-blue);
+}
+
+.mission-assistant > button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.mission-table-wrap {
+  overflow-x: auto;
+  border: 1px solid var(--mission-border);
+  border-radius: 0.75rem;
+}
+
+.mission-table {
+  width: 100%;
+  min-width: 52rem;
+  margin: 0;
+  border: 0;
+  font-size: 0.78rem;
+}
+
+.mission-table th {
+  color: #5b6c82;
+  background: rgba(226, 234, 246, 0.58);
+  font-size: 0.68rem;
+  letter-spacing: 0.055em;
+  text-transform: uppercase;
+}
+
+.mission-table td,
+.mission-table th {
+  padding: 0.7rem;
+}
+
+.mission-table small {
+  display: block;
+  margin-top: 0.2rem;
+  color: #6c7c90;
+}
+
+.mission-finding-button {
+  padding: 0;
+  border: 0;
+  color: var(--evidenceops-blue);
+  background: transparent;
+  font: inherit;
+  font-weight: 750;
+  text-align: left;
+  cursor: pointer;
+}
+
+.mission-severity {
+  font-weight: 800;
+  text-transform: capitalize;
+}
+
+.mission-severity-high {
+  color: #b84444;
+}
+
+.mission-severity-medium {
+  color: #a45d16;
+}
+
+.mission-hash {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.68rem;
+}
+
+.mission-empty,
+.mission-callout {
+  padding: 0.8rem 1rem;
+  margin: 0.8rem 0;
+  border-left: 0.25rem solid var(--evidenceops-cyan);
+  border-radius: 0.35rem;
+  background: rgba(0, 167, 189, 0.08);
+}
+
+.mission-resource-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+  gap: 0 1rem;
+}
+
+.mission-quality-row {
+  grid-template-columns: 0.55rem 1fr;
+}
+
+.mission-quality-row span:last-child {
+  grid-column: 2;
+}
+
+.mission-dot {
+  width: 0.48rem;
+  height: 0.48rem;
+  margin-top: 0.25rem;
+  border-radius: 999px;
+  background: #8491a3;
+}
+
+.mission-dot-collected {
+  background: #14845b;
+}
+
+.mission-dot-unavailable,
+.mission-dot-malformed {
+  background: #c17322;
+}
+
+.mission-assistant {
+  display: grid;
+  gap: 1rem;
+}
+
+.mission-questions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.mission-questions button[aria-pressed="true"] {
+  color: #fff;
+  border-color: var(--evidenceops-blue);
+  background: var(--evidenceops-blue);
+}
+
+.mission-dialog {
+  width: min(48rem, calc(100% - 2rem));
+  max-height: calc(100dvh - 2rem);
+  padding: 1.25rem;
+  border: 1px solid var(--mission-border);
+  border-radius: 0.9rem;
+  color: var(--evidenceops-ink);
+  background: #fff;
+}
+
+.mission-dialog::backdrop {
+  background: rgba(9, 20, 38, 0.68);
+  backdrop-filter: blur(0.18rem);
+}
+
+.mission-dialog form {
+  float: right;
+}
+
+.mission-dialog-close {
+  padding: 0.4rem 0.65rem;
+  border: 1px solid var(--mission-border);
+  border-radius: 0.45rem;
+  background: #fff;
+  cursor: pointer;
+}
+
+.mission-dialog-status {
+  color: #5b6c82;
+  font-weight: 750;
+}
+
+.mission-trace-chain {
+  display: grid;
+  gap: 0.6rem;
+  padding-left: 1.4rem;
+}
+
+.mission-trace-chain li strong,
+.mission-trace-chain li span {
+  display: block;
+}
+
+.mission-trace-chain li span {
+  margin-top: 0.18rem;
+  overflow-wrap: anywhere;
+  color: #5b6c82;
+  font-size: 0.8rem;
+}
+
+[data-md-color-scheme="slate"] .mission-shell {
+  --mission-border: rgba(151, 178, 213, 0.24);
+  --mission-surface: rgba(27, 45, 72, 0.84);
+}
+
+[data-md-color-scheme="slate"] .mission-metric-label,
+[data-md-color-scheme="slate"] .mission-metric-detail,
+[data-md-color-scheme="slate"] .mission-denominator,
+[data-md-color-scheme="slate"] .mission-panel dt,
+[data-md-color-scheme="slate"] .mission-filters label,
+[data-md-color-scheme="slate"] .mission-table th,
+[data-md-color-scheme="slate"] .mission-table small {
+  color: #b8c6d8;
+}
+
+[data-md-color-scheme="slate"] .mission-table th {
+  background: rgba(34, 53, 82, 0.96);
+}
+
+@media (max-width: 44rem) {
+  .mission-header,
+  .mission-section-heading {
+    display: grid;
+  }
+
+  .mission-mode,
+  .mission-count {
+    width: fit-content;
+    white-space: normal;
+  }
+
+  .mission-filters label,
+  .mission-filters select,
+  .mission-filters button {
+    width: 100%;
+  }
 }

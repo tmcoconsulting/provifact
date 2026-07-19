@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import http.client
 import json
+import random
 import time
 from collections.abc import Callable, Mapping
 from dataclasses import dataclass
@@ -13,14 +14,15 @@ from enum import StrEnum
 from typing import Final, Protocol, cast
 from urllib.parse import urlsplit
 
+from evidenceops.constants import DRIFT_ALGORITHM_VERSION
 from evidenceops.domain import EvidenceObject, FreshnessState, JsonValue, make_evidence_object
-from evidenceops.evidence import ALGORITHM_VERSION
 from evidenceops.providers.auth import TokenProvider
 from evidenceops.providers.base import ProviderCollection
 
 GRAPH_HOST: Final = "graph.microsoft.com"
 GRAPH_ROOT: Final = f"https://{GRAPH_HOST}"
 SOURCE_API_VERSION: Final = "v1.0"
+SUPPORTED_API_VERSIONS: Final = frozenset({"v1.0", "beta"})
 PROVIDER_VERSION: Final = "1.0.0"
 MAX_RESPONSE_BYTES: Final = 4_000_000
 MAX_PAGES: Final = 100
@@ -35,6 +37,7 @@ class GraphErrorCategory(StrEnum):
     THROTTLED = "throttled"
     TRANSIENT = "transient"
     MALFORMED_RESPONSE = "malformed_response"
+    CONFLICT = "conflict"
     TRANSPORT = "transport"
 
 
@@ -108,7 +111,11 @@ class HttpsGraphTransport:
 
 
 class GraphClient:
-    """Bounded, paginated, retry-aware Graph v1.0 reader."""
+    """Bounded, paginated, retry-aware Microsoft Graph GET-only reader.
+
+    Callers must select ``v1.0`` or ``beta`` in every path. Beta use is therefore
+    visible at the provider endpoint catalog rather than becoming a silent fallback.
+    """
 
     def __init__(
         self,
@@ -118,6 +125,7 @@ class GraphClient:
         timeout_seconds: float = 20.0,
         max_attempts: int = 3,
         sleeper: Callable[[float], None] = time.sleep,
+        jitter: Callable[[float], float] | None = None,
     ) -> None:
         if timeout_seconds <= 0 or max_attempts < 1:
             raise ValueError("timeout_seconds and max_attempts must be positive")
@@ -126,11 +134,13 @@ class GraphClient:
         self._timeout_seconds = timeout_seconds
         self._max_attempts = max_attempts
         self._sleeper = sleeper
+        self._jitter = jitter or (lambda maximum: random.SystemRandom().uniform(0, maximum))
 
     def get_collection(self, path: str) -> list[dict[str, JsonValue]]:
         """Read every page while treating nextLink as an opaque same-host URL."""
-        if not path.startswith(f"/{SOURCE_API_VERSION}/"):
-            raise ValueError("Graph path must use the documented v1.0 API")
+        api_version = _path_api_version(path)
+        if api_version is None:
+            raise ValueError("Graph path must explicitly use v1.0 or beta")
         next_url: str | None = f"{GRAPH_ROOT}{path}"
         seen: set[str] = set()
         values: list[dict[str, JsonValue]] = []
@@ -155,13 +165,19 @@ class GraphClient:
             candidate = page.get("@odata.nextLink")
             if candidate is None:
                 next_url = None
-            elif isinstance(candidate, str) and _is_graph_v1_url(candidate):
+            elif isinstance(candidate, str) and _is_graph_url(candidate, api_version):
                 next_url = candidate
             else:
                 raise GraphProviderError(
                     GraphErrorCategory.MALFORMED_RESPONSE, endpoint=urlsplit(next_url).path
                 )
         return values
+
+    def get_object(self, path: str) -> dict[str, JsonValue]:
+        """Read one Graph object using the same bounded GET-only transport."""
+        if _path_api_version(path) is None:
+            raise ValueError("Graph path must explicitly use v1.0 or beta")
+        return self._get_json(f"{GRAPH_ROOT}{path}")
 
     def _get_json(self, url: str) -> dict[str, JsonValue]:
         endpoint = urlsplit(url).path
@@ -201,7 +217,11 @@ class GraphClient:
                     status_code=response.status_code,
                     graph_code=_safe_graph_error_code(response.body),
                 )
-            delay = _retry_delay(response.headers.get("retry-after"), attempt)
+            delay = _retry_delay(
+                response.headers.get("retry-after"),
+                attempt,
+                jitter=self._jitter,
+            )
             self._sleeper(delay)
         raise AssertionError("bounded retry loop exhausted unexpectedly")
 
@@ -233,7 +253,7 @@ class IntuneProvider:
                 "collection_timestamp_utc": collected_at,
                 "provider_evidence_id": provider["evidence_id"],
                 "desired_state_git_commit_sha": desired_state_git_commit_sha,
-                "deterministic_algorithm_version": ALGORITHM_VERSION,
+                "deterministic_algorithm_version": DRIFT_ALGORITHM_VERSION,
                 "freshness": {
                     "as_of_utc": collected_at,
                     "max_age_seconds": 86400,
@@ -356,7 +376,14 @@ class IntuneProvider:
         }
 
 
-def _is_graph_v1_url(url: str) -> bool:
+def _path_api_version(path: str) -> str | None:
+    for version in SUPPORTED_API_VERSIONS:
+        if path.startswith(f"/{version}/"):
+            return version
+    return None
+
+
+def _is_graph_url(url: str, api_version: str) -> bool:
     parts = urlsplit(url)
     return (
         parts.scheme == "https"
@@ -365,7 +392,8 @@ def _is_graph_v1_url(url: str) -> bool:
         and parts.username is None
         and parts.password is None
         and not parts.fragment
-        and parts.path.startswith(f"/{SOURCE_API_VERSION}/")
+        and api_version in SUPPORTED_API_VERSIONS
+        and parts.path.startswith(f"/{api_version}/")
     )
 
 
@@ -376,6 +404,8 @@ def _error_category(status_code: int) -> GraphErrorCategory:
         return GraphErrorCategory.AUTHORIZATION
     if status_code == 404:
         return GraphErrorCategory.NOT_FOUND
+    if status_code == 409:
+        return GraphErrorCategory.CONFLICT
     if status_code == 429:
         return GraphErrorCategory.THROTTLED
     if 500 <= status_code <= 599:
@@ -397,7 +427,12 @@ def _safe_graph_error_code(body: bytes) -> str | None:
     return code if isinstance(code, str) and len(code) <= 100 else None
 
 
-def _retry_delay(retry_after: str | None, attempt: int) -> float:
+def _retry_delay(
+    retry_after: str | None,
+    attempt: int,
+    *,
+    jitter: Callable[[float], float] = lambda maximum: 0.0,
+) -> float:
     if retry_after is not None:
         try:
             seconds = int(retry_after)
@@ -408,7 +443,8 @@ def _retry_delay(retry_after: str | None, attempt: int) -> float:
             except (TypeError, ValueError):
                 seconds = 2**attempt
         return float(min(max(seconds, 0), 60))
-    return float(min(2**attempt, 60))
+    base = float(min(2**attempt, 60))
+    return min(60.0, base + max(0.0, min(jitter(min(1.0, base / 4)), 1.0)))
 
 
 def _normalize_graph_timestamp(value: str) -> str:

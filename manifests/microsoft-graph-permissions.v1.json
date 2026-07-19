@@ -1,26 +1,63 @@
 {
-  "manifest_version": "1.0.0",
+  "manifest_version": "2.0.0",
   "service": "Microsoft Graph",
-  "source_api_version": "v1.0",
+  "source_api_versions": ["v1.0", "beta"],
+  "beta_dependencies": [
+    {
+      "resource_family": "settings_catalog",
+      "path": "/deviceManagement/configurationPolicies",
+      "reason": "The Intune Settings Catalog configurationPolicy resource is documented only on Microsoft Graph beta at the pinned implementation date. The adapter isolates and attributes this schema explicitly."
+    }
+  ],
   "profiles": {
     "local_attended": {
       "permission_type": "delegated",
-      "authentication": "public-client device-code flow",
+      "authentication": "public-client device-code flow with an in-memory token cache only",
       "permissions": [
+        {
+          "name": "DeviceManagementApps.Read.All",
+          "permission_id": "4edf5f54-4666-44af-9de9-0144fb4b6e8c",
+          "admin_consent_required": true
+        },
         {
           "name": "DeviceManagementConfiguration.Read.All",
           "permission_id": "f1493658-876a-4c87-8fa7-edb559b3476a",
+          "admin_consent_required": true
+        },
+        {
+          "name": "DeviceManagementManagedDevices.Read.All",
+          "permission_id": "314874da-47d6-4978-88dc-cf0d37f0bb82",
+          "admin_consent_required": true
+        },
+        {
+          "name": "DeviceManagementServiceConfig.Read.All",
+          "permission_id": "8696daa5-bce5-4b2e-83f9-51b6defc4e1e",
           "admin_consent_required": true
         }
       ]
     },
     "private_automation": {
       "permission_type": "application",
-      "authentication": "workload identity federation with a protected GitHub environment",
+      "authentication": "workload identity federation restricted to the protected GitHub production environment",
       "permissions": [
+        {
+          "name": "DeviceManagementApps.Read.All",
+          "permission_id": "7a6ee1e7-141e-4cec-ae74-d9db155731ff",
+          "admin_consent_required": true
+        },
         {
           "name": "DeviceManagementConfiguration.Read.All",
           "permission_id": "dc377aa6-52d8-4e23-b271-2a7ae04cedf3",
+          "admin_consent_required": true
+        },
+        {
+          "name": "DeviceManagementManagedDevices.Read.All",
+          "permission_id": "2f51be20-0bb4-4fed-bf7b-db946066c75e",
+          "admin_consent_required": true
+        },
+        {
+          "name": "DeviceManagementServiceConfig.Read.All",
+          "permission_id": "06a5fe6d-c49d-46a7-b082-56b1b14103c7",
           "admin_consent_required": true
         }
       ]
@@ -28,32 +65,155 @@
   },
   "endpoints": [
     {
+      "key": "managed-devices",
+      "provider_keys": ["managed-devices"],
       "method": "GET",
-      "path": "/deviceManagement/deviceConfigurations",
-      "purpose": "Read macOS general device-configuration settings required for deterministic comparison.",
-      "permission": "DeviceManagementConfiguration.Read.All",
-      "data_accessed": "Intune device configuration and policy properties; unsupported types are counted and discarded."
+      "api_version": "v1.0",
+      "path": "/deviceManagement/managedDevices",
+      "permission": "DeviceManagementManagedDevices.Read.All",
+      "purpose": "Calculate Apple platform, management, compliance, encryption, supervision, compromise, OS-version, registration, and freshness aggregates.",
+      "privacy_boundary": "Source IDs exist only for in-process joins. Names, serials, user fields, network identifiers, and hardware identifiers are not requested. Public output contains aggregates only."
     },
     {
+      "key": "device-configurations",
+      "provider_keys": ["device-configurations"],
       "method": "GET",
-      "path": "/deviceManagement/deviceConfigurations/{deviceConfigurationId}/assignments",
-      "purpose": "Record assignment count and target kind without retaining target identifiers.",
+      "api_version": "v1.0",
+      "path": "/deviceManagement/deviceConfigurations",
       "permission": "DeviceManagementConfiguration.Read.All",
-      "data_accessed": "Assignment objects can contain group or directory identifiers; EvidenceOps discards those identifiers during normalization."
+      "purpose": "Read Apple legacy/custom configuration profile metadata and supported settings.",
+      "privacy_boundary": "Display names remain private; public resources use pseudonymous references."
+    },
+    {
+      "key": "device-configuration-assignments",
+      "provider_keys": ["device-configurations"],
+      "method": "GET",
+      "api_version": "v1.0",
+      "path": "/deviceManagement/deviceConfigurations/{id}/assignments",
+      "permission": "DeviceManagementConfiguration.Read.All",
+      "purpose": "Normalize include, exclude, all-device, all-user, group, and filter assignment shape.",
+      "privacy_boundary": "Group and filter identifiers remain private and are omitted or pseudonymized before publication."
+    },
+    {
+      "key": "settings-catalog",
+      "provider_keys": ["settings-catalog"],
+      "method": "GET",
+      "api_version": "beta",
+      "path": "/deviceManagement/configurationPolicies",
+      "permission": "DeviceManagementConfiguration.Read.All",
+      "purpose": "Read Apple Settings Catalog policy metadata.",
+      "privacy_boundary": "Beta schema is isolated, version-attributed, and fails into a collection gap on shape change."
+    },
+    {
+      "key": "settings-catalog-settings-and-assignments",
+      "provider_keys": ["settings-catalog"],
+      "method": "GET",
+      "api_version": "beta",
+      "path": "/deviceManagement/configurationPolicies/{id}/{settings|assignments}",
+      "permission": "DeviceManagementConfiguration.Read.All",
+      "purpose": "Normalize setting identifiers, typed values, and effective assignment metadata.",
+      "privacy_boundary": "Only allowlisted technical setting values and pseudonymous references can become public or model-visible."
+    },
+    {
+      "key": "compliance-policies",
+      "provider_keys": ["compliance-policies"],
+      "method": "GET",
+      "api_version": "v1.0",
+      "path": "/deviceManagement/deviceCompliancePolicies",
+      "permission": "DeviceManagementConfiguration.Read.All",
+      "purpose": "Read macOS and iOS/iPadOS compliance policy metadata.",
+      "privacy_boundary": "User and device rows are excluded."
+    },
+    {
+      "key": "compliance-relationships",
+      "provider_keys": ["compliance-policies"],
+      "method": "GET",
+      "api_version": "v1.0",
+      "path": "/deviceManagement/deviceCompliancePolicies/{id}/{assignments|scheduledActionsForRule}",
+      "permission": "DeviceManagementConfiguration.Read.All",
+      "purpose": "Normalize compliance policy scope and scheduled action metadata.",
+      "privacy_boundary": "Assignment target identifiers remain private."
+    },
+    {
+      "key": "applications",
+      "provider_keys": ["mobile-apps"],
+      "method": "GET",
+      "api_version": "v1.0",
+      "path": "/deviceAppManagement/mobileApps",
+      "permission": "DeviceManagementApps.Read.All",
+      "purpose": "Describe managed Apple application types and safe metadata.",
+      "privacy_boundary": "No user-level install status is collected or exposed."
+    },
+    {
+      "key": "application-assignments",
+      "provider_keys": ["mobile-apps"],
+      "method": "GET",
+      "api_version": "v1.0",
+      "path": "/deviceAppManagement/mobileApps/{id}/assignments",
+      "permission": "DeviceManagementApps.Read.All",
+      "purpose": "Normalize managed application assignment intent.",
+      "privacy_boundary": "Assignment target identifiers remain private and no user-level install status is collected."
+    },
+    {
+      "key": "application-policies",
+      "provider_keys": ["app-configurations", "app-protection-policies"],
+      "method": "GET",
+      "api_version": "v1.0",
+      "path": "/deviceAppManagement/{mobileAppConfigurations|managedAppPolicies}",
+      "permission": "DeviceManagementApps.Read.All",
+      "purpose": "Inventory app configuration and protection policy metadata.",
+      "privacy_boundary": "Policy names and assignment target identifiers remain private."
+    },
+    {
+      "key": "enrollment-and-categories",
+      "provider_keys": ["enrollment-configurations", "device-categories", "ade-tokens"],
+      "method": "GET",
+      "api_version": "v1.0",
+      "path": "/deviceManagement/{deviceEnrollmentConfigurations|deviceCategories|depOnboardingSettings}",
+      "permission": "DeviceManagementServiceConfig.Read.All",
+      "purpose": "Describe enrollment restrictions, categories, and Apple Automated Device Enrollment connection health.",
+      "privacy_boundary": "Token values, Apple account identifiers, and category names are not public."
+    },
+    {
+      "key": "apps-and-books-health",
+      "provider_keys": ["vpp-tokens"],
+      "method": "GET",
+      "api_version": "v1.0",
+      "path": "/deviceAppManagement/vppTokens",
+      "permission": "DeviceManagementApps.Read.All",
+      "purpose": "Describe Apple Apps and Books token state and freshness.",
+      "privacy_boundary": "Apple IDs, token material, organization names, and source IDs are private."
+    },
+    {
+      "key": "apns-health",
+      "provider_keys": ["apns-certificate"],
+      "method": "GET",
+      "api_version": "v1.0",
+      "path": "/deviceManagement/applePushNotificationCertificate",
+      "permission": "DeviceManagementServiceConfig.Read.All",
+      "purpose": "Describe Apple Push Notification service certificate state and expiry.",
+      "privacy_boundary": "Certificate content, Apple account identifiers, and source IDs are never published."
     }
   ],
   "deliberately_not_requested": [
+    "DeviceManagementApps.ReadWrite.All",
     "DeviceManagementConfiguration.ReadWrite.All",
-    "DeviceManagementManagedDevices.Read.All",
     "DeviceManagementManagedDevices.ReadWrite.All",
     "DeviceManagementManagedDevices.PrivilegedOperations.All",
+    "DeviceManagementServiceConfig.ReadWrite.All",
     "Directory.Read.All",
     "Group.Read.All",
     "User.Read.All"
   ],
   "official_sources": [
+    "https://learn.microsoft.com/en-us/graph/permissions-reference",
+    "https://learn.microsoft.com/en-us/graph/api/intune-devices-manageddevice-list?view=graph-rest-1.0",
     "https://learn.microsoft.com/en-us/graph/api/intune-deviceconfig-deviceconfiguration-list?view=graph-rest-1.0",
-    "https://learn.microsoft.com/en-us/graph/api/intune-deviceconfig-deviceconfigurationassignment-list?view=graph-rest-1.0",
-    "https://learn.microsoft.com/en-us/graph/permissions-reference#devicemanagementconfigurationreadall"
+    "https://learn.microsoft.com/en-us/graph/api/intune-deviceconfig-devicecompliancepolicy-list?view=graph-rest-1.0",
+    "https://learn.microsoft.com/en-us/graph/api/intune-apps-mobileapp-list?view=graph-rest-1.0",
+    "https://learn.microsoft.com/en-us/graph/api/intune-enrollment-deviceenrollmentconfiguration-list?view=graph-rest-1.0",
+    "https://learn.microsoft.com/en-us/graph/api/intune-onboarding-vpptoken-list?view=graph-rest-1.0",
+    "https://learn.microsoft.com/en-us/graph/api/intune-devices-applepushnotificationcertificate-get?view=graph-rest-1.0",
+    "https://learn.microsoft.com/en-us/graph/api/resources/intune-deviceconfigv2-devicemanagementconfigurationpolicy?view=graph-rest-beta"
   ]
 }

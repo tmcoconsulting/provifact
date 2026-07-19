@@ -7,6 +7,7 @@ from collections import defaultdict
 from collections.abc import Sequence
 from typing import Final, cast
 
+from evidenceops.constants import DRIFT_ALGORITHM_VERSION
 from evidenceops.domain import (
     EvidenceObject,
     EvidenceSchemaError,
@@ -16,7 +17,7 @@ from evidenceops.domain import (
     validate_evidence_object,
 )
 
-ALGORITHM_VERSION: Final = "evidenceops-drift-v1.1.0"
+ALGORITHM_VERSION: Final = DRIFT_ALGORITHM_VERSION
 
 
 def evaluate_desired_state(

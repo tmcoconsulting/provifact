@@ -3,107 +3,114 @@
 EvidenceOps separates collection, deterministic evaluation, publication policy, generated
 analysis, and human judgment so no layer silently inherits another layer's authority.
 
-```text
-Reviewed desired state (Git)                  private trust zone
-              |                                      |
-              +----> GET-only provider ---> normalized observations
-                                                   |
-                                        deterministic drift v1
-                                                   |
-                                      private evidence package
-                                                   |
-                                     field policy + content scan
-                                                   |
-                                            PUBLIC BOUNDARY
-                                                   |
-                                      sanitized evidence package
-                                          /                \
-                               local static demo       optional GPT-5.6
-                                                             |
-                                             typed-claim verifier
-                                                             |
-                                             generated prose quarantine
-                                                             |
-                                                     human review only
+```mermaid
+flowchart LR
+  A[Git-approved baseline and desired state] --> B[GitHub Actions OIDC]
+  B --> C[Microsoft Graph GET-only collection]
+  C --> D[Normalized private Apple evidence]
+  D --> E[Deterministic evidence and drift engine]
+  E --> F[Allowlist publication and content scans]
+  F --> G[Sanitized evidence package]
+  G --> H[Cloudflare Worker and static assets]
+  H --> I[Mission Control dashboard]
+  H --> J[Bounded GPT-5.6 assistant context]
+  J --> K[Typed-claim verifier and prose quarantine]
+  K --> L[Human review]
 ```
 
 ## Provider contract
 
-The additive `VersionedEvidenceProvider` exposes `collect` only. The Intune implementation uses
-Microsoft Graph v1.0 and its transport exposes only `get`. It currently recognizes
-`macOSGeneralDeviceConfiguration` and normalizes `passwordRequired` plus
-`passwordMinutesOfInactivityBeforeScreenTimeout`. Unsupported policy types are counted privately
-and never guessed. A later Jamf or Workspace ONE adapter can produce the same observation objects.
+The vendor-neutral provider interfaces expose `collect` only. The Apple-focused Intune provider
+uses Microsoft Graph v1.0 wherever available and isolates one documented beta dependency for
+Settings Catalog. It covers managed-device aggregates, legacy and Settings Catalog configuration,
+compliance policies, managed apps and application-policy metadata, enrollment configuration,
+device categories, Automated Device Enrollment, Apps and Books token health, APNs certificate
+health, assignments, and scheduled actions. Resource-family adapters normalize materially
+different response shapes independently.
 
-## Deterministic evidence engine
+The common Graph client implements pagination, bounded retry with jitter and `Retry-After`, request
+timeouts, same-host/version next-link validation, and structured 401/403/404/409/429/5xx errors.
+The Apple collector limits concurrency to four operations and converts an unavailable resource or
+unsupported shape into an explicit collection-gap record. It does not dump raw responses. A later
+Jamf or Workspace ONE adapter can produce the same evidence model.
 
-The engine compares normalized JSON values directly and records desired-state, observation, source
-collection, Git SHA, algorithm version, and input fingerprints in every finding. Its restrained
-statuses describe evidence relationships—not framework or organizational compliance. A language
-model is never involved in status selection.
+## Baseline and deterministic evidence engine
+
+The pinned baseline inventory comes from mSCP revision
+`11b5896e4f12f43410686024f543792742562c91`. Its source artifact and extracted inventory hashes are
+verified at test time. The repository contains a machine-readable internal TMCO demo approval for
+the complete 98-rule macOS inventory. Five settings currently have explicit, deterministic provider
+mappings. Unsupported rules stay visible and do not enter the alignment denominator. iOS and
+iPadOS posture is visible but is not scored against the macOS baseline.
+
+The engine compares only explicitly mapped normalized values and assignment evidence. Every
+finding links the baseline requirement, source evidence IDs, Git SHA, algorithm version, and
+fingerprints. Outcomes include aligned, missing, value drift, assignment drift, conflict,
+collection gap, unsupported, not applicable, and human review. These describe technical evidence
+relationships—not framework or organizational compliance. A model never selects an outcome.
 
 ## Private-to-public boundary
 
-Live collection creates no generic raw export. It normalizes only classified fields and retains
-source object IDs only inside the private package when needed for traceability. That package must
-be written to a Git-ignored, operator-selected directory with mode `0700`/`0600` where supported.
-Publication is a separate command requiring an ephemeral pseudonymization key.
+Live collection creates no generic raw export. It normalizes classified fields, keeps source IDs
+only in the private package when needed for joins, and writes that package only to a selected
+Git-ignored directory with mode `0700`/`0600` where supported. Publication is a separate command
+requiring an ephemeral pseudonymization key.
 
-Every mapping key is classified as allow, drop, or pseudonymize. A new field—including one nested
-under a dropped object—stops publication. The resulting package receives policy and content
-fingerprints, reference-graph validation, and a second content scan.
+The public Mission package is constructed from an allowlist rather than by deleting fields from a
+raw object. Unknown fields stop validation. Public and pre-model scans reject identities,
+credentials, tenant-specific values, URLs containing source IDs, and other prohibited data. The
+package records its policy version and canonical SHA-256 identity.
 
-## Narrative boundary
+## Cloudflare application boundary
 
-The opt-in narrative service uses the OpenAI Responses API with `store: false`, no tools, a strict
-JSON schema, and a 64 KiB sanitized-package limit. The documented Build Week model is
-`gpt-5.6-terra`. The verifier treats the returned object as untrusted and checks its schema, evidence
-IDs, exact finding coverage, typed deterministic claim codes/values, limitations, and human-review
-language. Only a `finding_status` claim whose typed value equals the authoritative finding can be
-machine-verified. Free-form executive, explanation, impact, limitation, and question text remains
-labeled generated and is always quarantined for human review. This deliberately avoids claiming
-that finite phrase matching can prove the meaning of unrestricted prose.
+`mkdocs build --strict` produces the scanned `site/` Static Assets directory. GitHub Pages is
+retired. The exact-pinned Cloudflare Worker runs first only for `/api/*`; static assets otherwise
+remain direct-serving.
 
-The adapter also repeats the shared credential and sensitive-content scan immediately before any
-OpenAI request. A package that merely has the public object shape cannot bypass that egress gate.
+`/api/health` reports process liveness. `/api/ready` validates the runtime configuration and
+fingerprint-verified Mission package. `/api/status` exposes a deliberately small, non-secret status
+contract derived from that package. `/api/narrative` verifies a complete public evidence package.
+`/api/ask` accepts only a bounded question and current snapshot ID, loads the validated package
+server-side, classifies a closed set of evidence intents, and constructs a small intent-specific
+context. Both POST routes enforce exact methods and JSON shape, same-origin,
+compressed/body-size rejection, content scans, native per-client and global rate limits, timeout
+and output bounds, and generic errors.
 
-## Static application boundary
+Production pins `gpt-5.6-terra`; the project service-account key exists only as the encrypted Worker
+secret `OPENAI_API_KEY`. Fixture mode performs no model request and never silently substitutes for
+a failed live request. Static assets carry repository-controlled CSP, HSTS, and browser security
+headers in `docs/_headers`; JSON API responses set the corresponding restrictive controls in code.
 
-`mkdocs build --strict` produces a self-contained `site/` directory from synthetic or policy-gated
-data. It is currently a local build artifact only. The GitHub Pages deployment workflow was removed
-after security review; executable public workflows now have read-only repository permission.
+## AI and verifier boundary
 
-The exact-pinned Cloudflare Workers runtime serves `site/` as Static Assets. Only `/api/*` routes
-run Worker code first. `/api/status` exposes a deliberately small non-secret status contract;
-`/api/narrative` accepts only same-origin bounded JSON, applies the publication and credential
-gates again, rate limits before parsing, and then uses either the exact synthetic fixture or one
-bounded OpenAI Responses API request. Static assets retain their direct-serving path.
+The OpenAI Responses API request uses `store: false`, no tools, low reasoning effort, strict JSON
+schema output, and a bounded context containing only sanitized facts and allowed references. The
+verifier treats model output as untrusted. Typed claims must exactly equal deterministic expected
+claims, evidence references must remain in-package, unsupported verdict language is rejected, and
+all explanatory prose remains generated and quarantined for human review.
 
-The Worker ports the package schema and deterministic narrative verifier into strict TypeScript and
-imports the same credential/public-value catalogs and strict narrative JSON schema as Python. The
-deployed production environment pins `gpt-5.6-terra`, stores its project key only as a Worker
-secret, and serves the custom domain in explicit fixture mode while project capacity is unavailable.
-The GitHub deployment workflow remains disabled until a narrow Cloudflare token is configured.
+## GitHub and Entra trust boundary
 
-The manual Intune workflow uses an exact GitHub `production`-environment federated identity and a
-consented application `DeviceManagementConfiguration.Read.All` permission. It is intentionally not
-run from feature branches; the first live audit remains a protected post-merge validation gate.
+Public CI has `contents: read` and no tenant or model credential. The manual Intune workflow checks
+out trusted `main`, targets the protected `production` environment, and uses the exact
+environment-scoped GitHub OIDC subject. The expanded collector requires four documented read-only
+application permissions: configuration, managed devices, managed applications, and service
+configuration. It never uses a client secret and cannot run on pull-request code.
 
-## Phase 1 modules
+## Modules
 
 | Module | Responsibility | Intentional exclusion |
 | --- | --- | --- |
-| `domain` | Ten strict schema-v1 evidence object types | Vendor SDK objects |
-| `providers` | Contract plus narrow GET-only Intune adapter | Writes and device identity inventory |
-| `evidence` | Reproducible drift, packages, and fingerprints | Model inference |
-| `sanitization` | Manifest classification and public-output gate | Key persistence |
-| `narrative` | Optional structured generation, typed claims, and prose quarantine | Semantic approval of prose, remediation, or approval |
-| `cli` | Six explicit operator workflows | Apply, assignment, or synthetic fallback |
+| `domain` | Strict schema-v1 evidence object types | Vendor SDK objects |
+| `baselines` | Pinned mSCP inventory, demo approval, and reviewed mappings | Certification or GPT-created crosswalks |
+| `providers` | Vendor-neutral contracts and GET-only Intune adapters | Writes, raw exports, public identities |
+| `evidence` | Reproducible drift, Mission packages, history summary, and fingerprints | Model inference |
+| `sanitization` | Explicit classification and public/model egress gates | Key persistence |
+| `narrative` / Worker assistant | Structured explanation and deterministic verification | Remediation, approval, or compliance verdicts |
+| `cli` | Synthetic, private collection, publication, narrative, verification, and build workflows | Apply or silent fallback |
 
 ## Compatibility
 
-Phase 0 objects and imports remain available. New evidence uses schema `1.0.0`; unknown fields,
-unknown object types, incompatible versions, and tampered fingerprints fail validation. The
-machine-readable catalog is `schemas/evidenceops-v1.schema.json`. The optional
-`deterministic_claim` member is an additive schema-v1 extension: legacy narrative objects still
-validate, but the verifier refuses to verify them without the typed claim.
+Phase 0 and the original Phase 1 schema-v1 objects remain available. Mission Control adds a strict
+schema-v2 public projection without changing legacy object identities. Unknown fields, incompatible
+versions, and tampered fingerprints fail closed.

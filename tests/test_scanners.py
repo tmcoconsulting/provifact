@@ -63,6 +63,15 @@ def test_public_scanner_rejects_private_evidence_paths(tmp_path: Path) -> None:
     ]
 
 
+@pytest.mark.parametrize("filename", ["index 2.html", "_headers 2", "sitemap 2.xml.gz"])
+def test_public_scanner_rejects_duplicate_style_artifact_names(
+    tmp_path: Path, filename: str
+) -> None:
+    (tmp_path / filename).write_text("safe synthetic content", encoding="utf-8")
+
+    assert scan_public(tmp_path) == [(Path(filename), 1, "duplicate-style artifact filename")]
+
+
 def test_public_scanner_allows_only_documented_public_permission_ids(tmp_path: Path) -> None:
     (tmp_path / "permissions.txt").write_text(
         "dc377aa6-52d8-4e23-b271-2a7ae04cedf3",

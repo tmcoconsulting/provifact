@@ -85,6 +85,23 @@ def _load_public_value_patterns() -> tuple[tuple[str, re.Pattern[str]], ...]:
 
 _PROHIBITED_PUBLIC_VALUE_PATTERNS: Final = _load_public_value_patterns()
 
+# These exact strings are public vendor permission identifiers or approved
+# EvidenceOps taxonomy keys, not network domains. Exact membership prevents the
+# domain detector from being weakened for arbitrary dotted strings.
+_PUBLIC_SAFE_TECHNICAL_VALUES: Final = frozenset(
+    {
+        "DeviceManagementApps.Read.All",
+        "DeviceManagementConfiguration.Read.All",
+        "DeviceManagementManagedDevices.Read.All",
+        "DeviceManagementServiceConfig.Read.All",
+        "macos.screen_lock.max_idle_seconds",
+        "macos.screen_lock.require_password",
+        "macos.security.filevault.enabled",
+        "macos.security.firewall.enabled",
+        "macos.security.firewall.stealth_mode",
+    }
+)
+
 
 def load_policy_manifest(path: Path = DEFAULT_POLICY_MANIFEST) -> SanitizationPolicy:
     """Load an explicit field-classification manifest or stop publication."""
@@ -223,6 +240,8 @@ def assert_public_safe(value: JsonValue) -> None:
             assert_public_safe(item)
         return
     if not isinstance(value, str):
+        return
+    if value in _PUBLIC_SAFE_TECHNICAL_VALUES:
         return
     for label, pattern in (*CREDENTIAL_PATTERNS, *_PROHIBITED_PUBLIC_VALUE_PATTERNS):
         if pattern.search(value):

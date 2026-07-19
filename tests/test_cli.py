@@ -7,6 +7,7 @@ import pytest
 
 from evidenceops import cli
 from evidenceops.domain import validate_evidence_object
+from evidenceops.evidence import validate_public_mission_snapshot
 from scripts.check_public_artifacts import scan as scan_public
 
 
@@ -16,7 +17,11 @@ def test_run_demo_reproduces_complete_public_flow(tmp_path: Path) -> None:
     assert {path.name for path in output.iterdir()} == cli.STATIC_DEMO_FILENAMES
     assert scan_public(output) == []
     for path in output.glob("*.json"):
-        validate_evidence_object(json.loads(path.read_text(encoding="utf-8")))
+        loaded = json.loads(path.read_text(encoding="utf-8"))
+        if path.name == "mission-control.json":
+            validate_public_mission_snapshot(loaded)
+        else:
+            validate_evidence_object(loaded)
 
 
 def test_run_demo_refuses_nonempty_directory(tmp_path: Path) -> None:

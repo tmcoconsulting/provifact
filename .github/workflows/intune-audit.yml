@@ -42,7 +42,7 @@ jobs:
 
       - name: Validate collection and publication contracts
         run: |
-          python -m pytest -o addopts='' tests/test_permissions_manifest.py tests/test_intune_provider.py tests/test_publication.py tests/test_sanitization.py
+          python -m pytest -o addopts='' tests/test_permissions_manifest.py tests/test_intune_provider.py tests/test_apple_provider.py tests/test_mission.py tests/test_publication.py tests/test_sanitization.py
           python scripts/check_secrets.py
 
       - name: Authenticate to Microsoft Entra through GitHub OIDC
@@ -61,14 +61,14 @@ jobs:
           token="$(az account get-access-token --resource-type ms-graph --query accessToken --output tsv)"
           echo "::add-mask::$token"
           export EVIDENCEOPS_GRAPH_ACCESS_TOKEN="$token"
-          python -m evidenceops live-collect --auth environment-token --private-dir artifacts/private --retention-days 1
-          private_package="$(find artifacts/private -maxdepth 1 -type f -name 'private-evidence-*.json' -print -quit)"
+          python -m evidenceops live-collect-apple --auth environment-token --private-dir artifacts/private --retention-days 1
+          private_package="$(find artifacts/private -maxdepth 1 -type f -name 'private-apple-*.json' -print -quit)"
           test -n "$private_package"
           export EVIDENCEOPS_PSEUDONYM_KEY="$(openssl rand -hex 32)"
-          python -m evidenceops publish "$private_package" --output build/live-public/evidence.json
+          python -m evidenceops publish-mission "$private_package" --output build/live-public/mission-control.json
           unset EVIDENCEOPS_PSEUDONYM_KEY EVIDENCEOPS_GRAPH_ACCESS_TOKEN token
           python scripts/check_public_artifacts.py build/live-public
-          python scripts/report_public_counts.py build/live-public/evidence.json >> "$GITHUB_STEP_SUMMARY"
+          python scripts/report_public_counts.py build/live-public/mission-control.json >> "$GITHUB_STEP_SUMMARY"
 
       - name: Remove ephemeral live evidence
         if: always()

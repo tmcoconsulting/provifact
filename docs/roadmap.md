@@ -9,20 +9,21 @@ Roadmap items describe intent, not operational capability or delivery commitment
 - Provider-neutral domain, deterministic drift, fail-closed sanitizer, and synthetic demo
 - Security/data-handling boundaries and Build Week evidence
 
-## Phase 1 — narrow proof on this branch
+## Phase 1 — Build Week vertical slice
 
-- Ten versioned schema-v1 objects with tamper-evident IDs/fingerprints
-- GET-only Graph v1.0 Intune adapter for two macOS general-configuration fields
-- Exact read-permission manifest and in-memory attended authentication
-- Private package writer, explicit retention, and fail-closed public publication
-- Four-state vendor-neutral desired/observed demonstration
-- Optional GPT-5.6 structured narrative plus typed-claim/prose-quarantine verifier
-- Credential-free end-to-end CLI and polished local synthetic static walkthrough
-- Shared credential detection across publication, repository/static scans, and model egress
-
-- [x] Configure the environment-scoped Entra federated identity and grant administrator consent to
-  application `DeviceManagementConfiguration.Read.All`
-- [ ] Run the manual protected post-merge audit and record sanitized counts only
+- [x] Preserve the schema-v1 proof and add a strict Mission Control public projection
+- [x] Implement the comprehensive GET-only Apple resource-family collector with partial gaps
+- [x] Pin and hash the 98-rule mSCP macOS CIS Level 1 demo inventory
+- [x] Approve the machine-readable TMCO technical demo baseline without claiming certification
+- [x] Add five explicit deterministic mappings, assignment/conflict drift, and evidence traceability
+- [x] Keep iOS/iPadOS posture visible but outside the macOS alignment denominator
+- [x] Add allowlist publication, private normalized storage, and shared public/model egress scans
+- [x] Build the dynamic synthetic Mission Control dashboard and bounded `/api/ask` assistant
+- [x] Preserve fixture mode, typed-claim verification, and prose quarantine
+- [x] Configure the exact environment-scoped Entra federated identity
+- [x] Grant and independently verify the complete four-permission read-only application set
+- [ ] Run the expanded manual protected post-merge audit and record sanitized counts only
+- [ ] Perform one bounded service-account GPT-5.6 request and return production to fixture mode
 
 Public CI never performs live collection.
 
@@ -40,13 +41,14 @@ Public CI never performs live collection.
 - [x] Store `CLOUDFLARE_API_TOKEN` by name in the protected production environment
 - [ ] Verify the Cloudflare token scope and enable the protected workflow; deployment remains
       disabled with `CLOUDFLARE_DEPLOY_ENABLED=false`
-- [ ] Configure OpenAI budget alerts/limits and enable live mode only after usable capacity exists
+- [x] Configure the EvidenceOps OpenAI project budget alerts and model limits
+- [ ] Validate one bounded live `gpt-5.6-terra` response; keep fixture mode as the public default
 
 ## Later application scope
 
-- Privately validate the two documented Graph endpoints and record only sanitized metadata
-- Add an independent reviewer for the permission/normalization contract
-- Evaluate Settings Catalog support only after confirming a supported v1.0 contract
+- Add an independent reviewer for the expanded permission/normalization contract
+- Re-evaluate Settings Catalog when Microsoft publishes an adequate v1.0 equivalent
+- Add sanitized operational snapshot persistence only after a separate retention/access review
 - Add a signed public-package manifest and broader narrative evaluation corpus
 - Design explicit exception ownership/expiry without automatic exception grants
 - Explore Jamf and Workspace ONE adapters against the same schema contract
@@ -55,9 +57,9 @@ Public CI never performs live collection.
 ## Explicitly deferred or rejected
 
 - Intune/Graph writes, automatic remediation, assignment, or rollback
-- Generic raw-tenant data lake or managed-device identity inventory
+- Generic raw-tenant data lake or public managed-device identity inventory
 - Scheduled live workflow in the public repository
-- Directory-wide or managed-device permissions for convenience
+- Directory-wide permissions or any read permission not tied to a documented collector family
 - Model tools, autonomous publication, exceptions, or compliance verdicts
 - Browser-persisted API keys or public-CI OpenAI credentials
 - Claims of complete CIS/STIG/NIST/CMMC coverage

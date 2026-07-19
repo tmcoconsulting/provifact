@@ -55,6 +55,32 @@ const FIELD_ACTIONS = new Map<string, string>(
   Object.entries(publicationPolicy.fields),
 );
 
+const SAFE_TECHNICAL_VALUES = new Set([
+  "DeviceManagementApps.Read.All",
+  "DeviceManagementConfiguration.Read.All",
+  "DeviceManagementManagedDevices.Read.All",
+  "DeviceManagementServiceConfig.Read.All",
+  "macos.screen_lock.max_idle_seconds",
+  "macos.screen_lock.require_password",
+  "macos.security.filevault.enabled",
+  "macos.security.firewall.enabled",
+  "macos.security.firewall.stealth_mode",
+]);
+
+const PRIVATE_MISSION_FIELDS = new Set([
+  "access_token",
+  "api_key",
+  "authorization",
+  "device_name",
+  "email_address",
+  "hostname",
+  "managed_device_id",
+  "private_display_name",
+  "serial_number",
+  "source_object_id",
+  "user_principal_name",
+]);
+
 export function hasUsableOpenAIKey(value: unknown): value is string {
   return typeof value === "string" && /^sk-[A-Za-z0-9_-]{20,}$/.test(value);
 }
@@ -92,6 +118,39 @@ export function assertPublicSafe(value: unknown, depth = 0): void {
   if (typeof value !== "string") {
     return;
   }
+  assertSafeString(value);
+}
+
+export function assertMissionEgressSafe(value: unknown, depth = 0): void {
+  if (depth > 16) {
+    throw new HttpError(
+      422,
+      "publication_policy_rejected",
+      "mission evidence nesting is too deep",
+    );
+  }
+  if (Array.isArray(value)) {
+    for (const item of value) assertMissionEgressSafe(item, depth + 1);
+    return;
+  }
+  if (isRecord(value)) {
+    for (const [field, item] of Object.entries(value)) {
+      if (PRIVATE_MISSION_FIELDS.has(field.toLowerCase())) {
+        throw new HttpError(
+          422,
+          "publication_policy_rejected",
+          "private field reached mission egress",
+        );
+      }
+      assertMissionEgressSafe(item, depth + 1);
+    }
+    return;
+  }
+  if (typeof value === "string") assertSafeString(value);
+}
+
+function assertSafeString(value: string): void {
+  if (SAFE_TECHNICAL_VALUES.has(value)) return;
   for (const entry of SENSITIVE_VALUE_PATTERNS) {
     entry.pattern.lastIndex = 0;
     if (entry.pattern.test(value)) {
@@ -280,13 +339,19 @@ export function jsonResponse(
 ): Response {
   const headers = new Headers(extraHeaders);
   headers.set("Cache-Control", "no-store");
+  headers.set(
+    "Content-Security-Policy",
+    "default-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'",
+  );
   headers.set("Content-Type", "application/json; charset=utf-8");
+  headers.set("Cross-Origin-Opener-Policy", "same-origin");
   headers.set("Cross-Origin-Resource-Policy", "same-origin");
   headers.set(
     "Permissions-Policy",
     "camera=(), geolocation=(), microphone=(), payment=()",
   );
   headers.set("Referrer-Policy", "no-referrer");
+  headers.set("Strict-Transport-Security", "max-age=31536000");
   headers.set("X-Content-Type-Options", "nosniff");
   headers.set("X-Frame-Options", "DENY");
   return new Response(JSON.stringify(payload), { status, headers });

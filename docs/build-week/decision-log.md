@@ -245,3 +245,63 @@ existing manual workflow to use a short-lived Graph token later.
 **Pre-existing state:** Eight consented delegated permissions remain on the application. They are
 not used by the EvidenceOps application-only workflow, were not added for this proof, and were not
 removed automatically because their ownership and unrelated consumers require human review.
+
+## 2026-07-19 — Expand the Apple proof without adding mutation authority
+
+**Decision:** Keep the provider-neutral and schema-v1 contracts, then add a separate Apple-focused
+collector and Mission schema. Use exactly four Graph read-only permission families: configuration,
+managed devices, managed applications, and service configuration. Retain one isolated beta
+dependency for Settings Catalog because an adequate v1.0 contract was not available at the
+implementation date.
+
+**Why:** Policy evidence alone cannot explain Apple fleet, app, enrollment, assignment, and service
+health. Independent adapters make partial permission or schema failures visible without inventing
+a universal Intune response. The provider and transport still expose only collection/GET.
+
+**Rejected:** `Directory.Read.All`, group/user scopes, raw tenant exports, write permissions,
+client secrets, and silent beta/v1 substitution.
+
+**Sources:** Microsoft [permissions reference](https://learn.microsoft.com/en-us/graph/permissions-reference),
+[managed-device API](https://learn.microsoft.com/en-us/graph/api/intune-devices-manageddevice-list?view=graph-rest-1.0),
+[Apps and Books API](https://learn.microsoft.com/en-us/graph/api/intune-onboarding-vpptoken-list?view=graph-rest-1.0),
+and [APNs API](https://learn.microsoft.com/en-us/graph/api/intune-devices-applepushnotificationcertificate-get?view=graph-rest-1.0).
+
+## 2026-07-19 — Pin an internally approved mSCP demo baseline
+
+**Decision:** Pin mSCP revision `11b5896e4f12f43410686024f543792742562c91` and its macOS 26 CIS
+Level 1 profile. Verify the source artifact and derived 98-rule inventory hashes. Approve it only as
+the “TMCO macOS CIS Level 1 Build Week Demo Baseline.” Map five settings using identifiers from the
+pinned source; keep all other rules visible but unsupported. Do not score iOS/iPadOS.
+
+**Why:** Complete inventory visibility plus explicit mapping support avoids cherry-picking and
+false coverage. Framework IDs are deterministic source metadata, not model-created mappings.
+
+**License:** Derived mSCP metadata is attributed under CC BY 4.0 in `NOTICE`; Apple vendor
+descriptions are excluded.
+
+## 2026-07-19 — Use database-free sanitized history and a prefiltered assistant
+
+**Decision:** Put current/previous sanitized snapshot deltas in the Mission package; do not add D1,
+KV, or R2. Add same-origin `/api/ask`, accepting only a bounded question and snapshot ID. Load the
+package server-side, classify a closed evidence intent, and send fewer than 16 KiB of allowlisted
+context to fixed `gpt-5.6-terra` with `store: false`, no tools, low reasoning, strict JSON, exact
+typed claims, and prose quarantine. Continue to reject BYOK.
+
+**Why:** This proves history and grounded explanation without adding a persistence product or a
+browser credential boundary. Prefiltering is cheaper and safer than sending a whole package.
+
+## 2026-07-19 — Add non-executing CodeQL analysis
+
+**Decision:** Add an exact-commit-pinned CodeQL v4 workflow for Python and
+JavaScript/TypeScript. Both interpreted-language analyses use `build-mode: none`, so the scanner
+analyzes pull-request source without executing it. Keep CodeQL separate from the required CI gate
+and grant only repository/action read access plus `security-events: write` for analysis upload.
+
+**Why:** GitHub's code-scanning API reported that no analysis existed. CodeQL is supported for this
+public repository and adds data-flow analysis without giving untrusted pull-request code a secret,
+deployment identity, or build step.
+
+**Platform limitation:** GitHub's non-provider secret-pattern and secret-validity status remained
+`disabled` after a repository-API enable request, so EvidenceOps does not claim those controls are
+active. Provider secret scanning, push protection, the shared credential catalog, and fail-closed
+repository/public-artifact scans remain enabled requirements.

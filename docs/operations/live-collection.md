@@ -1,120 +1,121 @@
 # Live Read-Only Collection
 
-Live collection is an opt-in private operator action. It reads a narrow Microsoft Intune
-configuration slice and never publishes automatically.
+Live collection is an opt-in private operator action. It never publishes automatically and has no
+Intune mutation command.
 
-## Supported Microsoft Graph contract
+## Microsoft Graph contract
 
-EvidenceOps calls only these Microsoft Graph v1.0 endpoints:
+The machine-readable source of truth is
+`manifests/microsoft-graph-permissions.v1.json`. The expanded Apple collector uses these resource
+families, plus documented child `GET` requests for settings, assignments, and scheduled actions:
 
-| Method and endpoint | Purpose | Normalized/public data |
+| API | GET resource family | Evidence purpose |
 | --- | --- | --- |
-| `GET /deviceManagement/deviceConfigurations` | Find macOS general device configurations | Two supported setting values and modified time |
-| `GET /deviceManagement/deviceConfigurations/{id}/assignments` | Count assignment records/target kinds | Counts/kinds only; no group IDs or names |
+| v1.0 | `deviceManagement/managedDevices` with a fixed `$select` | Aggregate Apple platform, management, compliance, encryption, supervision, registration, and freshness posture |
+| v1.0 | `deviceManagement/deviceConfigurations` | Legacy/custom Apple configuration and assignments |
+| beta | `deviceManagement/configurationPolicies` | Settings Catalog metadata, settings, and assignments |
+| v1.0 | `deviceManagement/deviceCompliancePolicies` | Apple compliance policy, assignment, and scheduled-action metadata |
+| v1.0 | `deviceAppManagement/mobileApps` | Managed Apple application type, safe version metadata, and assignment intent |
+| v1.0 | `deviceAppManagement/mobileAppConfigurations` and `managedAppPolicies` | Application configuration/protection policy metadata |
+| v1.0 | `deviceManagement/deviceEnrollmentConfigurations`, `deviceCategories`, and `depOnboardingSettings` | Enrollment restrictions, categories, and ADE connection health |
+| v1.0 | `deviceAppManagement/vppTokens` | Apps and Books token health without token/account values |
+| v1.0 | `deviceManagement/applePushNotificationCertificate` | APNs certificate state/expiry without certificate/account values |
 
-The adapter supports only `#microsoft.graph.macOSGeneralDeviceConfiguration` and two documented
-properties: `passwordRequired` and `passwordMinutesOfInactivityBeforeScreenTimeout`. The latter is
-normalized from minutes to seconds. Policy IDs remain only in the private trace. Display names,
-descriptions, groups, users, devices, domains, and raw response objects are not retained.
+Settings Catalog is the only beta dependency. The adapter attributes it as beta, validates beta
+pagination separately, and records a visible gap if it is unavailable or changes shape. It does
+not silently substitute another endpoint.
 
-No `/beta` endpoint is used. Managed-device counts were deliberately omitted because they require
-the additional `DeviceManagementManagedDevices.Read.All` permission.
+The Graph client supports complete pagination, concurrency bounded to four operations, exponential
+retry with jitter, `Retry-After`, timeouts, and structured handling for 401, 403, 404, 409, 429,
+transient 5xx, malformed responses, empty collections, and hostile next links. A failure in one
+resource family becomes a collection gap; successful families remain usable.
 
-Microsoft documents the [configuration list](https://learn.microsoft.com/graph/api/intune-deviceconfig-deviceconfiguration-list?view=graph-rest-1.0),
-[assignment list](https://learn.microsoft.com/graph/api/intune-deviceconfig-deviceconfigurationassignment-list?view=graph-rest-1.0),
-[macOS resource properties](https://learn.microsoft.com/graph/api/resources/intune-deviceconfig-macosgeneraldeviceconfiguration?view=graph-rest-1.0),
-[paging contract](https://learn.microsoft.com/graph/paging), and
-[429 handling](https://learn.microsoft.com/graph/throttling).
+Microsoft documents the [Graph permissions reference](https://learn.microsoft.com/en-us/graph/permissions-reference),
+[managed-device list](https://learn.microsoft.com/en-us/graph/api/intune-devices-manageddevice-list?view=graph-rest-1.0),
+[device configuration list](https://learn.microsoft.com/en-us/graph/api/intune-deviceconfig-deviceconfiguration-list?view=graph-rest-1.0),
+[mobile app list](https://learn.microsoft.com/en-us/graph/api/intune-apps-mobileapp-list?view=graph-rest-1.0),
+[Apps and Books tokens](https://learn.microsoft.com/en-us/graph/api/intune-onboarding-vpptoken-list?view=graph-rest-1.0),
+[APNs certificate](https://learn.microsoft.com/en-us/graph/api/intune-devices-applepushnotificationcertificate-get?view=graph-rest-1.0),
+[paging](https://learn.microsoft.com/en-us/graph/paging), and
+[throttling](https://learn.microsoft.com/en-us/graph/throttling).
 
-## Exact permission
+## Exact permissions
 
-The machine-readable source of truth is `manifests/microsoft-graph-permissions.v1.json`.
+All four permissions require administrator consent for the profiles used here.
 
-| Profile | Permission | Permission ID | Admin consent | Accessible data |
-| --- | --- | --- | --- | --- |
-| Attended delegated | `DeviceManagementConfiguration.Read.All` | `f1493658-876a-4c87-8fa7-edb559b3476a` | Yes | Intune device configuration/compliance policies and assignments available to the signed-in operator |
-| Private automation application | `DeviceManagementConfiguration.Read.All` | `dc377aa6-52d8-4e23-b271-2a7ae04cedf3` | Yes | Tenant-wide Intune device configuration/compliance policies and assignments |
+| Permission | Delegated ID | Application ID | Why it is required |
+| --- | --- | --- | --- |
+| `DeviceManagementConfiguration.Read.All` | `f1493658-876a-4c87-8fa7-edb559b3476a` | `dc377aa6-52d8-4e23-b271-2a7ae04cedf3` | Configuration, Settings Catalog, compliance, and their relationships |
+| `DeviceManagementManagedDevices.Read.All` | `314874da-47d6-4978-88dc-cf0d37f0bb82` | `2f51be20-0bb4-4fed-bf7b-db946066c75e` | Aggregate managed-device posture |
+| `DeviceManagementApps.Read.All` | `4edf5f54-4666-44af-9de9-0144fb4b6e8c` | `7a6ee1e7-141e-4cec-ae74-d9db155731ff` | Managed apps, app policies, assignments, and Apps and Books health |
+| `DeviceManagementServiceConfig.Read.All` | `8696daa5-bce5-4b2e-83f9-51b6defc4e1e` | `06a5fe6d-c49d-46a7-b082-56b1b14103c7` | Enrollment, ADE, category, and APNs service metadata |
 
-No write permission, `Directory.Read.All`, user/group permission, or managed-device inventory
-permission is requested. Microsoft describes this permission in the
-[Graph permissions reference](https://learn.microsoft.com/graph/permissions-reference#devicemanagementconfigurationreadall).
+EvidenceOps does not request write scopes, privileged device operations, `Directory.Read.All`,
+`Group.Read.All`, or `User.Read.All`. These four read scopes are broad tenant permissions even
+though the collector requests and publishes a much smaller field set; application ownership and
+admin consent remain meaningful security boundaries.
 
 ## Attended local setup
 
-1. Create or select an approved public-client Entra app in the intended tenant.
-2. Add only delegated `DeviceManagementConfiguration.Read.All`; obtain administrator consent.
-3. Enable the public-client/device-code flow according to organizational policy.
-4. Place only the IDs in the current process environment—not in a file:
+Use an approved public-client app with the four delegated scopes, tenant admin consent, and device
+code enabled. Provide nonsecret IDs only to the current process:
 
-   ```bash
-   export AZURE_TENANT_ID='operator-supplied-value'
-   export AZURE_CLIENT_ID='operator-supplied-value'
-   python -m evidenceops live-collect --auth device-code \
-     --private-dir artifacts/private --retention-days 7
-   ```
+```bash
+export AZURE_TENANT_ID='operator-supplied-value'
+export AZURE_CLIENT_ID='operator-supplied-value'
+python -m evidenceops live-collect-apple --auth device-code \
+  --private-dir artifacts/private --retention-days 1
+```
 
-MSAL uses its in-memory cache; EvidenceOps does not configure persistent token caching. The device
-code is shown only for the attended sign-in and is never placed in evidence.
+MSAL uses an in-memory cache; EvidenceOps configures no persistent token storage. An already
+acquired short-lived token can instead be supplied as `EVIDENCEOPS_GRAPH_ACCESS_TOKEN` with
+`--auth environment-token`. EvidenceOps never writes the token.
 
-An already acquired short-lived token can instead be placed in
-`EVIDENCEOPS_GRAPH_ACCESS_TOKEN` and used with `--auth environment-token`. EvidenceOps never writes
-that token.
+## Publication
 
-## Private evidence lifecycle
-
-- The selected directory must be inside the repository and covered by `.gitignore`.
-- Directory/file modes are restricted to `0700`/`0600` where supported.
-- Existing packages are never overwritten and symlinks are not followed.
-- Retention is explicit (default seven days; maximum 90). The operator must securely delete the
-  package and backups at expiry.
-- Publication is a separate, fail-closed command with a runtime-only pseudonym key.
+The live command writes a normalized, owner-only `private-apple-*.json` package to a Git-ignored
+directory. Source IDs are retained only where needed for joins. Raw Graph responses are not
+persisted. Publication requires a fresh runtime-only HMAC key:
 
 ```bash
 export EVIDENCEOPS_PSEUDONYM_KEY='operator-generated-random-value-at-least-32-bytes'
-python -m evidenceops publish artifacts/private/private-evidence-….json \
-  --output build/sanitized-public.json
+python -m evidenceops publish-mission artifacts/private/private-apple-….json \
+  --output build/live-public/mission-control.json
+unset EVIDENCEOPS_PSEUDONYM_KEY
+python scripts/check_public_artifacts.py build/live-public
 ```
 
-Human review of a sanitized live package is required before any public placement.
+The publisher reconstructs an allowlisted public package, validates its canonical fingerprint,
+and performs the credential/content scan. Unknown fields fail closed. A human must inspect any live
+sanitized package before it can replace the public synthetic artifact.
 
-## TMCO test-tenant validation status
+## GitHub OIDC workflow
 
-The adapter has mocked contract coverage for pagination, empty collections, assignments, malformed
-fields, hostile next links, 401/403/404/429, and transient 5xx behavior. The repository now contains
-a manual-only, main-only `intune-audit.yml` workflow targeting the protected `production`
-environment. It requests only `contents: read` and `id-token: write`, obtains a process-scoped Graph
-token, writes private evidence only to ignored ephemeral storage, publishes/scans in memory and
-ignored build paths, reports aggregate sanitized counts, and deletes both packages at job end.
+`.github/workflows/intune-audit.yml` is manual, main-only, and targets the protected `production`
+environment. It checks out trusted `main`, requests only `contents: read` and `id-token: write`,
+uses the exact environment-scoped Entra federation, runs contract tests with repository-wide
+coverage addopts explicitly disabled for that smoke step, collects privately, publishes and scans
+the derived package, writes only aggregate counts to the job summary, and deletes all evidence at
+job end. Pull requests and arbitrary branches cannot obtain the production identity.
 
-The existing Entra application now has the following environment-scoped federated identity
-credential, which was created and then independently re-opened in the Entra control plane:
+## Validation status
 
-```text
-name: github-evidenceops-production
-issuer: https://token.actions.githubusercontent.com
-subject: repo:tmcoconsulting/evidenceops:environment:production
-audience: api://AzureADTokenExchange
-```
+Mocked provider and contract tests cover every configured resource family, pagination, retry,
+partial failure, schema changes, and GET-only enforcement. The original narrow configuration-only
+OIDC proof succeeded. All four required application permissions now show tenant administrator
+consent, but the expanded collector has not yet been run against the TMCO tenant from reviewed
+`main`; until that protected run succeeds, live Mission Control remains an implemented but
+unvalidated path and production continues to serve synthetic data.
 
-Application `DeviceManagementConfiguration.Read.All` is present and shows administrator consent.
-No Entra client secret exists or was created. The application also retains these pre-existing
-delegated permissions, all already consented before the EvidenceOps application permission was
-added:
+The Entra application retains pre-existing delegated permissions that are not used by the
+application-permission workflow. EvidenceOps does not remove unrelated permissions automatically.
+No client secret exists or is needed.
 
-- `DeviceManagementApps.Read.All`
-- `DeviceManagementCloudCA.Read.All`
-- `DeviceManagementConfiguration.Read.All`
-- `DeviceManagementManagedDevices.Read.All`
-- `DeviceManagementRBAC.Read.All`
-- `DeviceManagementScripts.Read.All`
-- `DeviceManagementServiceConfig.Read.All`
-- `User.Read`
+## Retention and deletion
 
-The EvidenceOps production workflow does not request or use those delegated permissions. Several
-are broader than the narrow configuration collection proof; they were left unchanged because they
-pre-date this project and require application-owner review before removal.
-
-Live TMCO validation remains outstanding. The privileged workflow is manual, checks out reviewed
-`main`, and targets the protected `production` environment, so it must not be executed from this
-feature branch. No endpoint is reported as live-validated until that controlled post-merge run
-succeeds. Do not add a client secret or broaden the documented application permission.
+- Private directories/files use `0700`/`0600` where supported.
+- Existing packages are never overwritten and symlinks are not followed.
+- Retention is explicit from 1–30 days; the operator must delete the package and backups at expiry.
+- Public output contains only aggregates, approved technical values, hashes, and pseudonymous
+  references.
+- Graph tokens and pseudonymization keys remain process-scoped and must be unset after use.

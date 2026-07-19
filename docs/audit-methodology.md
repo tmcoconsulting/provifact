@@ -42,6 +42,33 @@ claiming requirements not established by authoritative sources. A mapping record
 version, reviewer, rationale, and known ambiguity. Passing a technical check does not by itself
 prove organizational compliance.
 
+The Build Week demo pins the complete 98-rule macOS CIS Level 1 inventory from one mSCP revision.
+Only five rules currently have explicit mappings from approved baseline metadata to safe Intune
+setting keys. Their CIS, STIG, NIST SP 800-171, NIST SP 800-53, and CMMC identifiers are copied from
+the pinned source and tested; GPT does not create crosswalks. Unsupported rules remain visible and
+outside the score denominator. iOS/iPadOS has no approved baseline in this repository and is not
+scored against the macOS inventory.
+
+## Drift and severity methodology
+
+Stable matching uses explicit rule mappings, payload/setting keys, safe normalized metadata, and
+reviewed aliases—not display names alone. The algorithm first detects missing observations and
+conflicting values, then evaluates exact or typed maximum values, and finally checks normalized
+assignment presence. An invalid or incomparable numeric value becomes human review, not a match.
+
+Severity is baseline-mapping metadata, not model judgment. The demo marks encryption and firewall
+drift high, firewall stealth and password enforcement medium, and idle-timeout drift low. Severity
+prioritizes technical review; it does not estimate business risk, accept risk, or establish a
+compliance verdict. Every drift finding continues to require additional evidence and human review.
+
+## Evidence history
+
+The smallest demo history mechanism is a pair of sanitized, fingerprinted snapshots embedded in
+the generated Mission package. It reports score change, changed requirements, new drift, resolved
+drift, and endpoint gaps. No Cloudflare database or raw tenant history was added. A future
+operational history store must accept sanitized packages only and receive its own retention and
+access-control review.
+
 ## Narrative discipline
 
 Generated analysis must:

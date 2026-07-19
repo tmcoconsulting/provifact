@@ -1,9 +1,12 @@
 from __future__ import annotations
 
 import io
+import time
 import urllib.error
 from collections.abc import Mapping
+from concurrent.futures import ThreadPoolExecutor
 from email.message import Message
+from threading import Event
 from types import SimpleNamespace
 
 import pytest
@@ -173,6 +176,21 @@ class FakeMsalApplication:
         return self.result
 
 
+class BlockingFakeMsalApplication(FakeMsalApplication):
+    def __init__(self, flow: dict[str, object], result: dict[str, object]) -> None:
+        super().__init__(flow, result)
+        self.started = Event()
+        self.release = Event()
+        self.acquire_calls = 0
+
+    def acquire_token_by_device_flow(self, flow: dict[str, object]) -> dict[str, object]:
+        self.acquire_calls += 1
+        self.started.set()
+        if not self.release.wait(timeout=2):
+            raise AssertionError("test device-code acquisition was not released")
+        return super().acquire_token_by_device_flow(flow)
+
+
 def _install_fake_msal(
     monkeypatch: pytest.MonkeyPatch, application: FakeMsalApplication
 ) -> list[tuple[object, object, object]]:
@@ -207,6 +225,30 @@ def test_device_code_provider_uses_memory_and_caches_token(
     assert calls[0][2] is None
     assert app.scopes == ["https://graph.microsoft.com/DeviceManagementConfiguration.Read.All"]
     assert "SAFE-CODE" in prompts[0]
+
+
+def test_device_code_provider_serializes_concurrent_token_acquisition(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    app = BlockingFakeMsalApplication(
+        {"user_code": "SAFE-CODE", "verification_uri": "https://microsoft.com/devicelogin"},
+        {"access_token": "short-lived-test-token"},
+    )
+    calls = _install_fake_msal(monkeypatch, app)
+    prompts: list[str] = []
+    provider = DeviceCodeTokenProvider(
+        tenant_id="tenant-placeholder", client_id="client-placeholder", prompt=prompts.append
+    )
+    with ThreadPoolExecutor(max_workers=4) as pool:
+        futures = [pool.submit(provider.get_token)]
+        assert app.started.wait(timeout=1)
+        futures.extend(pool.submit(provider.get_token) for _ in range(3))
+        time.sleep(0.05)
+        assert app.acquire_calls == 1
+        app.release.set()
+        assert [future.result(timeout=1) for future in futures] == ["short-lived-test-token"] * 4
+    assert len(calls) == 1
+    assert len(prompts) == 1
 
 
 @pytest.mark.parametrize(

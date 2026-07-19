@@ -29,6 +29,17 @@ from evidenceops.evidence import (
     write_private_package,
     write_public_package,
 )
+from evidenceops.evidence.mission import (
+    build_public_mission_snapshot,
+    validate_public_mission_snapshot,
+)
+from evidenceops.evidence.mission_storage import (
+    collection_from_private_document,
+    load_private_collection,
+    private_collection_document,
+    write_private_collection,
+)
+from evidenceops.mission_demo import build_mission_demo
 from evidenceops.narrative import (
     DEFAULT_OPENAI_MODEL,
     NarrativeGenerationError,
@@ -38,6 +49,7 @@ from evidenceops.narrative import (
     verify_narrative,
 )
 from evidenceops.providers import (
+    AppleIntuneProvider,
     DeviceCodeTokenProvider,
     EnvironmentTokenProvider,
     GraphClient,
@@ -56,7 +68,17 @@ STATIC_DEMO_FILENAMES: Final = {
     "phase1-verification.json",
     "phase1-rejected-verification.json",
     "demo-summary.json",
+    "mission-control.json",
 }
+APPLE_DELEGATED_SCOPES: Final = tuple(
+    f"https://graph.microsoft.com/{permission}"
+    for permission in (
+        "DeviceManagementConfiguration.Read.All",
+        "DeviceManagementManagedDevices.Read.All",
+        "DeviceManagementApps.Read.All",
+        "DeviceManagementServiceConfig.Read.All",
+    )
+)
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -67,15 +89,33 @@ def build_parser() -> argparse.ArgumentParser:
     demo = subparsers.add_parser("run-demo", help="run the credential-free synthetic flow")
     demo.add_argument("--output-dir", type=Path, default=Path("build/synthetic-demo"))
 
+    mission_demo = subparsers.add_parser(
+        "run-mission-demo", help="build the credential-free Mission Control vertical slice"
+    )
+    mission_demo.add_argument("--output-dir", type=Path, default=Path("build/mission-demo"))
+
     live = subparsers.add_parser("live-collect", help="collect the narrow Intune slice read-only")
     live.add_argument("--private-dir", type=Path, default=Path("artifacts/private"))
     live.add_argument("--desired-state", type=Path, default=DEFAULT_DESIRED_FIXTURE)
     live.add_argument("--retention-days", type=int, default=7)
     live.add_argument("--auth", choices=("device-code", "environment-token"), required=True)
 
+    live_apple = subparsers.add_parser(
+        "live-collect-apple", help="collect normalized Apple Intune evidence read-only"
+    )
+    live_apple.add_argument("--private-dir", type=Path, default=Path("artifacts/private"))
+    live_apple.add_argument("--retention-days", type=int, default=1)
+    live_apple.add_argument("--auth", choices=("device-code", "environment-token"), required=True)
+
     publish = subparsers.add_parser("publish", help="sanitize a selected private package")
     publish.add_argument("private_package", type=Path)
     publish.add_argument("--output", type=Path, required=True)
+
+    publish_mission = subparsers.add_parser(
+        "publish-mission", help="sanitize a normalized private Apple collection"
+    )
+    publish_mission.add_argument("private_collection", type=Path)
+    publish_mission.add_argument("--output", type=Path, required=True)
 
     generate = subparsers.add_parser(
         "generate-narrative", help="opt in to GPT-5.6 analysis of sanitized evidence"
@@ -104,6 +144,8 @@ def main(argv: list[str] | None = None) -> int:
     try:
         if args.command == "run-demo":
             _run_demo(args.output_dir)
+        elif args.command == "run-mission-demo":
+            _run_mission_demo(args.output_dir)
         elif args.command == "live-collect":
             _live_collect(
                 args.private_dir,
@@ -113,6 +155,14 @@ def main(argv: list[str] | None = None) -> int:
             )
         elif args.command == "publish":
             _publish(args.private_package, args.output)
+        elif args.command == "live-collect-apple":
+            _live_collect_apple(
+                args.private_dir,
+                retention_days=args.retention_days,
+                auth=args.auth,
+            )
+        elif args.command == "publish-mission":
+            _publish_mission(args.private_collection, args.output)
         elif args.command == "generate-narrative":
             _generate_narrative(args.public_package, args.output, model=args.model)
         elif args.command == "verify-narrative":
@@ -142,6 +192,15 @@ def _run_demo(output_directory: Path) -> None:
     for filename, document in _synthetic_artifacts().items():
         _write_new_json(destination / filename, document)
     print(f"synthetic demo complete: {destination}")
+
+
+def _run_mission_demo(output_directory: Path) -> None:
+    destination = output_directory.resolve()
+    if destination.exists() and any(destination.iterdir()):
+        raise ValueError("Mission demo output directory must not exist or must be empty")
+    destination.mkdir(mode=0o755, parents=True, exist_ok=True)
+    _write_new_json(destination / "mission-control.json", build_mission_demo())
+    print(f"synthetic Mission Control demo complete: {destination}")
 
 
 def _live_collect(
@@ -196,6 +255,49 @@ def _publish(private_path: Path, output: Path) -> None:
     print(f"sanitized package written: {written.resolve()}")
 
 
+def _live_collect_apple(private_directory: Path, *, retention_days: int, auth: str) -> None:
+    if retention_days < 1 or retention_days > 30:
+        raise ValueError("retention-days must be between 1 and 30")
+    token_provider: TokenProvider
+    if auth == "environment-token":
+        token_provider = EnvironmentTokenProvider(
+            _required_environment("EVIDENCEOPS_GRAPH_ACCESS_TOKEN")
+        )
+    else:
+        token_provider = DeviceCodeTokenProvider(
+            tenant_id=_required_environment("AZURE_TENANT_ID"),
+            client_id=_required_environment("AZURE_CLIENT_ID"),
+            scopes=APPLE_DELEGATED_SCOPES,
+        )
+    collection = AppleIntuneProvider(GraphClient(token_provider=token_provider)).collect()
+    delete_after = datetime.now(UTC) + timedelta(days=retention_days)
+    document = private_collection_document(
+        collection,
+        delete_after_utc=delete_after.isoformat(timespec="seconds").replace("+00:00", "Z"),
+    )
+    output = write_private_collection(
+        document,
+        directory=private_directory,
+        repository_root=REPOSITORY_ROOT,
+    )
+    print(f"normalized private Apple collection written: {output}")
+
+
+def _publish_mission(private_path: Path, output: Path) -> None:
+    document = load_private_collection(private_path)
+    collection = collection_from_private_document(document)
+    key = _required_environment("EVIDENCEOPS_PSEUDONYM_KEY").encode("utf-8")
+    public = build_public_mission_snapshot(
+        collection,
+        pseudonym_key=key,
+        synthetic=False,
+        source_git_commit=_git_commit_sha(),
+    )
+    validate_public_mission_snapshot(public)
+    _write_new_json(output, public)
+    print(f"sanitized Mission Control package written: {output.resolve()}")
+
+
 def _generate_narrative(public_path: Path, output: Path, *, model: str) -> None:
     public = load_evidence_package(public_path)
     narrative = OpenAINarrativeAdapter(transport=OpenAIResponsesTransport(), model=model).generate(
@@ -240,6 +342,7 @@ def _synthetic_artifacts() -> dict[str, EvidenceObject]:
         "phase1-verification.json": verification,
         "phase1-rejected-verification.json": rejected_verification,
         "demo-summary.json": _demo_summary(public, narrative, verification, rejected_verification),
+        "mission-control.json": build_mission_demo(),
     }
 
 

@@ -2,6 +2,7 @@ import { describe, expect, it, vi } from "vitest";
 
 import fixtureNarrative from "../docs/assets/data/phase1-fixture-narrative.json";
 import fixturePackage from "../docs/assets/data/phase1-public-evidence.json";
+import missionFixture from "../docs/assets/data/mission-control.json";
 import worker from "../worker/src/index";
 import { validatePublicPackage } from "../worker/src/contracts";
 import type { StaticAssetBinding, WorkerEnv } from "../worker/src/env";
@@ -37,7 +38,7 @@ function modelOutput(): NarrativeModelOutput {
   });
 }
 
-function assetBinding(): StaticAssetBinding {
+function assetBinding(mission: unknown = missionFixture): StaticAssetBinding {
   return {
     async fetch(input: RequestInfo | URL): Promise<Response> {
       const url = new URL(
@@ -50,6 +51,9 @@ function assetBinding(): StaticAssetBinding {
       if (url.pathname === "/assets/data/phase1-fixture-narrative.json") {
         return Response.json(fixtureNarrative);
       }
+      if (url.pathname === "/assets/data/mission-control.json") {
+        return Response.json(mission);
+      }
       return new Response("static asset", { status: 200 });
     },
   };
@@ -61,10 +65,11 @@ function environment(
     apiKey?: string;
     globalRateLimitSuccess?: boolean;
     rateLimitSuccess?: boolean;
+    mission?: unknown;
   } = {},
 ): WorkerEnv {
   return {
-    ASSETS: assetBinding(),
+    ASSETS: assetBinding(options.mission),
     EVIDENCEOPS_MODE: mode,
     NARRATIVE_GLOBAL_RATE_LIMITER: {
       async limit(): Promise<{ success: boolean }> {
@@ -93,6 +98,22 @@ function narrativeRequest(document: unknown = packageDocument()): Request {
   });
 }
 
+function assistantRequest(
+  question = "What are the highest-severity findings?",
+  snapshotId = missionFixture.snapshot_id,
+  document?: unknown,
+): Request {
+  return new Request(`${ORIGIN}/api/ask`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Origin: ORIGIN,
+      "Sec-Fetch-Site": "same-origin",
+    },
+    body: JSON.stringify(document ?? { question, snapshot_id: snapshotId }),
+  });
+}
+
 function responseEnvelope(output: NarrativeModelOutput): object {
   return {
     output: [
@@ -113,6 +134,15 @@ describe("Worker routes", () => {
     );
     expect(response.status).toBe(200);
     expect(response.headers.get("X-Request-ID")).toMatch(/^[0-9a-f-]+$/);
+    expect(response.headers.get("Strict-Transport-Security")).toBe(
+      "max-age=31536000",
+    );
+    expect(response.headers.get("Content-Security-Policy")).toContain(
+      "default-src 'none'",
+    );
+    expect(response.headers.get("Cross-Origin-Opener-Policy")).toBe(
+      "same-origin",
+    );
     const text = await response.text();
     expect(text).not.toContain(secret);
     const status = JSON.parse(text);
@@ -122,8 +152,66 @@ describe("Worker routes", () => {
       model_configured: true,
       byok_supported: false,
       intune_write_capability: false,
+      data_mode: "SYNTHETIC DEMO DATA",
+      live_intune_collection_performed: false,
+      source_snapshot_id: missionFixture.snapshot_id,
     });
     expect(status).not.toHaveProperty("ai_model_call_performed");
+  });
+
+  it("separates liveness from fail-closed evidence readiness", async () => {
+    const health = await worker.fetch(
+      new Request(`${ORIGIN}/api/health`),
+      environment("fixture", { mission: { invalid: true } }),
+    );
+    expect(health.status).toBe(200);
+    await expect(health.json()).resolves.toMatchObject({
+      service: "EvidenceOps Worker",
+      status: "ok",
+    });
+
+    const ready = await worker.fetch(
+      new Request(`${ORIGIN}/api/ready`),
+      environment(),
+    );
+    expect(ready.status).toBe(200);
+    await expect(ready.json()).resolves.toMatchObject({
+      narrative_mode: "fixture",
+      status: "ready",
+      mission: {
+        data_mode: "SYNTHETIC DEMO DATA",
+        snapshot_id: missionFixture.snapshot_id,
+      },
+    });
+
+    const invalidMission = await worker.fetch(
+      new Request(`${ORIGIN}/api/ready`),
+      environment("fixture", { mission: { invalid: true } }),
+    );
+    expect(invalidMission.status).toBe(503);
+    await expect(invalidMission.json()).resolves.toMatchObject({
+      error: "mission_schema_rejected",
+    });
+
+    const missingLiveKey = await worker.fetch(
+      new Request(`${ORIGIN}/api/ready`),
+      environment("openai"),
+    );
+    expect(missingLiveKey.status).toBe(503);
+    await expect(missingLiveKey.json()).resolves.toMatchObject({
+      error: "runtime_not_ready",
+    });
+  });
+
+  it("allows only GET on health and readiness routes", async () => {
+    for (const route of ["health", "ready"]) {
+      const response = await worker.fetch(
+        new Request(`${ORIGIN}/api/${route}`, { method: "POST" }),
+        environment(),
+      );
+      expect(response.status).toBe(405);
+      expect(response.headers.get("Allow")).toBe("GET");
+    }
   });
 
   it("reports an unavailable live model without silently selecting fixture mode", async () => {
@@ -182,6 +270,190 @@ describe("Worker routes", () => {
       verification: { accepted: false, human_review_required: true },
     });
   });
+
+  it.each([
+    ["What is our overall macOS CIS Level 1 alignment?", "alignment"],
+    ["Which FileVault requirements are not aligned?", "filevault"],
+    ["What changed since the previous collection?", "changes"],
+    ["Which devices are noncompliant?", "device_posture"],
+    ["Are any policies unassigned?", "assignment_drift"],
+    ["Which policies conflict?", "conflicts"],
+    ["What data could not be collected?", "collection_gaps"],
+  ])("answers bounded fixture question %s as %s", async (question, intent) => {
+    const outboundFetch = vi.fn<typeof fetch>();
+    const response = await handleRequest(
+      assistantRequest(question),
+      environment(),
+      { outboundFetch },
+    );
+    expect(response.status).toBe(200);
+    expect(outboundFetch).not.toHaveBeenCalled();
+    await expect(response.json()).resolves.toMatchObject({
+      mode: "fixture",
+      ai_model_call_performed: false,
+      question_intent: intent,
+      human_review_required: true,
+      answer: {
+        ai_generated_analysis: false,
+        human_review_required: true,
+        evidence_timestamp: missionFixture.collection.collected_at_utc,
+      },
+      verification: {
+        status: "typed_claims_verified",
+        generated_prose_quarantined: true,
+      },
+    });
+  });
+
+  it("returns the exact insufficient-evidence response for unclassified questions", async () => {
+    const response = await handleRequest(
+      assistantRequest("Who approved the annual corporate risk assessment?"),
+      environment(),
+    );
+    await expect(response.json()).resolves.toMatchObject({
+      question_intent: "insufficient",
+      answer: {
+        direct_answer:
+          "EvidenceOps does not have sufficient collected evidence to answer this question.",
+        evidence_sufficiency: "insufficient",
+      },
+      verification: { status: "insufficient_evidence" },
+    });
+  });
+
+  it("rejects assistant credentials, unknown fields, and stale package IDs before model egress", async () => {
+    const outboundFetch = vi.fn<typeof fetch>();
+    await expect(
+      handleRequest(
+        assistantRequest(`ghp_${"A".repeat(40)}`),
+        environment("openai", { apiKey: TEST_API_KEY }),
+        { outboundFetch },
+      ),
+    ).rejects.toMatchObject({ code: "publication_policy_rejected" });
+    await expect(
+      handleRequest(
+        assistantRequest("safe", missionFixture.snapshot_id, {
+          question: "safe question",
+          snapshot_id: missionFixture.snapshot_id,
+          unexpected: true,
+        }),
+        environment(),
+      ),
+    ).rejects.toMatchObject({ code: "assistant_request_rejected" });
+    await expect(
+      handleRequest(
+        assistantRequest("What changed?", `mission-${"0".repeat(24)}`),
+        environment(),
+      ),
+    ).rejects.toMatchObject({ code: "mission_package_changed", status: 409 });
+    expect(outboundFetch).not.toHaveBeenCalled();
+  });
+
+  it("rejects a tampered mission asset before model egress", async () => {
+    const tampered = structuredClone(missionFixture);
+    tampered.metrics.alignment_percent = 100;
+    const outboundFetch = vi.fn<typeof fetch>();
+    await expect(
+      handleRequest(
+        assistantRequest(),
+        environment("openai", { apiKey: TEST_API_KEY, mission: tampered }),
+        { outboundFetch },
+      ),
+    ).rejects.toMatchObject({ code: "mission_schema_rejected" });
+    expect(outboundFetch).not.toHaveBeenCalled();
+  });
+
+  it("sends only a bounded selected context to GPT-5.6 and verifies typed claims", async () => {
+    const high = missionFixture.findings.filter(
+      (finding) => finding.severity === "high",
+    );
+    const modelAnswer = {
+      direct_answer: `${high.length} high-severity technical findings require human review.`,
+      claims: high.map((finding) => ({
+        claim_code: "finding_outcome",
+        subject_id: finding.finding_id,
+        claim_value: finding.drift_type,
+      })),
+      evidence_references: [
+        missionFixture.snapshot_id,
+        ...high.map((finding) => finding.finding_id),
+      ],
+      evidence_sufficiency: "verified",
+      limitations: [
+        "Technical evidence is not an assessor conclusion; human review is required.",
+      ],
+      additional_evidence_required: [
+        "Review scope and operating effectiveness.",
+      ],
+      suggested_human_review_questions: [
+        "Does human review confirm the intended scope?",
+      ],
+    };
+    const outboundFetch = vi.fn<typeof fetch>(async (_input, init) => {
+      expect(init?.method).toBe("POST");
+      if (typeof init?.body !== "string") throw new Error("expected JSON body");
+      expect(init.body.length).toBeLessThan(16_000);
+      const body = JSON.parse(init.body) as Record<string, unknown>;
+      expect(body).toMatchObject({
+        model: "gpt-5.6-terra",
+        store: false,
+        max_output_tokens: 700,
+        reasoning: { effort: "low" },
+      });
+      expect(body).not.toHaveProperty("tools");
+      expect(init.body).not.toContain("synthetic-device-mac");
+      return Response.json({
+        output: [
+          {
+            type: "message",
+            content: [
+              { type: "output_text", text: JSON.stringify(modelAnswer) },
+            ],
+          },
+        ],
+      });
+    });
+    const response = await handleRequest(
+      assistantRequest(),
+      environment("openai", { apiKey: TEST_API_KEY }),
+      { outboundFetch },
+    );
+    expect(outboundFetch).toHaveBeenCalledTimes(1);
+    await expect(response.json()).resolves.toMatchObject({
+      mode: "openai",
+      ai_model_call_performed: true,
+      verification: { status: "typed_claims_verified" },
+    });
+  });
+
+  it.each([
+    ["insufficient_quota", "assistant_quota_unavailable"],
+    ["rate_limit_exceeded", "assistant_upstream_rate_limited"],
+  ])(
+    "classifies sanitized assistant 429 code %s without exposing details",
+    async (upstreamCode, errorCode) => {
+      const privateDetail = `ghp_${"A".repeat(40)}`;
+      await expect(
+        handleRequest(
+          assistantRequest(),
+          environment("openai", { apiKey: TEST_API_KEY }),
+          {
+            outboundFetch: async () =>
+              Response.json(
+                {
+                  error: {
+                    code: upstreamCode,
+                    message: privateDetail,
+                    type: "invalid_request_error",
+                  },
+                },
+                { status: 429 },
+              ),
+          },
+        ),
+      ).rejects.toMatchObject({ code: errorCode, status: 503 });
+    },
+  );
 
   it("rejects cross-origin, BYOK, compressed, and oversized requests", async () => {
     const crossOrigin = narrativeRequest();

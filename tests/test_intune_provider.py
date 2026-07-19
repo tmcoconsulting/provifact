@@ -199,8 +199,40 @@ def test_client_rejects_invalid_bounds_and_non_v1_path() -> None:
     with pytest.raises(ValueError, match="positive"):
         GraphClient(token_provider=EnvironmentTokenProvider("token"), timeout_seconds=0)
     client, _ = _client({})
-    with pytest.raises(ValueError, match="v1.0"):
-        client.get_collection("/beta/deviceManagement/deviceConfigurations")
+    with pytest.raises(ValueError, match="v1.0 or beta"):
+        client.get_collection("/future/deviceManagement/deviceConfigurations")
+
+
+def test_client_allows_explicit_beta_and_single_object_get() -> None:
+    beta = "https://graph.microsoft.com/beta/deviceManagement/configurationPolicies"
+    singleton = "https://graph.microsoft.com/v1.0/deviceManagement/applePushNotificationCertificate"
+    client, transport = _client(
+        {
+            beta: [_response(200, {"value": []})],
+            singleton: [_response(200, {"state": "healthy"})],
+        }
+    )
+    assert client.get_collection("/beta/deviceManagement/configurationPolicies") == []
+    assert client.get_object("/v1.0/deviceManagement/applePushNotificationCertificate") == {
+        "state": "healthy"
+    }
+    assert [call[0] for call in transport.calls] == [beta, singleton]
+
+
+def test_beta_pagination_cannot_switch_api_version() -> None:
+    beta = "https://graph.microsoft.com/beta/deviceManagement/configurationPolicies"
+    client, _ = _client(
+        {
+            beta: [
+                _response(
+                    200,
+                    {"value": [], "@odata.nextLink": ROOT},
+                )
+            ]
+        }
+    )
+    with pytest.raises(GraphProviderError, match="malformed_response"):
+        client.get_collection("/beta/deviceManagement/configurationPolicies")
 
 
 @pytest.mark.parametrize("retry_after", ["invalid-date", "-5", "999"])
@@ -217,6 +249,27 @@ def test_retry_after_fallback_and_bounds(retry_after: str) -> None:
     )
     client.get_collection("/v1.0/deviceManagement/deviceConfigurations")
     assert 0 <= sleeps[0] <= 60
+
+
+def test_exponential_backoff_uses_bounded_jitter() -> None:
+    sleeps: list[float] = []
+    transport = FakeTransport({ROOT: [_response(503, {}), _response(200, {"value": []})]})
+    client = GraphClient(
+        token_provider=EnvironmentTokenProvider("synthetic-access-token"),
+        transport=transport,
+        sleeper=sleeps.append,
+        jitter=lambda maximum: maximum,
+    )
+    client.get_collection("/v1.0/deviceManagement/deviceConfigurations")
+    assert sleeps == [1.25]
+
+
+def test_conflict_is_structured_and_not_retried() -> None:
+    client, transport = _client({ROOT: [_response(409, {"error": {"code": "Conflict"}})]})
+    with pytest.raises(GraphProviderError) as caught:
+        client.get_collection("/v1.0/deviceManagement/deviceConfigurations")
+    assert caught.value.category is GraphErrorCategory.CONFLICT
+    assert len(transport.calls) == 1
 
 
 @pytest.mark.parametrize(

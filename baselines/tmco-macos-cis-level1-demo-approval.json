@@ -1,0 +1,28 @@
+{
+  "approval_date": "2026-07-19",
+  "approval_rationale": "Provide reproducible technical drift detection for the EvidenceOps Build Week demo.",
+  "approval_status": "internally approved demo baseline",
+  "approver": "TMCO Build Week Demo Authority",
+  "baseline_name": "TMCO macOS CIS Level 1 Build Week Demo Baseline",
+  "benchmark": "CIS Apple macOS 26 Tahoe Benchmark Level 1",
+  "benchmark_version": "macOS 26.0 / pinned mSCP profile",
+  "extracted_baseline_sha256": "5cced0709c90885ede600f00a640a35b0679aed933cda456db80ee629ee54d41",
+  "license": "CC-BY-4.0 (upstream mSCP metadata; Apple vendor descriptions excluded)",
+  "limitations": [
+    "This internal demo approval is not CIS, NIST, DoD, C3PAO, or assessor certification.",
+    "Only explicitly mapped settings are automatically evaluated.",
+    "iOS and iPadOS are outside this macOS baseline and are not scored against it.",
+    "Organizational, procedural, interview, and assessor evidence remain required."
+  ],
+  "mscp_source_revision": "11b5896e4f12f43410686024f543792742562c91",
+  "organization": "TMCO Consulting",
+  "platform": "macOS",
+  "repository_commit": "3dd8902a609c6be177cdc913c731fbd378f075a4",
+  "rule_count": 98,
+  "schema_version": "1.0.0",
+  "scope": "macOS technical configuration evidence only",
+  "source_artifact_sha256": "af9ef14ca568f17d3663e6e508c1f75971596fe43c6f185af27ca43451c240d2",
+  "source_path": "src/mscp/data/baselines/macos/cis_lvl1_macos_26.0.yaml",
+  "source_url": "https://github.com/usnistgov/macos_security",
+  "supersedes": null
+}
