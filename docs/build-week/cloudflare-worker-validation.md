@@ -18,10 +18,11 @@
 
 ## Scope
 
-This milestone adds and deploys the Worker/static-assets runtime selected after Phase 1 security
-remediation. It does not complete Phase 1: live TMCO Intune validation and a successful generated
-OpenAI narrative remain outstanding. Production intentionally serves the synthetic fixture after
-the bounded OpenAI validation returned capacity unavailable.
+This milestone added and deployed the Worker/static-assets runtime selected after Phase 1 security
+remediation. At this checkpoint, live TMCO Intune validation and a successful generated OpenAI
+narrative remained outstanding, and production intentionally served the synthetic fixture after
+the first bounded OpenAI validation returned capacity unavailable. Later dated sections record the
+successful model validation, protected GET-only audit, and reviewed sanitized publication.
 
 Implemented runtime controls include:
 
@@ -167,21 +168,22 @@ and passed the public-artifact scan. No deployment was made for this continuatio
   its value with the only active key belonging to the project service account
   `evidenceops-cloudflare-production`; no key value was exposed to Codex, GitHub, or the repository.
 
-## External validation not performed
+## Gates that remained outstanding at this checkpoint
 
-- No Microsoft Graph or Intune request was made. The trust and permission are now configured, but
-  the workflow remains restricted to protected `main` and must not run from this feature branch.
+- No Microsoft Graph or Intune request had been made at this checkpoint. The trust and permission
+  were configured, but the workflow remained restricted to protected `main` and could not run from
+  the feature branch.
 - OpenAI project controls were later verified in the authenticated Platform UI: the service account
   is the only nonhuman project member, the project allows only `gpt-5.6-terra`, the model limit is
   5 RPM/25,000 TPM, the monthly soft budget is `$5`, and alerts exist at 50%, 80%, and 100%.
-  A project budget is a soft alert—not a hard spending cap. One bounded live response remains a
+  A project budget is a soft alert—not a hard spending cap. One bounded live response remained a
   separate validation gate.
 - The service account is assigned only the custom `evidenceops-responses-runtime` role. That role
   grants Responses API model capability and no file, assistant, thread, eval, fine-tuning, vector,
   project-administration, usage-export, or key-management permission.
-- The protected GitHub environment contains `CLOUDFLARE_API_TOKEN` by name only. Its ownership,
-  validity, and Cloudflare resource scope have not been independently verified; deployment remains
-  disabled through `CLOUDFLARE_DEPLOY_ENABLED=false`.
+- The protected GitHub environment contained `CLOUDFLARE_API_TOKEN` by name only. Its ownership,
+  validity, and Cloudflare resource scope had not yet been independently verified; deployment
+  remained disabled through `CLOUDFLARE_DEPLOY_ENABLED=false`.
 - No production rollback was executed because earlier versions used live model mode; the CLI
   deployment history and rollback command were verified instead.
 
@@ -199,3 +201,27 @@ immediately redeployed from the reviewed configuration and independently verifie
 
 This later success supersedes only the earlier capacity-unavailable operational result. It does not
 alter the historical validation record or make generated analysis authoritative.
+
+## 2026-07-19 protected collection and live sanitized publication
+
+Protected-main audit `29701160503` completed the environment-scoped OIDC exchange, all configured
+GET-only collection families, fail-closed publication, aggregate reporting, and ephemeral cleanup.
+It retained no artifact. A separately reviewed publication handoff was then merged as
+`b966cd0a5b20580b046c6ed3bb31057f7682bda7`; protected run `29702128497` retained exactly one
+scanned public Mission file for one day and no private package.
+
+The selected artifact was independently revalidated and deployed. Production now reports live
+sanitized evidence while keeping narrative mode explicitly fixture-based. The status endpoint and
+Mission asset matched the selected snapshot; the dashboard, fixture assistant, TLS, and browser/API
+security headers passed. No secret, raw Graph response, tenant identifier, assignment identity, or
+private package was logged, committed, deployed, or retained.
+
+Cloudflare UI inspection independently verified that `evidenceops-github-deploy` is an active
+account token with only Workers Scripts write access on the TMCO Consulting account. Protected
+deployment run `29702213181` proved that the GitHub environment secret is bound to that working
+token without exposing the value: validation and upload succeeded. Wrangler then made an
+unnecessary zone-route inspection because the existing custom domain was still declarative; the
+narrow token correctly denied it after activation. The pending routine-deployment fix treats the
+custom domain as a separately provisioned control-plane resource, removes route management from
+routine uploads, and adds an exact deployed-snapshot check. `CLOUDFLARE_DEPLOY_ENABLED` remains
+`false` outside the bounded retry window.

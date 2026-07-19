@@ -329,3 +329,15 @@ tenant-derived evidence. The two-workflow boundary preserves a human inspection 
 private artifact retention, and gives the deployed revision an auditable source without adding a
 database or a scheduled live workflow. Nested public metadata now uses explicit field allowlists so
 a recomputed fingerprint cannot legitimize an unknown field.
+
+## 2026-07-19 — Keep routine Worker uploads outside custom-domain management
+
+**Decision:** Treat `evidenceops.tmcoconsulting.com` as a separately provisioned Cloudflare
+control-plane resource. Omit routes/custom domains from the routine production Wrangler upload,
+require an explicit manual confirmation input, keep the emergency environment enable flag false
+outside reviewed windows, and verify the exact deployed snapshot ID after upload.
+
+**Why:** The account token has only Workers Scripts write access. It successfully uploaded and
+activated the reviewed Worker/assets but could not inspect a zone route that routine code deployment
+does not need to manage. Separating these concerns preserves the narrow token, avoids DNS/route
+mutation authority, and makes a wrong or stale deployment fail the exact runtime status check.

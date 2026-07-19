@@ -2,9 +2,10 @@
 
 **Date:** 2026-07-19
 
-**Branch:** `codex/build-week-demo-slice`
+**Branches:** `codex/build-week-demo-slice`, `codex/live-publication-handoff`, and
+`codex/phase1-finalization`
 
-**Data mode:** synthetic fixture
+**Data modes:** tracked synthetic fixture; deployed reviewed live sanitized projection
 
 **Human review:** required
 
@@ -23,6 +24,8 @@
 - `c328e4b` — green responsive-head validation record
 - `3cd611d` — assistant, audit-reporting, and device-code review fixes
 - `0220b2c` — fail-closed duplicate public-artifact filename detection
+- `b966cd0` — reviewed sanitized-publication handoff squash merge
+- `aa9c8fa` — routine deployment isolated from custom-domain management; review required
 
 TJ reviewed PR #2 through `0220b2cf19a5dd019f1d18f90a2e45acc99242df`. PR #2 was squash-merged
 through protected `main` as `7d7f8bca0ac7b652e515a360755b534af99c0b46`. The follow-up live
@@ -250,16 +253,58 @@ The only skipped test is the local credential-gated Intune test. No feature-bran
 OpenAI request, Cloudflare deployment, or production mutation occurred while validating this
 checkpoint.
 
-## Outstanding gates
+## Reviewed live-publication evidence
 
-1. Review and merge the narrow one-day scanned-public-package handoff. It must never upload the
-   private normalized package or a raw response.
-2. Run the publication-preparation input once from protected main, review the sanitized package,
-   and pass only that successful run ID to the separate deployment workflow.
-3. Keep the Cloudflare deployment workflow disabled until the environment token's least-privilege
-   scope is independently verified.
-4. Run `/feedback` in the primary Codex task and preserve the Session ID privately.
+PR #4 was separately reviewed and squash-merged as
+`b966cd0a5b20580b046c6ed3bb31057f7682bda7`. Protected-main run `29702128497` then acquired the
+environment-scoped OIDC identity, used only the allowlisted Graph `GET` paths, built and scanned the
+public Mission projection, and uploaded exactly one public file with one-day retention. The private
+normalized package, Graph responses, access token, and pseudonym key were never uploaded and were
+removed by the always-run cleanup step.
 
-The bounded model response and protected expanded Intune audit are complete. Phase 1 still must not
-be called technically complete until the reviewed sanitized live package is the source of the
-production dashboard and production validation confirms that boundary.
+The public artifact was downloaded to an isolated temporary directory and passed the strict Mission
+schema, canonical fingerprint, nested field classification, shared credential scan, and public
+content scan before deployment. Only aggregate public values are recorded here:
+
+- 98 baseline rules;
+- 5 rules in the deterministic alignment denominator;
+- 0 aligned and 5 drifted observations;
+- 13 policy objects evaluated;
+- 5 declared collection gaps;
+- 94 unmapped objects; and
+- no retained raw/private evidence.
+
+Deployment run `29702213181` repeated all validation and successfully uploaded and activated the
+reviewed Worker and assets. Wrangler then attempted to inspect the already-provisioned custom-domain
+route because it was still declarative in the production configuration. The intentionally narrow
+account token has only Workers Scripts write access, so that unnecessary post-upload inspection was
+denied. This was a safe partial failure: the domain and DNS were not changed, and production status
+independently matched the selected live sanitized snapshot.
+
+The production dashboard, Mission asset, `/api/status`, fixture assistant, TLS, CSP, HSTS, frame,
+MIME, referrer, permissions, cache, and cross-origin headers were revalidated. The assistant made
+no model call, verified its typed claims, quarantined generated prose, and retained human review.
+The temporary repository-level deployment flag used to start the diagnostic run was deleted;
+`CLOUDFLARE_DEPLOY_ENABLED` remains `false` in the protected environment.
+
+Commit `aa9c8fa` removes custom-domain/route management from routine uploads, requires explicit
+manual deployment confirmation, limits the Cloudflare secret to the deploy step, and verifies the
+exact expected snapshot after deployment. Its complete credential-free local matrix passed: 201
+Python tests with one credential-gated live test skipped and 91.16% branch coverage; 43 Worker
+tests; Ruff, Mypy, Bandit, both dependency audits, repository/public scans, strict MkDocs, generated
+bindings, deterministic rebuild comparison, all Wrangler dry-runs, and `git diff --check`.
+
+## Outstanding gate
+
+Review and merge the routine-deployment isolation fix, then complete one green protected-main
+deployment retry using the already reviewed audit run ID. Keep the environment enable flag false
+before and immediately after that bounded window. This review gate is separate from the completed
+GET-only audit and sanitized publication.
+
+After the operational gate, run `/feedback` in the primary Codex task and preserve the Session ID
+privately.
+
+The bounded model response, protected expanded Intune audit, and reviewed sanitized live publication
+are complete. Phase 1 still must not be called technically complete until the corrected routine
+deployment completes once through the protected main workflow and its exact snapshot verification
+passes.

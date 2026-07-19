@@ -80,10 +80,13 @@ def test_privileged_workflows_are_main_only_and_environment_protected() -> None:
 
     deploy = (WORKFLOWS / "deploy-cloudflare.yml").read_text(encoding="utf-8")
     assert "id-token: write" not in deploy
+    assert "push:" not in deploy
     assert "environment: production" in deploy
     assert "github.ref == 'refs/heads/main'" in deploy
-    assert "CLOUDFLARE_DEPLOY_ENABLED == 'true'" in deploy
+    assert "inputs.confirm_production_deploy" in deploy
+    assert 'if [ "$CLOUDFLARE_DEPLOY_ENABLED" != "true" ]' in deploy
     assert "secrets.CLOUDFLARE_API_TOKEN" in deploy
+    assert deploy.count("secrets.CLOUDFLARE_API_TOKEN") == 1
     assert "npm run deploy:production" in deploy
     assert "ref: main" in deploy
     assert "actions: read" in deploy
@@ -91,6 +94,7 @@ def test_privileged_workflows_are_main_only_and_environment_protected() -> None:
     assert "run-id: ${{ inputs.sanitized_audit_run_id }}" in deploy
     assert "python scripts/promote_live_mission.py" in deploy
     assert "python scripts/verify_runtime_status.py" in deploy
+    assert '--expected-source-snapshot-id "$EXPECTED_SOURCE_SNAPSHOT_ID"' in deploy
     assert "python scripts/check_public_artifacts.py build/publication-handoff" in deploy
 
 
@@ -135,12 +139,8 @@ def test_worker_static_assets_and_modes_are_explicit() -> None:
     assert production["workers_dev"] is False
     assert production["vars"]["EVIDENCEOPS_MODE"] == "fixture"
     assert production["secrets"]["required"] == ["OPENAI_API_KEY"]
-    assert production["routes"] == [
-        {
-            "pattern": "evidenceops.tmcoconsulting.com",
-            "custom_domain": True,
-        }
-    ]
+    assert "routes" not in production
+    assert "route" not in production
 
 
 def test_worker_toolchain_is_exact_pinned_and_private() -> None:

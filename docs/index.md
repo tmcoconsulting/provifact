@@ -87,7 +87,8 @@ and Omnissa Workspace ONE adapters to normalize into the same evidence engine.
 
 ## Privacy and operating guarantees
 
-- No real tenant or device data is included in the repository or site.
+- No raw or identity-bearing tenant/device data is included in the repository or public site. The
+  repository is synthetic; production may serve only the reviewed fail-closed sanitized projection.
 - Microsoft Graph access is read-only and least-privilege.
 - Raw live responses are never eligible for public static output.
 - Unknown fields stop sanitization until a human classifies them.
@@ -99,13 +100,16 @@ Read the [data-handling policy](data-handling.md), [threat model](threat-model.m
 
 ## Current limitations
 
-- Live TMCO Microsoft Graph/Intune validation has not been performed.
-- The site uses generated evidence objects derived only from curated synthetic input.
+- Live TMCO Microsoft Graph/Intune validation completed through protected-main GitHub OIDC.
+- Production serves a reviewed sanitized aggregate package; the source checkout and local demo use
+  only curated synthetic input.
 - Only five macOS rules have approved provider mappings; the remaining inventory is visible but unsupported.
 - iOS/iPadOS has no approved baseline and is deliberately not scored against macOS CIS.
 - Full exception persistence, signed manifests, and auditor exports are deferred.
-- Cloudflare same-origin API routes are operational in production with synthetic fixture data only.
-- A new project service-account key is installed as a Worker secret; bounded live response validation remains outstanding.
+- Cloudflare same-origin API routes are operational with live sanitized evidence and fixture-mode
+  narrative by default.
+- The dedicated project service-account key is a Worker secret; one bounded Terra response passed
+  structured verification and production was returned to fixture narrative mode.
 - GitHub Pages is disabled; local `site/` output is deployed as Cloudflare Workers Static Assets.
 - Phase 0 was validated on Python 3.14 locally and targets Python 3.12 in CI; neither result is a
   production-readiness or compliance certification.
@@ -114,6 +118,7 @@ Read the [data-handling policy](data-handling.md), [threat model](threat-model.m
 
 Codex with the GPT-5.6 Sol execution profile established the Phase 0 code, tests, workflows, and
 documentation in the primary implementation thread under human direction. Phase 1 adds a bounded
-GPT-5.6 adapter, exact deterministic claim verification, and prose quarantine; the public demo uses
-an offline fixture and makes no model request. See
+GPT-5.6 adapter, exact deterministic claim verification, and prose quarantine. The production
+dashboard uses reviewed sanitized evidence while the default assistant remains a no-charge fixture;
+one separately bounded Terra validation passed. See
 [Codex collaboration](build-week/codex-collaboration.md).

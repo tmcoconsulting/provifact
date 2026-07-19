@@ -66,16 +66,17 @@ Pages workflow/site and its `pages: write`/deployment OIDC permissions were remo
 actions are pinned to immutable commit SHAs. Separate main-only workflows target the protected
 `production` environment. The manual Intune audit has an exact environment-scoped Entra FIC and is
 restricted to trusted `main`. The expanded four-permission application grant is consented and was
-independently re-read; its first live audit must still succeed before live collection is described
-as operational. No client secret exists.
+independently re-read. Protected-main OIDC collection and one separately reviewed sanitized
+publication completed successfully. No client secret exists.
 
-The public Worker runtime is deployed in fixture mode. It uses Worker-first routing only for
-`/api/*`, exact methods, same-origin checks, a 64 KiB request bound, compressed-body rejection,
-native client and global rate limiting, a 20-second OpenAI timeout, bounded model context/output,
-a 256 KiB upstream-response bound, one non-retrying model request, and generic error responses. Logs contain request IDs,
-method, route, status, and event code—not headers, IP addresses, evidence, prompts, responses, or
-secrets. Cloudflare's privileged live-tail transport includes platform request metadata, so tail
-access is administrative and stored invocation logs are disabled. Static assets carry
+The public Worker runtime serves a reviewed live sanitized Mission package with fixture narrative
+mode by default. It uses Worker-first routing only for `/api/*`, exact methods, same-origin checks,
+a 64 KiB request bound, compressed-body rejection, native client and global rate limiting, a
+20-second OpenAI timeout, bounded model context/output, a 256 KiB upstream-response bound, one
+non-retrying model request, and generic error responses. Logs contain request IDs, method, route,
+status, and event code—not headers, IP addresses, evidence, prompts, responses, or secrets.
+Cloudflare's privileged live-tail transport includes platform request metadata, so tail access is
+administrative and stored invocation logs are disabled. Static assets carry
 the security headers in `docs/_headers`; JSON responses set CSP, HSTS, MIME, referrer,
 permissions, cross-origin, and frame protections in code. Separate liveness and fail-closed
 readiness routes prevent a running Worker from being mistaken for a usable evidence runtime.

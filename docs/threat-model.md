@@ -5,8 +5,9 @@ adapter, private evidence writer, sanitizer, OpenAI boundary, deterministic veri
 synthetic demo, and the deployed Cloudflare Worker/static-assets runtime. The public custom domain,
 encrypted OpenAI secret binding, fixture API behavior, TLS, headers, and rate limits are in scope.
 The environment-bound Entra trust and expanded four-permission application consent are configured
-and independently re-read. Live Intune execution and successful model-generated output remain
-outside the validated state.
+and independently re-read. A protected-main GET-only audit, separately reviewed live sanitized
+publication, and one bounded verified model response are now inside the validated state; narrative
+mode remains fixture-based by default.
 
 ## Assets
 
@@ -48,7 +49,7 @@ outside the validated state.
 | Public client floods narrative route | Cost or availability loss | Native rate binding, request bound, one attempt, timeout | Account budget alerts, WAF/abuse telemetry, authenticated tier if needed |
 | Model or upstream returns oversized/hostile JSON | Resource exhaustion or false evidence | Response bound, strict schema, shared scanner, deterministic verifier | Production alerting and evaluation corpus |
 | Logs disclose input or secret | Data or credential exposure | Structured allowlisted metadata only; stored invocation logs disabled | Administrative live tail exposes platform metadata; restrict access and retention |
-| Sanitized history becomes a shadow tenant store | Re-identification and retention risk | Demo uses two code-owned synthetic snapshots; no database added | Separate storage/access/retention design before live history persistence |
+| Sanitized history becomes a shadow tenant store | Re-identification and retention risk | No database added; reviewed public handoff expires after one day | Separate storage/access/retention design before live history persistence |
 
 ## Abuse cases covered by tests
 

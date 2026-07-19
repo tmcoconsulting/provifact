@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 from pathlib import Path
 from typing import Final
 
@@ -43,12 +44,15 @@ def verify_runtime_status(
     *,
     expected_data_mode: str,
     expected_narrative_mode: str,
+    expected_source_snapshot_id: str,
 ) -> None:
     """Fail unless the status exactly reflects the reviewed deployment mode."""
     if expected_data_mode not in ALLOWED_DATA_MODES:
         raise ValueError("unsupported expected data mode")
     if expected_narrative_mode not in ALLOWED_NARRATIVE_MODES:
         raise ValueError("unsupported expected narrative mode")
+    if not re.fullmatch(r"mission-[0-9a-f]{24}", expected_source_snapshot_id):
+        raise ValueError("invalid expected source snapshot ID")
     if not isinstance(value, dict):
         raise ValueError("runtime status must be an object")
     assert_public_safe(value)
@@ -76,6 +80,8 @@ def verify_runtime_status(
     for field in ("evidence_timestamp", "source_snapshot_id"):
         if not isinstance(value.get(field), str) or not value[field]:
             raise ValueError(f"runtime status field {field} is missing")
+    if value["source_snapshot_id"] != expected_source_snapshot_id:
+        raise ValueError("runtime status source snapshot does not match the reviewed package")
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -83,6 +89,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("status", type=Path)
     parser.add_argument("--expected-data-mode", required=True)
     parser.add_argument("--expected-narrative-mode", required=True)
+    parser.add_argument("--expected-source-snapshot-id", required=True)
     args = parser.parse_args(argv)
     try:
         loaded = json.loads(args.status.read_text(encoding="utf-8"))
@@ -92,6 +99,7 @@ def main(argv: list[str] | None = None) -> int:
         loaded,
         expected_data_mode=args.expected_data_mode,
         expected_narrative_mode=args.expected_narrative_mode,
+        expected_source_snapshot_id=args.expected_source_snapshot_id,
     )
     print("production runtime status matches deployment policy")
     return 0

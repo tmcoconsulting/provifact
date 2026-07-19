@@ -74,8 +74,9 @@ Live collection requires a separately approved Entra app and explicit authentica
 
 No successful paid model call is required or claimed by the static demo. Production has a dedicated
 EvidenceOps Project service-account key stored only as the encrypted Cloudflare Worker secret
-`OPENAI_API_KEY`; the value is absent from the repository and GitHub. Production remains in
-explicit fixture mode until one bounded live response passes the same deterministic verifier.
+`OPENAI_API_KEY`; the value is absent from the repository and GitHub. One bounded live response
+passed the same deterministic verifier. Production intentionally remains in fixture narrative mode
+by default, so normal public use makes no model call.
 Browser BYOK is rejected because it would create browser-storage, exfiltration, logging, and abuse
 risks without improving the server-side least-privilege boundary.
 
@@ -105,5 +106,6 @@ The test command enforces 90% branch-aware coverage. All public artifacts must p
 
 `mkdocs build --strict` produces `site/` with relative navigation and self-contained public assets.
 The exact-pinned Wrangler configuration serves `site/` through Workers Static Assets and routes
-only `/api/*` through Worker code first. The production fixture deployment is available at
-`https://evidenceops.tmcoconsulting.com/`; it uses synthetic data and makes no model request.
+only `/api/*` through Worker code first. Production is available at
+`https://evidenceops.tmcoconsulting.com/`; it serves a separately reviewed live sanitized Mission
+package and uses fixture narrative mode, which makes no model request.

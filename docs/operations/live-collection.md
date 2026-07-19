@@ -116,8 +116,16 @@ permissions show tenant administrator consent. Protected-main run `29701160503` 
 through the exact environment-scoped OIDC trust, completed the expanded GET-only collection,
 constructed and scanned the sanitized Mission package, wrote only its aggregate report, and ran
 ephemeral cleanup successfully. It retained no artifact because publication preparation was not
-selected. Production therefore continues to serve synthetic data pending the separate reviewed
-publication handoff.
+selected.
+
+After the publication handoff was separately reviewed and merged, protected-main run
+`29702128497` repeated the same GET-only path with `prepare_publication` explicitly selected. It
+retained exactly one scanned `mission-control.json` public artifact for one day and no private
+package. That public package was independently downloaded, schema/fingerprint validated, scanned,
+and deployed. Production now reports `LIVE SANITIZED TENANT DATA`; it discloses only approved
+aggregate technical evidence and retains the human-review requirement. No tenant name, object ID,
+device identity, assignment identity, raw Graph response, access token, or pseudonym key is present
+in the repository or deployed package.
 
 The Entra application retains pre-existing delegated permissions that are not used by the
 application-permission workflow. EvidenceOps does not remove unrelated permissions automatically.

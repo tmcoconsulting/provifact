@@ -102,6 +102,7 @@ def test_runtime_status_accepts_only_the_expected_reviewed_mode(
         status,
         expected_data_mode=cast(str, mission["data_mode"]),
         expected_narrative_mode="fixture",
+        expected_source_snapshot_id=cast(str, mission["snapshot_id"]),
     )
 
     wrong = copy.deepcopy(status)
@@ -111,6 +112,7 @@ def test_runtime_status_accepts_only_the_expected_reviewed_mode(
             wrong,
             expected_data_mode=cast(str, mission["data_mode"]),
             expected_narrative_mode="fixture",
+            expected_source_snapshot_id=cast(str, mission["snapshot_id"]),
         )
 
 
@@ -122,6 +124,7 @@ def test_runtime_status_rejects_wrong_mode_unknown_fields_and_unsafe_values() ->
             status,
             expected_data_mode="SYNTHETIC DEMO DATA",
             expected_narrative_mode="fixture",
+            expected_source_snapshot_id=cast(str, mission["snapshot_id"]),
         )
 
     unknown = copy.deepcopy(status)
@@ -131,6 +134,7 @@ def test_runtime_status_rejects_wrong_mode_unknown_fields_and_unsafe_values() ->
             unknown,
             expected_data_mode="LIVE SANITIZED TENANT DATA",
             expected_narrative_mode="fixture",
+            expected_source_snapshot_id=cast(str, mission["snapshot_id"]),
         )
 
     unsafe = copy.deepcopy(status)
@@ -140,4 +144,13 @@ def test_runtime_status_rejects_wrong_mode_unknown_fields_and_unsafe_values() ->
             unsafe,
             expected_data_mode="LIVE SANITIZED TENANT DATA",
             expected_narrative_mode="fixture",
+            expected_source_snapshot_id=cast(str, mission["snapshot_id"]),
+        )
+
+    with pytest.raises(ValueError, match="does not match"):
+        verify_runtime_status(
+            status,
+            expected_data_mode="LIVE SANITIZED TENANT DATA",
+            expected_narrative_mode="fixture",
+            expected_source_snapshot_id="mission-" + "0" * 24,
         )

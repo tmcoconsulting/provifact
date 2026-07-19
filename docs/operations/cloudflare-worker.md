@@ -2,11 +2,11 @@
 
 ## Current state
 
-The Worker runtime is deployed at `https://evidenceops.tmcoconsulting.com/` in explicit fixture
-mode. The credential-free preview is available at
+The Worker runtime is deployed at `https://evidenceops.tmcoconsulting.com/` with a live sanitized
+Mission package and explicit fixture narrative mode. The credential-free preview is available at
 `https://evidenceops-preview.tmco-consulting.workers.dev/`. The custom domain/TLS, Static Assets,
-dual native rate limiters, and encrypted `OPENAI_API_KEY` binding are active. Fixture mode does not
-call OpenAI.
+dual native rate limiters, and encrypted `OPENAI_API_KEY` binding are active. The default fixture
+narrative mode does not call OpenAI.
 
 Cloudflare Workers Static Assets serves the scanned MkDocs `site/` directory. The
 [`run_worker_first`](https://developers.cloudflare.com/workers/static-assets/binding/#run_worker_first)
@@ -89,8 +89,9 @@ requires its own browser storage, transit, redaction, support, exfiltration, and
 Completed: account/zone verification, preview and production deployment, custom-domain/TLS checks,
 static/API/header tests, fixture verification, rate-limit proof, secure Worker-secret transfer,
 exact Entra environment federation, required Graph application consent, one bounded verified Terra
-response, and one successful expanded protected-main GET-only Intune audit. Production remains in
-fixture mode until the resulting public projection passes the separate publication-review gate.
+response, one successful expanded protected-main GET-only Intune audit, the separate scanned-public
+artifact review, and live sanitized publication. The public assistant remains in fixture narrative
+mode.
 
 Repository-controlled static and JSON responses declare CSP, HSTS, MIME, referrer, permissions,
 cross-origin, and frame protections. `/api/ready` validates the Mission schema, fingerprint, data
@@ -99,28 +100,23 @@ signal.
 
 Remaining:
 
-1. independently verify that the token stored as the protected GitHub environment secret
-   `CLOUDFLARE_API_TOKEN` is restricted to the TMCO Consulting account with Account `Workers
-   Scripts Edit`; do not add zone, route, DNS, KV, R2, account-settings, membership, user-details,
-   billing, or unrelated-account access. The workflow supplies the exact account ID, so it does not
-   need membership discovery. The secret exists by name, but its value and scope have not been
-   retrieved or claimed as verified;
-2. keep `CLOUDFLARE_DEPLOY_ENABLED=false` until the token scope is validated against the exact
-   workflow, then enable deployment only after review;
+1. merge the routine-deployment fix that removes the already-provisioned custom domain from the
+   Wrangler upload configuration, then complete one green protected workflow retry;
+2. keep `CLOUDFLARE_DEPLOY_ENABLED=false` outside an explicitly reviewed deployment window;
 3. review Cloudflare observability/alert retention in the dashboard;
-4. review and merge the one-day sanitized-public-package handoff, run it once from protected main,
-   inspect only the public package, and use the separate deployment selector to publish it;
-5. use `wrangler deployments list --env production` and
+4. use `wrangler deployments list --env production` and
    `wrangler rollback <known-good-version> --env production` for rollback; and
-6. leave OpenAI mode off by default unless a separately reviewed operational policy authorizes it.
+5. leave OpenAI mode off by default unless a separately reviewed operational policy authorizes it.
 
-The current workflow uses `wrangler deploy` while the custom domain remains declarative in
-`wrangler.jsonc`. Cloudflare's [Attach Domain API](https://developers.cloudflare.com/api/resources/workers/subresources/domains/methods/update/)
-accepts `Workers Scripts Write`, and the existing custom-domain operation does not require a zone
-route or DNS permission. Cloudflare scopes `Workers Scripts Edit` at the account resource, not an
-individual Worker, so protected-main execution, the fixed Worker name, and environment review are
-necessary residual controls even for the narrowest practical token. This proposed minimum still
-requires a real token validation before deployment is enabled.
+The active account token `evidenceops-github-deploy` has only `Workers Scripts Write` on the TMCO
+Consulting account, and the protected workflow proved that GitHub holds that working token without
+revealing its value. The first upload activated the reviewed Worker and assets, then Wrangler tried
+to inspect the existing zone route because the custom domain was still declarative and correctly
+received an authorization error. Production status nevertheless confirmed the exact live sanitized
+snapshot. Routine upload configuration now omits route/domain management; the already-provisioned
+custom domain remains a separately managed control-plane resource. Cloudflare scopes Workers Script
+write at the account, not an individual Worker, so manual main-only execution, the fixed Worker
+name, exact snapshot check, and protected environment are necessary residual controls.
 
 Cloudflare documents [Worker secrets](https://developers.cloudflare.com/workers/configuration/secrets/),
 [custom domains](https://developers.cloudflare.com/workers/configuration/routing/custom-domains/),

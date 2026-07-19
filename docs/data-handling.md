@@ -5,7 +5,8 @@
 Any public static artifact may contain only curated synthetic data or a live-derived package that
 passed schema validation, allowlist construction, reference validation, content and credential
 scans, and human publication review. The current Cloudflare deployment serves only the tracked
-synthetic Mission package.
+reviewed live sanitized Mission package; the repository and credential-free local build retain the
+tracked synthetic package.
 
 ## Collection minimization
 
@@ -38,6 +39,7 @@ runtime key material of at least 32 bytes. EvidenceOps never persists that key.
 | Graph response | Process memory | Request lifetime only |
 | Private normalized package | Operator-selected ignored directory | Explicit 1–30 days for the expanded Apple slice |
 | Sanitized package | Reviewed workspace | Publication policy |
+| Reviewed public handoff | GitHub Actions artifact | One day; exactly one scanned Mission file |
 | Public synthetic package | Tracked data/local static artifact | Repository/build policy |
 | Tokens/pseudonym key | Process environment/memory | Current operation only |
 | OpenAI project service-account key | Cloudflare Worker secret | Operator-managed rotation and immediate revocation on incident |
@@ -50,5 +52,6 @@ package and backups securely at expiry.
 
 TMCO Consulting, LLC is the project sponsor and copyright holder for its original EvidenceOps work.
 Public company identity may appear in documentation. That authorization does not extend to TMCO
-tenant identifiers, directory/device data, credentials, or configuration exports. The synthetic
-static demo does not represent TMCO production state.
+tenant identifiers, directory/device data, credentials, or configuration exports. The tracked
+synthetic demo does not represent TMCO production state; the deployed live projection contains only
+reviewed sanitized aggregates and does not establish compliance.

@@ -1,10 +1,13 @@
 name: Deploy Cloudflare production
 
 on:
-  push:
-    branches: [main]
   workflow_dispatch:
     inputs:
+      confirm_production_deploy:
+        description: Confirm this reviewed main-branch production deployment
+        required: true
+        type: boolean
+        default: false
       sanitized_audit_run_id:
         description: Optional successful Intune audit run containing the reviewed public Mission
         required: false
@@ -21,7 +24,10 @@ concurrency:
 jobs:
   deploy:
     name: Validate and deploy reviewed production
-    if: github.ref == 'refs/heads/main' && vars.CLOUDFLARE_DEPLOY_ENABLED == 'true'
+    if: >-
+      github.ref == 'refs/heads/main' &&
+      github.event_name == 'workflow_dispatch' &&
+      inputs.confirm_production_deploy
     runs-on: ubuntu-latest
     timeout-minutes: 25
     environment: production
@@ -30,9 +36,16 @@ jobs:
       PIP_DISABLE_PIP_VERSION_CHECK: "1"
       CLOUDFLARE_LOAD_DEV_VARS_FROM_DOT_ENV: "false"
       CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
-      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_DEPLOY_ENABLED: ${{ vars.CLOUDFLARE_DEPLOY_ENABLED }}
       SANITIZED_AUDIT_RUN_ID: ${{ inputs.sanitized_audit_run_id }}
     steps:
+      - name: Require reviewed deployment window
+        run: |
+          if [ "$CLOUDFLARE_DEPLOY_ENABLED" != "true" ]; then
+            echo "production deployment window is disabled" >&2
+            exit 2
+          fi
+
       - name: Check out trusted main
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
         with:
@@ -101,7 +114,18 @@ jobs:
           mkdocs build --strict
           python scripts/check_public_artifacts.py site
 
+      - name: Pin expected deployed snapshot
+        run: |
+          snapshot_id="$(jq -r '.snapshot_id' docs/assets/data/mission-control.json)"
+          if [[ ! "$snapshot_id" =~ ^mission-[0-9a-f]{24}$ ]]; then
+            echo "invalid expected Mission snapshot ID" >&2
+            exit 2
+          fi
+          echo "EXPECTED_SOURCE_SNAPSHOT_ID=$snapshot_id" >> "$GITHUB_ENV"
+
       - name: Deploy production Worker
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
         run: npm run deploy:production
 
       - name: Verify production status and static boundary
@@ -114,5 +138,6 @@ jobs:
           python scripts/verify_runtime_status.py \
             "$RUNNER_TEMP/evidenceops-status.json" \
             --expected-data-mode "$EXPECTED_DATA_MODE" \
-            --expected-narrative-mode fixture
+            --expected-narrative-mode fixture \
+            --expected-source-snapshot-id "$EXPECTED_SOURCE_SNAPSHOT_ID"
           curl --fail --silent --show-error --retry 3 --max-time 15 https://evidenceops.tmcoconsulting.com/ >/dev/null

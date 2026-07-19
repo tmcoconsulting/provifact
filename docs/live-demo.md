@@ -1,9 +1,10 @@
 # Live Demo
 
 <div class="synthetic-banner">
-SYNTHETIC DEMO DATA. This deployment never calls Microsoft Graph. Fixture mode makes no OpenAI
-request; any future live model response must be labeled separately and pass the deterministic
-verifier.
+DECLARED DATA MODE. Mission Control and <code>/api/status</code> are authoritative for the deployed
+package. Production currently serves a reviewed, fail-closed sanitized projection from read-only
+Microsoft Graph collection. The assistant remains in fixture mode and makes no OpenAI request.
+The repository checkout and reproduction path below remain entirely synthetic.
 </div>
 
 The primary Build Week demonstration is the dynamic [EvidenceOps Mission Control](evidence-dashboard.md).
@@ -11,7 +12,7 @@ It renders entirely from the validated
 [Mission package](assets/data/mission-control.json), so dashboard metrics, findings, history,
 platform posture, gaps, and assistant references have one deterministic source.
 
-## What the fixture proves
+## What the credential-free fixture proves
 
 | Stage | Demonstrated result | Authority boundary |
 | --- | --- | --- |
@@ -24,11 +25,12 @@ platform posture, gaps, and assistant references have one deterministic source.
 | Assistant | Supported answers cite the package; unsupported questions return the exact insufficient-evidence sentence | Fixture mode is not a model call |
 | Verification | Typed claims must exactly match evidence; prose remains generated and quarantined | Human review required |
 
-The alignment score is intentionally 20%: one aligned rule divided by five explicitly mapped and
-evaluable rules. The other 93 baseline rules remain visible as unsupported and do not inflate or
-deflate the denominator.
+The tracked fixture alignment score is intentionally 20%: one aligned rule divided by five
+explicitly mapped and evaluable rules. Production derives its current score from the sanitized
+Mission package instead. In both modes, the other 93 baseline rules remain visible as unsupported
+and do not inflate or deflate the denominator.
 
-## Representative states
+## Representative fixture states
 
 - FileVault value drift (high severity)
 - Firewall value drift (high severity)
@@ -43,6 +45,23 @@ deflate the denominator.
 
 These are technical evidence states. They are not certification, control satisfaction, assessment
 completion, or organizational compliance.
+
+## Production live path
+
+The protected production path is separate from the fixture build:
+
+1. GitHub obtains a short-lived Microsoft Graph token through the exact Entra production-
+   environment federation.
+2. The GET-only collector creates an ephemeral private normalized package.
+3. The allowlist publisher, credential scan, public-content scan, schema validator, and fingerprint
+   validator produce one public Mission package.
+4. Private evidence and key material are deleted; only the scanned public file receives one-day
+   review retention.
+5. A separate reviewed deployment revalidates that exact run-ID-bound artifact before building the
+   static site and confirms the deployed snapshot ID afterward.
+
+The current production banner says `LIVE SANITIZED TENANT DATA`; the repository does not contain
+that package.
 
 ## Reproduce it
 

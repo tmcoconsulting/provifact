@@ -92,6 +92,8 @@ or proprietary material from `intune-apple-gitops` or any other repository.
 | 2026-07-19 | Responsive desktop/mobile browser evidence record | `214f1bf` |
 | 2026-07-19 | Reviewed Mission Control slice squash merge | `7d7f8bca0ac7b652e515a360755b534af99c0b46` |
 | 2026-07-19 | Reviewed Graph fallback fix squash merge | `0f6f3b4fc8897528a5d66383802f578e87dbfd4e` |
+| 2026-07-19 | Reviewed sanitized-publication handoff squash merge | `b966cd0a5b20580b046c6ed3bb31057f7682bda7` |
+| 2026-07-19 | Routine deployment isolated from custom-domain management | `aa9c8fa` |
 
 Exact Phase 1 commands, results, limitations, and commit hashes are maintained in the
 [Phase 1 validation record](phase-1-validation.md).
@@ -124,5 +126,9 @@ audit completed private GET-only collection but correctly failed public publicat
 domain-shaped fallback value; cleanup removed the ephemeral evidence. The follow-up normalization
 fix preserved the detector, was separately reviewed and merged, and the authorized retry completed
 OIDC collection, sanitization, public scanning, aggregate reporting, and cleanup. The next review
-boundary is a one-day scanned-public-package handoff; it retains no private package and does not
-weaken the fixture-safe deployment default.
+boundary was a one-day scanned-public-package handoff; it retained no private package and did not
+weaken the fixture-safe deployment default. After separate review and merge, a protected run
+created exactly one scanned public artifact and the selected package was revalidated and deployed.
+Production now reports live sanitized evidence and fixture narrative mode. The remaining review
+boundary removes the already-provisioned custom domain from routine Wrangler uploads so the narrow
+deployment token needs no zone-route permission.

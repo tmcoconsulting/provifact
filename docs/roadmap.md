@@ -24,11 +24,11 @@ Roadmap items describe intent, not operational capability or delivery commitment
 - [x] Grant and independently verify the complete four-permission read-only application set
 - [x] Run the expanded manual protected post-merge audit and retain no private artifact
 - [x] Perform one bounded service-account GPT-5.6 request and return production to fixture mode
-- [ ] Publish one separately reviewed sanitized live Mission package through the protected handoff
+- [x] Publish one separately reviewed sanitized live Mission package through the protected handoff
 
 Public CI never performs live collection.
 
-## Cloudflare runtime — fixture production deployed
+## Cloudflare runtime — live sanitized production deployed
 
 - [x] Add exact-pinned Worker tooling and Static Assets configuration for `site/`
 - [x] Implement `/api/status` and `/api/narrative` with method/origin/body/rate/timeout limits
@@ -40,8 +40,10 @@ Public CI never performs live collection.
 - [x] Create the Worker/custom domain at `evidenceops.tmcoconsulting.com` and verify DNS/TLS
 - [x] Add disabled-by-default least-privilege GitHub deployment orchestration after manual validation
 - [x] Store `CLOUDFLARE_API_TOKEN` by name in the protected production environment
-- [ ] Verify the Cloudflare token scope and enable the protected workflow; deployment remains
-      disabled with `CLOUDFLARE_DEPLOY_ENABLED=false`
+- [x] Verify the account deployment token has only `Workers Scripts Write` and prove its GitHub
+      secret binding without exposing the value
+- [ ] Merge the routine-deploy route-management fix and complete one green orchestration retry;
+      the emergency enable flag remains `false`
 - [x] Configure the EvidenceOps OpenAI project budget alerts and model limits
 - [x] Validate one bounded live `gpt-5.6-terra` response; keep fixture mode as the public default
 

@@ -41,9 +41,11 @@ package. It has no tools and cannot collect, publish, remediate, change a status
 exception, or decide compliance. A deterministic verifier checks exact finding coverage and typed
 status claims; it quarantines all unrestricted prose before human review. Public CI and the local
 static demo use an offline fixture and require no API key. The Worker OpenAI transport is mocked in
-tests. Production routing reached OpenAI during a bounded synthetic validation, but the project
-returned capacity unavailable and no model output was accepted. The public deployment therefore
-remains in explicit fixture mode.
+tests. An initial bounded production attempt returned capacity unavailable; a later single bounded
+request succeeded against fixed `gpt-5.6-terra`, passed exact typed-claim verification, quarantined
+all generated prose, and required human review. Production was then returned to fixture narrative
+mode. The deployed evidence package is now a separately reviewed, fail-closed sanitized live
+projection; deterministic evidence remains authoritative.
 
 ## Authorship and ownership
 

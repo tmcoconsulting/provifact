@@ -12,9 +12,9 @@ inventory to a bounded GET-only Microsoft Intune Apple collector, deterministic 
 fail-closed publication, a dynamic Mission Control dashboard, and a constrained GPT-5.6 assistant.
 The 98-rule baseline is visible in full; five settings have explicit deterministic demo mappings,
 and unsupported rules remain visible instead of being guessed. iOS and iPadOS posture is shown but
-is never scored against the macOS baseline. The public deployment remains synthetic even though a
-trusted-main live audit has now passed; publishing its sanitized projection still requires a
-separate human-reviewed deployment. Nothing in this repository can create,
+is never scored against the macOS baseline. The public deployment now serves the separately
+reviewed, fail-closed sanitized projection from a protected-main live audit; the repository and
+credential-free local demo remain synthetic. Nothing in this repository can create,
 assign, update, delete, deploy, remediate, or roll back an Intune configuration.
 
 ## Safety model
@@ -55,13 +55,14 @@ See the [getting-started guide](docs/getting-started.md) and
 
 EvidenceOps is a **Phase 1 technical proof**, not a compliance product or autonomous endpoint
 manager. The expanded collector and four-permission application identity completed a protected,
-trusted-main GET-only audit; its private package was deleted and production remains synthetic.
-GitHub Pages is disabled. Cloudflare serves
-the scanned synthetic application at
+trusted-main GET-only audit; its private package was deleted and only the scanned public projection
+crossed the publication gate. GitHub Pages is disabled. Cloudflare serves
+the live sanitized application at
 [evidenceops.tmcoconsulting.com](https://evidenceops.tmcoconsulting.com/) with bounded same-origin
 `/api/status`, `/api/narrative`, and `/api/ask` routes. A bounded service-account Terra response
-passed deterministic verification, but production remains fixture-first until the sanitized live
-Mission package passes the separate publication-review gate. See the
+passed deterministic verification; production intentionally runs the narrative service in fixture
+mode by default, so the public dashboard incurs no model call while still proving the live
+read-only collection and publication boundary. See the
 [live-collection guide](docs/operations/live-collection.md), [demo package](docs/build-week/demo-package.md),
 and [roadmap](docs/roadmap.md).
 
