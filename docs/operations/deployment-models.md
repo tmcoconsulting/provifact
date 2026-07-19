@@ -1,88 +1,91 @@
 # Deployment Models
 
-Phase 1 implements the credential-free local build, Python application core, and a deployed
-Worker/static-assets runtime. The Entra trust and four required Graph application permissions are
-configured; a protected GET-only tenant audit, separately reviewed sanitized publication, and one
-bounded verified model response have completed. The public assistant remains in fixture narrative
-mode by default.
+EvidenceOps currently combines a Python evidence engine, a credential-free synthetic build, a
+protected read-only collection workflow, and a deployed Cloudflare Worker plus Static Assets
+runtime. The deployed evidence package is a reviewed sanitized live projection; the public
+assistant remains in fixture narrative mode by default.
 
-## 1. Current local synthetic static artifact
+## 1. Local synthetic application
 
-Public CI uses no tenant or OpenAI credential. It regenerates tracked synthetic data, builds
-`site/` with MkDocs, and scans that directory. Operators can serve the result locally. `site/` is a
-build artifact, not evidence that a hosting platform or production API is operational.
+Public CI and local development use no tenant or OpenAI credential. The CLI regenerates the tracked
+synthetic Mission package, MkDocs builds `site/`, and the public-artifact scanner verifies the exact
+output. Mission Control and the settings matrix read the same package.
 
-## 2. Current public Cloudflare deployment
+Use the local Worker (`npm run dev`) when testing `/api/*`. A plain static server cannot reproduce
+same-origin API behavior, rate limits, readiness validation, or the assistant route.
 
-The public runtime code is a Worker intended for `evidenceops.tmcoconsulting.com`, serving the
-scanned `site/` directory as static assets. Only `/api/*` runs Worker code first; the same-origin
-endpoints are `/api/status` and `/api/narrative`. Cloudflare documents selective
-[`run_worker_first`](https://developers.cloudflare.com/workers/static-assets/binding/#run_worker_first)
-routing and encrypted [Worker secrets](https://developers.cloudflare.com/workers/configuration/secrets/).
+## 2. Public Cloudflare application
 
-The repository now includes:
+The production application runs at `evidenceops.tmcoconsulting.com` and consists of:
 
-1. exact-pinned Wrangler/TypeScript/workerd tooling and a `site/` assets configuration;
-2. a small typed Worker with explicit method, origin, body-size, timeout, and response bounds;
-3. a non-secret `/api/status` contract;
-4. `/api/narrative`, which repeats publication scanning and preserves typed-claim verification;
-5. native rate-limit binding, allowlisted logs, static CSP/security headers, and fixture mode; and
-6. credential-free CI contract tests, generated-binding checks, and bundle dry-run.
+1. the scanned MkDocs `site/` directory served through Workers Static Assets;
+2. a small TypeScript Worker that runs first only for `/api/*`;
+3. native per-client and global rate-limit bindings;
+4. an encrypted `OPENAI_API_KEY` Worker secret;
+5. repository-controlled CSP, HSTS, MIME, referrer, permissions, frame, and cross-origin headers;
+6. persistent structured Worker logs containing only allowlisted operational metadata; and
+7. a reviewed sanitized Mission package that drives Mission Control and the settings matrix.
 
-The Worker and preview exist, the custom domain/TLS are active, dual native rate limiters are
-bound, and `OPENAI_API_KEY` exists only as an encrypted Worker secret. The protected GitHub
-environment contains a working account-scoped deployment token with only Workers Scripts write
-access; its value is not retrievable from the repository. Production serves a separately reviewed,
-fail-closed sanitized live Mission package while the assistant remains in fixture narrative mode.
-The routine deployment workflow is disabled outside an explicitly reviewed deployment window. See
-the [Worker runbook](cloudflare-worker.md).
+The same-origin API contract is:
 
-OpenAI recommends keeping API keys out of code/public repositories and exposing them through a
-secret manager. It also recommends human review for high-stakes output:
-[production practices](https://developers.openai.com/api/docs/guides/production-best-practices) and
-[safety practices](https://developers.openai.com/api/docs/guides/safety-best-practices).
+| Route | Method | Purpose |
+| --- | --- | --- |
+| `/api/health` | `GET` | Process liveness only |
+| `/api/ready` | `GET` | Fails closed unless runtime configuration and the fingerprint-verified Mission package are usable |
+| `/api/status` | `GET` | Non-secret mode, data-package, model, and safety state |
+| `/api/ask` | `POST` | Bounded evidence question with server-selected sanitized context |
+| `/api/narrative` | `POST` | Complete sanitized public-package narrative and deterministic verification path |
 
-Fixture mode must remain available when credits or the runtime key are unavailable. Browser BYOK
-is deferred: a browser-supplied key would cross the Worker, logging, support, and abuse boundaries.
-If later approved, it must be request-scoped, never persisted or logged, never written to browser
-storage, and clearly separated from the TMCO-funded service-account path.
+The current Worker/Static Assets stack is appropriate for the read-mostly Phase 1 application. A
+frontend migration by itself would not add missing policy-to-control semantics. A dedicated SPA and
+D1-backed API become justified when EvidenceOps introduces authenticated private policy names,
+long-term history, approvals, exceptions, multi-tenancy, or server-side matrix queries.
 
 ## 3. Protected private collection and sanitized publication
 
-The current public repository uses a manual, main-only collection workflow and the protected
-`production` environment. GitHub Actions authenticates to Entra with OIDC/workload identity
-federation; the federated subject is constrained to this repository and environment. The expanded
-Apple proof uses the exact four read-only permission families documented in the machine-readable
-manifest. Protected-main collection and one explicitly selected sanitized publication have
-completed; no feature branch can obtain the identity.
+The public repository uses a manual, trusted-main collection workflow and the protected GitHub
+`production` environment. GitHub Actions exchanges its environment-scoped OIDC token through an
+Entra federated credential. The workflow receives four documented Microsoft Graph read-only
+application permission families and has no client secret.
 
-The private workflow:
+The collection/publication boundary:
 
-1. request `id-token: write` only in the collection job;
-2. exchange the GitHub OIDC token for a short-lived Entra token;
-3. collect to ephemeral restricted storage without logging responses;
-4. sanitize and run policy/content tests before any artifact upload;
-5. upload only the selected sanitized package with one-day retention;
-6. require protected-environment approval before any sanitized package or deployment crosses its
-   intended trust boundary; and
-7. deny secrets and privileged jobs to fork-originated pull requests.
+1. calls only allowlisted Graph `GET` paths;
+2. normalizes provider responses without retaining a generic raw export;
+3. writes private evidence only to restricted ephemeral storage;
+4. computes findings and framework mappings deterministically;
+5. reconstructs a public package through an explicit allowlist;
+6. verifies fingerprints and scans credentials, identities, and prohibited content;
+7. optionally retains exactly one reviewed public Mission package for one day; and
+8. requires a separate protected deployment action before public presentation changes.
 
-GitHub explains that OIDC avoids duplicated long-lived cloud secrets and yields job-scoped,
-short-lived credentials in its [OIDC security guide](https://docs.github.com/actions/concepts/security/openid-connect).
-Microsoft documents the corresponding
-[workload identity federation](https://learn.microsoft.com/entra/workload-id/workload-identity-federation)
-trust model.
+The current public package intentionally excludes tenant policy display names, object IDs, group
+names, and assignment identities. A private enterprise deployment can retain approved friendly
+policy references only after a separate data-classification, access-control, and retention review.
 
-The repository also includes a deliberately non-executable
-[`examples/private-repository/intune-oidc.yml`](https://github.com/tmcoconsulting/evidenceops/blob/main/examples/private-repository/intune-oidc.yml)
-reference. It is outside `.github/workflows`, pins actions to commit SHAs, collects with a
-process-scoped Graph token, and uploads nothing. Copy it only after reviewing the Entra subject,
-audience, tenant/application IDs, environment protection, retention, and publication topology.
+## 4. Private enterprise presentation
 
-## 4. Private corporate or enterprise presentation
+A private repository or internal application may use the same collector, evaluator, sanitizer, and
+verifier while placing the presentation layer behind Cloudflare Access or another approved identity
+provider. Repository privacy does not weaken the private/public package boundary, OIDC restriction,
+retention, sanitizer, or human-review requirements.
 
-A private repository may orchestrate the same collection and sanitization controls and present the
-application through an access-controlled Worker or another approved internal platform. Repository
-privacy does not weaken the private/public package boundary, OIDC restriction, retention,
-sanitizer, verifier, or human approval gates, and it is never a reason to publish raw Graph
-responses.
+The recommended enterprise progression is:
+
+- first add a stable parent-policy reference and reviewed friendly-name classification;
+- then gate private evidence with SSO and role-based authorization;
+- store only sanitized operational snapshots in D1 or another reviewed regional store;
+- use Queues or Workflows for scheduled collection and longer-running processing; and
+- preserve the GET-only provider and deterministic finding authority.
+
+## 5. Explicitly unsupported deployment patterns
+
+- Publishing raw Intune or Graph responses to static assets
+- Browser-persisted OpenAI or Graph credentials
+- Giving the public Worker Microsoft Graph write permissions
+- Treating a matrix cell or AI response as a compliance certification
+- Inferring CIS Level 2 or another baseline that is not loaded and reviewed
+- Allowing a feature branch or fork to obtain the production OIDC identity
+
+See the [Cloudflare Worker runbook](cloudflare-worker.md), [live collection guide](live-collection.md),
+[security model](../security-model.md), and [settings matrix](../settings-matrix.md).
