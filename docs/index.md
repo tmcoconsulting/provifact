@@ -1,124 +1,103 @@
 <div class="evidence-hero">
-  <div class="hero-kicker">Continuous compliance evidence</div>
-  <h1>Make every approved change audit-ready.</h1>
+  <div class="hero-kicker">Continuous endpoint evidence</div>
+  <h1>Connect approved intent to observed Intune state.</h1>
   <p>
-    EvidenceOps connects desired configuration, Git review history, read-only endpoint inventory,
-    deterministic drift analysis, exceptions, compliance mappings, and grounded narrative into one
-    traceable evidence lifecycle.
+    EvidenceOps collects managed-Apple configuration read-only, evaluates mapped settings
+    deterministically, and publishes a sanitized evidence package that reviewers can trace without
+    granting the product Intune write authority.
   </p>
   <div class="hero-actions">
-    <a class="primary" href="live-demo/">Explore the synthetic demo</a>
-    <a class="secondary" href="architecture/">Read the architecture</a>
+    <a class="primary" href="evidence-dashboard/">Open Mission Control</a>
+    <a class="secondary" href="settings-matrix/">Compare settings and baselines</a>
   </div>
 </div>
 
 <div class="synthetic-banner">
-Phase 1 is a bounded read-only Apple evidence proof. Mission Control is generated from a reviewed,
-fail-closed sanitized tenant package and is labeled `LIVE SANITIZED TENANT DATA`; no raw tenant,
-device, user, group, assignment, or credential value is public. The protected GET-only audit and
-Cloudflare deployment are verified. The assistant remains explicitly in fixture narrative mode,
-so the public demonstration makes no OpenAI request.
+Production serves a reviewed package labeled `LIVE SANITIZED TENANT DATA`. Tenant, device, user,
+group, assignment, and credential identities are not public. The assistant remains in fixture mode
+by default, so ordinary public use makes no OpenAI model request.
 </div>
 
-## The problem
-
-Regulated endpoint teams often have the configuration they intended, the inventory they observe,
-and the approvals they received—but in different systems and at different points in time. Before
-an audit, they reconstruct the story manually. Screenshots, exports, tickets, and pull requests are
-assembled after the fact, when context is already missing.
-
-EvidenceOps starts from a different thesis:
-
-> Every approved configuration change should produce traceable, audit-ready evidence.
-
-## One evidence lifecycle
+## Choose the view that answers your question
 
 <div class="evidence-grid">
   <div class="evidence-card">
-    <h3>1. Approve intent</h3>
-    <p>Desired configuration and compliance mappings are reviewed through Git pull requests.</p>
+    <h3>Mission Control</h3>
+    <p>Start with alignment, drift, collection gaps, device aggregates, changes, and evidence traces.</p>
+    <p><a href="evidence-dashboard/">Open the dashboard →</a></p>
   </div>
   <div class="evidence-card">
-    <h3>2. Collect read-only</h3>
-    <p>A provider adapter reads observed state without exposing create, update, or delete methods.</p>
+    <h3>Settings &amp; Baselines</h3>
+    <p>Compare each mapped Intune setting with CIS, STIG, NIST, and CMMC identifiers and see the required technical change.</p>
+    <p><a href="settings-matrix/">Open the matrix →</a></p>
   </div>
   <div class="evidence-card">
-    <h3>3. Evaluate deterministically</h3>
-    <p>Normalized desired and observed values produce reproducible drift findings and fingerprints.</p>
-  </div>
-  <div class="evidence-card">
-    <h3>4. Sanitize before publishing</h3>
-    <p>Explicit field classification, pseudonymization, and output scans stop unsafe public data.</p>
-  </div>
-  <div class="evidence-card">
-    <h3>5. Explain with boundaries</h3>
-    <p>Optional GPT-5.6 output is structured, evidence-referenced, and quarantined for human review.</p>
+    <h3>Runtime Demo</h3>
+    <p>Inspect Worker readiness, narrative mode, model-call status, and the bounded API behavior.</p>
+    <p><a href="live-demo/">Open the runtime demo →</a></p>
   </div>
 </div>
 
-## Evidence first, narrative second
+## What the current project does
 
-| Layer | Authority | Phase 1 behavior |
+1. **Approves intent in Git.** A pinned macOS baseline, explicit provider mappings, and approval
+   metadata define the technical target.
+2. **Collects Microsoft Intune read-only.** The Apple provider uses documented Microsoft Graph GET
+   paths and records partial collection failures as visible gaps.
+3. **Evaluates deterministically.** Value, assignment, conflict, missing, unsupported, and collection
+   states are calculated without a model.
+4. **Publishes by allowlist.** A public package is reconstructed from approved fields, fingerprinted,
+   scanned, and reviewed before deployment.
+5. **Explains within evidence boundaries.** The optional GPT-5.6 path receives only a small sanitized
+   context. Typed claims and references are verified; free prose remains subject to human review.
+
+## Current capability at a glance
+
+| Capability | Current state | Important limit |
 | --- | --- | --- |
-| Approved baseline and desired state | Git history, pinned mSCP revision, and TMCO demo approval | 98-rule macOS inventory; five rules mapped |
-| Observed state | Read-only provider response | Expanded GET-only Apple/Intune adapter; protected live validation passed |
-| Drift result | Deterministic comparison | Assignment, value, conflict, gap, and unsupported states |
-| Public artifact | Sanitization policy and policy gate | Implemented and tested |
-| Assistant | GPT-generated analysis grounded in prefiltered evidence | Deterministic fixture by default; fixed Terra model path is opt-in |
-| Narrative claims | Typed deterministic claim codes | Verified; free prose quarantined |
-| Acceptance | Human reviewer | Required boundary |
+| macOS baseline inventory | 98 pinned CIS Level 1 rules | Five settings have reviewed provider mappings |
+| Intune collection | Comprehensive GET-only managed-Apple resource families | No create, update, assign, remediate, or rollback method exists |
+| Settings matrix | Observed value, target, state, framework IDs, and required change | CIS Level 2 is not loaded and is never inferred |
+| Public dashboard | Live sanitized aggregate package on Cloudflare | Tenant policy display names and object identities are intentionally excluded |
+| Assistant | Bounded `/api/ask`, exact typed-claim verification, prose quarantine | Fixture mode is the public default; it cannot decide compliance |
+| History | Current/prior sanitized snapshot delta | No persistent D1/KV/R2 history store yet |
 
-A model may help summarize why a set of deterministic findings matters. It cannot silently change
-a finding, grant an exception, approve a control, or claim that an audit requirement is satisfied.
+## What the framework columns mean
 
-## Initial scope and vendor-neutral direction
+A mapped setting can support technical evidence for several framework identifiers. For example, a
+FileVault setting may be linked to CIS, STIG, NIST, and CMMC identifiers while sharing one observed
+Intune value. EvidenceOps reports whether that **setting-level evidence** matches the approved target.
+It does not convert that result into a framework-wide pass, certification, or assessor conclusion.
 
-The first live integration is Microsoft Intune with managed Apple platforms. The core
-objects and provider interface do not contain Intune-specific write semantics, allowing later Jamf
-and Omnissa Workspace ONE adapters to normalize into the same evidence engine.
+The [settings matrix](settings-matrix.md) makes three distinctions visible:
 
-## Who uses EvidenceOps?
+- **Mapped and aligned:** collected technical evidence matches the approved target.
+- **Mapped and drifting:** a deterministic value, assignment, conflict, or collection condition
+  requires review, with an exact non-mutating change instruction.
+- **Not loaded or not mapped:** EvidenceOps says so directly rather than asking AI to fill the gap.
 
-- **Auditors** trace a claim to a deterministic finding, approved change, and collection boundary.
-- **Engineers** review desired configuration and evidence-impacting changes in Git.
-- **Security leaders** see control posture, drift, exceptions, provenance, and limitations together.
-- **Endpoint administrators** investigate normalized drift without granting EvidenceOps mutation
-  rights in the management plane.
+## Security and privacy boundaries
 
-## Privacy and operating guarantees
+- Microsoft Graph access is GET-only and limited to four documented read permission families.
+- Raw Graph responses are not eligible for public output.
+- Public and pre-model packages fail closed on unknown fields, credentials, identity values, and
+  invalid fingerprints.
+- GitHub OIDC supplies a short-lived Entra identity only to a protected main-branch workflow.
+- The OpenAI key exists only as a Cloudflare Worker secret; browser BYOK is rejected.
+- Every result remains technical evidence subject to human review.
 
-- No raw or identity-bearing tenant/device data is included in the repository or public site. The
-  repository is synthetic; production may serve only the reviewed fail-closed sanitized projection.
-- Microsoft Graph access is read-only and least-privilege.
-- Raw live responses are never eligible for public static output.
-- Unknown fields stop sanitization until a human classifies them.
-- Pseudonymization key material stays outside the repository.
-- Fork-originated workflows never receive privileged collection credentials.
+Read the [architecture](architecture.md), [audit methodology](audit-methodology.md), and
+[security model](security-model.md) for the full trust boundaries.
 
-Read the [data-handling policy](data-handling.md), [threat model](threat-model.md), and
-[audit methodology](audit-methodology.md) for the precise boundary.
+## Current limitations and next priorities
 
-## Current limitations
+EvidenceOps is a technically complete Phase 1 vertical slice, not a finished enterprise compliance
+platform. The highest-value next work is to preserve an approved parent-policy reference in the
+private model, load and review additional baselines such as CIS Level 2, expand provider mappings
+beyond five settings, improve evidence-grounded assistant answers, and add authenticated sanitized
+history only after retention and access-control design.
 
-- Live TMCO Microsoft Graph/Intune validation completed through protected-main GitHub OIDC.
-- Production serves a reviewed sanitized aggregate package; the source checkout and local demo use
-  only curated synthetic input.
-- Only five macOS rules have approved provider mappings; the remaining inventory is visible but unsupported.
-- iOS/iPadOS has no approved baseline and is deliberately not scored against macOS CIS.
-- Full exception persistence, signed manifests, and auditor exports are deferred.
-- Cloudflare same-origin API routes are operational with live sanitized evidence and fixture-mode
-  narrative by default.
-- The dedicated project service-account key is a Worker secret; one bounded Terra response passed
-  structured verification and production was returned to fixture narrative mode.
-- GitHub Pages is disabled; local `site/` output is deployed as Cloudflare Workers Static Assets.
-- Phase 0 was validated on Python 3.14 locally and targets Python 3.12 in CI; neither result is a
-  production-readiness or compliance certification.
-
-## Build Week contribution
-
-Codex with the GPT-5.6 Sol execution profile established the Phase 0 code, tests, workflows, and
-documentation in the primary implementation thread under human direction. Phase 1 adds a bounded
-GPT-5.6 adapter, exact deterministic claim verification, and prose quarantine. The production
-dashboard uses reviewed sanitized evidence while the default assistant remains a no-charge fixture;
-one separately bounded Terra validation passed. See
-[Codex collaboration](build-week/codex-collaboration.md).
+The existing Cloudflare Worker plus Static Assets architecture is sufficient for the present
+read-mostly product. A dedicated application frontend and D1-backed history become justified when
+EvidenceOps adds authenticated users, private policy names, multi-tenant state, approvals, or
+long-running workflows—not merely because GitHub Pages was retired.
