@@ -126,18 +126,14 @@ jobs:
       - name: Deploy production Worker
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-        run: npm run deploy:production
-
-      - name: Verify production status and static boundary
-        env:
-          EXPECTED_DATA_MODE: ${{ inputs.sanitized_audit_run_id != '' && 'LIVE SANITIZED TENANT DATA' || 'SYNTHETIC DEMO DATA' }}
         run: |
-          curl --fail --silent --show-error --retry 3 --max-time 15 \
-            --output "$RUNNER_TEMP/evidenceops-status.json" \
-            https://evidenceops.tmcoconsulting.com/api/status
-          python scripts/verify_runtime_status.py \
-            "$RUNNER_TEMP/evidenceops-status.json" \
-            --expected-data-mode "$EXPECTED_DATA_MODE" \
-            --expected-narrative-mode fixture \
-            --expected-source-snapshot-id "$EXPECTED_SOURCE_SNAPSHOT_ID"
-          curl --fail --silent --show-error --retry 3 --max-time 15 https://evidenceops.tmcoconsulting.com/ >/dev/null
+          deployment_message="evidenceops-snapshot:$EXPECTED_SOURCE_SNAPSHOT_ID"
+          npm run deploy:production -- --message "$deployment_message"
+          npx wrangler versions list --env production --json \
+            > "$RUNNER_TEMP/evidenceops-versions.json"
+          npx wrangler deployments list --env production --json \
+            > "$RUNNER_TEMP/evidenceops-deployments.json"
+          python scripts/verify_cloudflare_deployment.py \
+            "$RUNNER_TEMP/evidenceops-versions.json" \
+            "$RUNNER_TEMP/evidenceops-deployments.json" \
+            --expected-message "$deployment_message"

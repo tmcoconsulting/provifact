@@ -12,6 +12,7 @@ from evidenceops.evidence import validate_public_mission_snapshot
 from evidenceops.evidence.mission import build_public_mission_snapshot
 from evidenceops.mission_demo import MISSION_PSEUDONYM_KEY, _collection, build_mission_demo
 from scripts.promote_live_mission import promote_live_mission
+from scripts.verify_cloudflare_deployment import verify_active_deployment
 from scripts.verify_runtime_status import verify_runtime_status
 
 
@@ -153,4 +154,82 @@ def test_runtime_status_rejects_wrong_mode_unknown_fields_and_unsafe_values() ->
             expected_data_mode="LIVE SANITIZED TENANT DATA",
             expected_narrative_mode="fixture",
             expected_source_snapshot_id="mission-" + "0" * 24,
+        )
+
+
+def _cloudflare_control_plane() -> tuple[list[object], list[object], str]:
+    message = "evidenceops-snapshot:mission-" + "a" * 24
+    versions: list[object] = [
+        {
+            "id": "version-old",
+            "metadata": {"created_on": "2026-07-19T20:00:00Z", "source": "wrangler"},
+            "annotations": {"workers/triggered_by": "version_upload"},
+        },
+        {
+            "id": "version-reviewed",
+            "metadata": {"created_on": "2026-07-19T20:42:02Z", "source": "wrangler"},
+            "annotations": {
+                "workers/message": message,
+                "workers/triggered_by": "version_upload",
+            },
+        },
+    ]
+    deployments: list[object] = [
+        {
+            "source": "wrangler",
+            "annotations": {"workers/triggered_by": "deployment"},
+            "created_on": "2026-07-19T20:42:03Z",
+            "versions": [{"version_id": "version-reviewed", "percentage": 100}],
+        }
+    ]
+    return versions, deployments, message
+
+
+def test_cloudflare_control_plane_proves_reviewed_version_is_fully_active() -> None:
+    versions, deployments, message = _cloudflare_control_plane()
+    verify_active_deployment(versions, deployments, expected_message=message)
+
+
+@pytest.mark.parametrize(
+    ("mutation", "error"),
+    [
+        ("missing-message", "reviewed snapshot version is absent"),
+        ("wrong-version", "not receiving 100 percent"),
+        ("split-traffic", "single-version rollout"),
+        ("wrong-source", "source is not Wrangler"),
+        ("bad-timestamp", "timestamp is invalid"),
+    ],
+)
+def test_cloudflare_control_plane_rejects_unreviewed_or_partial_deployments(
+    mutation: str, error: str
+) -> None:
+    versions, deployments, message = _cloudflare_control_plane()
+    reviewed = cast(dict[str, object], versions[1])
+    active_deployment = cast(dict[str, object], deployments[0])
+    if mutation == "missing-message":
+        cast(dict[str, object], reviewed["annotations"])["workers/message"] = "different"
+    elif mutation == "wrong-version":
+        cast(list[dict[str, object]], active_deployment["versions"])[0]["version_id"] = (
+            "version-old"
+        )
+    elif mutation == "split-traffic":
+        cast(list[dict[str, object]], active_deployment["versions"]).append(
+            {"version_id": "version-old", "percentage": 10}
+        )
+    elif mutation == "wrong-source":
+        reviewed_metadata = cast(dict[str, object], reviewed["metadata"])
+        reviewed_metadata["source"] = "dashboard"
+    else:
+        active_deployment["created_on"] = "not-a-timestamp"
+    with pytest.raises(ValueError, match=error):
+        verify_active_deployment(versions, deployments, expected_message=message)
+
+
+def test_cloudflare_control_plane_rejects_invalid_snapshot_message() -> None:
+    versions, deployments, _ = _cloudflare_control_plane()
+    with pytest.raises(ValueError, match="message is invalid"):
+        verify_active_deployment(
+            versions,
+            deployments,
+            expected_message="evidenceops-snapshot:unclassified",
         )

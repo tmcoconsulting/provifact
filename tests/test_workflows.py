@@ -93,8 +93,13 @@ def test_privileged_workflows_are_main_only_and_environment_protected() -> None:
     assert "actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131" in deploy
     assert "run-id: ${{ inputs.sanitized_audit_run_id }}" in deploy
     assert "python scripts/promote_live_mission.py" in deploy
-    assert "python scripts/verify_runtime_status.py" in deploy
-    assert '--expected-source-snapshot-id "$EXPECTED_SOURCE_SNAPSHOT_ID"' in deploy
+    assert 'deployment_message="evidenceops-snapshot:$EXPECTED_SOURCE_SNAPSHOT_ID"' in deploy
+    assert 'npm run deploy:production -- --message "$deployment_message"' in deploy
+    assert "npx wrangler versions list --env production --json" in deploy
+    assert "npx wrangler deployments list --env production --json" in deploy
+    assert "python scripts/verify_cloudflare_deployment.py" in deploy
+    assert "evidenceops.tmcoconsulting.com/api/status" not in deploy
+    assert "curl " not in deploy
     assert "python scripts/check_public_artifacts.py build/publication-handoff" in deploy
 
 
