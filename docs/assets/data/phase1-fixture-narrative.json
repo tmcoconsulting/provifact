@@ -1,0 +1,83 @@
+{
+  "additional_evidence_required": [
+    "A human assessor must determine scope, applicability, and corroborating evidence."
+  ],
+  "ai_generated_analysis": true,
+  "content_fingerprint": "sha256:68ac01abdf23f430950e023c97e97dc5f2af4f21999b77af8ee008c24d555746",
+  "drift_explanations": [
+    {
+      "change_or_drift_explanation": "The deterministic engine reported 'matches desired state' for this reviewed record.",
+      "deterministic_claim": {
+        "claim_code": "finding_status",
+        "claim_value": "matches desired state"
+      },
+      "deterministic_status": "matches desired state",
+      "evidence_references": [
+        "ev1-9fe83b2f63a9b9107943a194",
+        "ev1-7156d564f37b26edbfb3e134",
+        "ev1-57aea1576d508c25c017cc8b"
+      ],
+      "finding_evidence_id": "ev1-9fe83b2f63a9b9107943a194",
+      "technical_impact": "This result describes collected configuration evidence only; operational impact and applicability require human review."
+    },
+    {
+      "change_or_drift_explanation": "The deterministic engine reported 'differs from desired state' for this reviewed record.",
+      "deterministic_claim": {
+        "claim_code": "finding_status",
+        "claim_value": "differs from desired state"
+      },
+      "deterministic_status": "differs from desired state",
+      "evidence_references": [
+        "ev1-00692c1442a1aa1944950d0c",
+        "ev1-5afa05fffab63171195bee7b",
+        "ev1-e714bc3d5694da36879178e5"
+      ],
+      "finding_evidence_id": "ev1-00692c1442a1aa1944950d0c",
+      "technical_impact": "This result describes collected configuration evidence only; operational impact and applicability require human review."
+    },
+    {
+      "change_or_drift_explanation": "The deterministic engine reported 'additional evidence required' for this reviewed record.",
+      "deterministic_claim": {
+        "claim_code": "finding_status",
+        "claim_value": "additional evidence required"
+      },
+      "deterministic_status": "additional evidence required",
+      "evidence_references": [
+        "ev1-93beffaa2b16e7591f3f4a68",
+        "ev1-4779a8c392bdd82406d5e287"
+      ],
+      "finding_evidence_id": "ev1-93beffaa2b16e7591f3f4a68",
+      "technical_impact": "This result describes collected configuration evidence only; operational impact and applicability require human review."
+    },
+    {
+      "change_or_drift_explanation": "The deterministic engine reported 'not evaluated' for this reviewed record.",
+      "deterministic_claim": {
+        "claim_code": "finding_status",
+        "claim_value": "not evaluated"
+      },
+      "deterministic_status": "not evaluated",
+      "evidence_references": [
+        "ev1-c1b0791bad7da5bee53c519d",
+        "ev1-da1256122f1e5a35a9483de5",
+        "ev1-9eeb4ad9d67fc3d6d4e7dc38"
+      ],
+      "finding_evidence_id": "ev1-c1b0791bad7da5bee53c519d",
+      "technical_impact": "This result describes collected configuration evidence only; operational impact and applicability require human review."
+    }
+  ],
+  "evidence_id": "ev1-68ac01abdf23f430950e023c",
+  "executive_summary": "Fixture analysis summarizes deterministic results without changing them; human review is required before any audit or operational use.",
+  "human_review_required": true,
+  "limitations": [
+    "This is a synthetic fixture narrative, not a live GPT-5.6 response.",
+    "Configuration evidence does not establish organizational compliance."
+  ],
+  "model": "deterministic-offline-fixture-not-a-model-call",
+  "object_type": "generated_narrative",
+  "schema_version": "1.0.0",
+  "source_package_evidence_id": "ev1-bf5788de43a3d43d37454d25",
+  "suggested_human_review_questions": [
+    "Does the evidence scope match the systems and assessment period under review?",
+    "Are the desired values approved and applicable to the target population?"
+  ]
+}

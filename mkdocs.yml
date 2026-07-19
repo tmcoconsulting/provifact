@@ -1,6 +1,6 @@
 site_name: EvidenceOps
 site_description: Continuous audit evidence for regulated endpoint-management teams
-site_url: https://tmcoconsulting.github.io/evidenceops/
+site_url: https://evidenceops.tmcoconsulting.com/
 repo_url: https://github.com/tmcoconsulting/evidenceops
 repo_name: tmcoconsulting/evidenceops
 edit_uri: edit/main/docs/
@@ -9,6 +9,7 @@ copyright: Copyright &copy; 2026 TMCO Consulting, LLC
 theme:
   name: material
   language: en
+  font: false
   features:
     - navigation.footer
     - navigation.indexes
@@ -41,7 +42,9 @@ nav:
   - Getting Started: getting-started.md
   - Standard Operating Procedures:
       - Demo Mode: operations/demo-mode.md
-      - Future Live Collection: operations/live-collection.md
+      - Live Read-Only Collection: operations/live-collection.md
+      - Deployment Models: operations/deployment-models.md
+      - Cloudflare Worker: operations/cloudflare-worker.md
       - Incident Response: operations/incident-response.md
   - Security and Data Handling:
       - Security Model: security-model.md
@@ -54,6 +57,8 @@ nav:
       - Codex Collaboration: build-week/codex-collaboration.md
       - Decision Log: build-week/decision-log.md
       - Contribution Log: build-week/contribution-log.md
+      - Phase 1 Validation: build-week/phase-1-validation.md
+      - Worker Validation: build-week/cloudflare-worker-validation.md
       - Submission Checklist: build-week/submission-checklist.md
   - Roadmap: roadmap.md
 
@@ -74,7 +79,12 @@ markdown_extensions:
 extra_css:
   - assets/stylesheets/extra.css
 
+extra_javascript:
+  - assets/javascripts/evidenceops-api.js
+
 plugins:
   - search
 
 strict: true
+exclude_docs: |
+  private/**

@@ -4,7 +4,8 @@ This procedure covers suspected credential, tenant-data, device-data, or public-
 
 ## Immediate actions
 
-1. Stop the affected workflow or Pages deployment without deleting evidence needed for response.
+1. Stop the affected workflow, static publication, or future Worker deployment without deleting
+   evidence needed for response.
 2. Restrict access to the exposed artifact or repository surface.
 3. Revoke or rotate the affected credential or pseudonymization key through its owning platform.
 4. Preserve minimal audit metadata in a restricted location; do not paste sensitive content into a

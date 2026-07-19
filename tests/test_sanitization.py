@@ -10,6 +10,7 @@ from evidenceops.sanitization import (
     SanitizationError,
     SensitiveValueError,
     UnknownFieldError,
+    load_policy_manifest,
     sanitize_document,
 )
 
@@ -72,6 +73,49 @@ def test_sensitive_value_in_allowed_field_fails_closed() -> None:
         sanitize_document(source, pseudonym_key=secrets.token_bytes(32))
 
 
+@pytest.mark.parametrize("prefix", ["ghp_", "gho_", "ghu_", "ghs_", "ghr_", "github_pat_"])
+def test_every_github_token_family_fails_publication_content_scanning(prefix: str) -> None:
+    source: dict[str, JsonValue] = {
+        "schema_version": "1.0",
+        "description": prefix + ("A" * 40),
+    }
+
+    with pytest.raises(SensitiveValueError, match="GitHub token"):
+        sanitize_document(source, pseudonym_key=secrets.token_bytes(32))
+
+
 def test_short_pseudonym_key_is_rejected() -> None:
     with pytest.raises(SanitizationError, match="at least 32 bytes"):
         sanitize_document({"schema_version": "1.0"}, pseudonym_key=b"too-short")
+
+
+@pytest.mark.parametrize(
+    "manifest",
+    [
+        {},
+        {"policy_version": "", "fields": {}, "pseudonym_prefixes": {}},
+        {"policy_version": "v1", "fields": [], "pseudonym_prefixes": {}},
+        {"policy_version": "v1", "fields": {}, "pseudonym_prefixes": []},
+        {"policy_version": "v1", "fields": {"value": "future"}, "pseudonym_prefixes": {}},
+        {
+            "policy_version": "v1",
+            "fields": {"tenant_id": "pseudonymize"},
+            "pseudonym_prefixes": {},
+        },
+    ],
+)
+def test_invalid_policy_manifests_fail_closed(tmp_path: Path, manifest: object) -> None:
+    path = tmp_path / "policy.json"
+    path.write_text(json.dumps(manifest), encoding="utf-8")
+    with pytest.raises(SanitizationError):
+        load_policy_manifest(path)
+
+
+def test_invalid_policy_json_and_pseudonym_value_fail_closed(tmp_path: Path) -> None:
+    path = tmp_path / "policy.json"
+    path.write_text("not-json", encoding="utf-8")
+    with pytest.raises(SanitizationError, match="could not be loaded"):
+        load_policy_manifest(path)
+
+    with pytest.raises(SanitizationError, match="non-empty string"):
+        sanitize_document({"tenant_id": None}, pseudonym_key=secrets.token_bytes(32))

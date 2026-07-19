@@ -1,0 +1,43 @@
+{
+  "schema_version": "1.0.0",
+  "fixture_notice": "SYNTHETIC_TEST_DATA_ONLY",
+  "scope_notice": "A narrow demonstration of macOS screen-lock intent; not a complete security baseline or compliance mapping.",
+  "records": [
+    {
+      "record_key": "screen-lock-password",
+      "platform": "macOS",
+      "setting_key": "macos.screen_lock.require_password",
+      "desired_value": true,
+      "evaluation_mode": "exact",
+      "title": "Require a password after screen lock",
+      "description": "Synthetic desired state for deterministic comparison."
+    },
+    {
+      "record_key": "screen-lock-timeout",
+      "platform": "macOS",
+      "setting_key": "macos.screen_lock.max_idle_seconds",
+      "desired_value": 900,
+      "evaluation_mode": "maximum",
+      "title": "Limit the idle interval before screen lock",
+      "description": "Synthetic desired state for deterministic comparison."
+    },
+    {
+      "record_key": "screen-lock-grace-period",
+      "platform": "macOS",
+      "setting_key": "macos.screen_lock.password_grace_seconds",
+      "desired_value": 0,
+      "evaluation_mode": "exact",
+      "title": "Request immediate password enforcement",
+      "description": "Synthetic desired state intentionally lacking an observation."
+    },
+    {
+      "record_key": "screen-lock-unsupported",
+      "platform": "macOS",
+      "setting_key": "macos.screen_lock.unsupported_demo_setting",
+      "desired_value": true,
+      "evaluation_mode": "unsupported",
+      "title": "Demonstrate an unsupported evaluator",
+      "description": "Synthetic desired state that must remain not evaluated."
+    }
+  ]
+}

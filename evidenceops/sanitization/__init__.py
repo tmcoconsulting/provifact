@@ -7,6 +7,8 @@ from evidenceops.sanitization.policy import (
     SanitizationPolicy,
     SensitiveValueError,
     UnknownFieldError,
+    assert_public_safe,
+    load_policy_manifest,
     sanitize_document,
 )
 
@@ -17,5 +19,7 @@ __all__ = [
     "SanitizationPolicy",
     "SensitiveValueError",
     "UnknownFieldError",
+    "assert_public_safe",
+    "load_policy_manifest",
     "sanitize_document",
 ]

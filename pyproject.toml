@@ -19,11 +19,21 @@ classifiers = [
 ]
 dependencies = []
 
+[project.scripts]
+evidenceops = "evidenceops.cli:main"
+
 [project.optional-dependencies]
+ai = [
+  "certifi==2026.6.17",
+]
+live = [
+  "msal==1.37.0",
+]
 dev = [
   "bandit==1.9.4",
   "mkdocs==1.6.1",
   "mkdocs-material==9.7.7",
+  "msal==1.37.0",
   "mypy==2.3.0",
   "pip-audit==2.10.1",
   "pre-commit==4.6.0",
@@ -33,7 +43,7 @@ dev = [
 ]
 
 [project.urls]
-Documentation = "https://tmcoconsulting.github.io/evidenceops/"
+Documentation = "https://github.com/tmcoconsulting/evidenceops/tree/main/docs"
 Issues = "https://github.com/tmcoconsulting/evidenceops/issues"
 Repository = "https://github.com/tmcoconsulting/evidenceops"
 
@@ -61,6 +71,9 @@ exclude = ["site"]
 [tool.pytest.ini_options]
 addopts = "--strict-config --strict-markers --cov=evidenceops --cov-report=term-missing --cov-fail-under=90"
 testpaths = ["tests"]
+markers = [
+  "live: opt-in tests that contact a private provider and are skipped by default",
+]
 
 [tool.coverage.run]
 branch = true

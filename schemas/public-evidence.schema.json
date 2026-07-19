@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://tmcoconsulting.github.io/evidenceops/schemas/public-evidence.schema.json",
+  "$id": "https://raw.githubusercontent.com/tmcoconsulting/evidenceops/main/schemas/public-evidence.schema.json",
   "title": "EvidenceOps public evidence package",
   "type": "object",
   "additionalProperties": false,

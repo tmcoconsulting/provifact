@@ -3,9 +3,18 @@
 
 import argparse
 import re
+import shutil
+import subprocess  # nosec B404
+import sys
 from collections.abc import Iterator
 from pathlib import Path
 from typing import Final
+
+_REPOSITORY_ROOT = Path(__file__).resolve().parents[1]
+if str(_REPOSITORY_ROOT) not in sys.path:
+    sys.path.insert(0, str(_REPOSITORY_ROOT))
+
+from evidenceops.sanitization.credentials import CREDENTIAL_PATTERNS  # noqa: E402
 
 _EXCLUDED_PARTS: Final = {
     ".git",
@@ -17,22 +26,15 @@ _EXCLUDED_PARTS: Final = {
     "htmlcov",
     "site",
 }
+_PROHIBITED_TRACKED_PARTS: Final = {"artifacts", "exports", "private", "raw", "site"}
+_PROHIBITED_TRACKED_SUFFIXES: Final = {".cer", ".crt", ".key", ".p12", ".pem", ".pfx"}
 
-_PATTERNS: Final = (
-    (
-        "private key",
-        re.compile(r"-----BEGIN " r"(?:RSA |EC |OPENSSH )?PRIVATE KEY-----"),
-    ),
-    (
-        "GitHub token",
-        re.compile(r"\b(?:gh[pousr]_[A-Za-z0-9]{30,}|github_pat_[A-Za-z0-9_]{30,})\b"),
-    ),
-    ("Slack token", re.compile(r"\bxox[baprs]-[A-Za-z0-9-]{20,}\b")),
-    ("bearer credential", re.compile(r"authorization\s*[:=]\s*bearer\s+\S+", re.IGNORECASE)),
+_REPOSITORY_ONLY_PATTERNS: Final = (
     (
         "non-empty secret environment assignment",
         re.compile(
-            r"^(?:OPENAI_API_KEY|AZURE_CLIENT_SECRET|EVIDENCEOPS_PSEUDONYM_KEY)="
+            r"^(?:OPENAI_API_KEY|AZURE_CLIENT_SECRET|AZURE_TENANT_ID|AZURE_CLIENT_ID|"
+            r"EVIDENCEOPS_GRAPH_ACCESS_TOKEN|EVIDENCEOPS_PSEUDONYM_KEY)="
             r"[^\s#][^\s]*$",
             re.MULTILINE,
         ),
@@ -41,6 +43,22 @@ _PATTERNS: Final = (
 
 
 def _iter_files(root: Path) -> Iterator[Path]:
+    git_executable = shutil.which("git")
+    if git_executable is not None:
+        result = subprocess.run(  # noqa: S603  # nosec B603
+            [git_executable, "ls-files", "--cached", "--others", "--exclude-standard", "-z"],
+            cwd=root,
+            check=False,
+            capture_output=True,
+        )
+        if result.returncode == 0:
+            for encoded in result.stdout.split(b"\0"):
+                if not encoded:
+                    continue
+                path = root / encoded.decode("utf-8")
+                if path.is_file() and path.stat().st_size <= 2_000_000:
+                    yield path
+            return
     for path in root.rglob("*"):
         if not path.is_file():
             continue
@@ -56,14 +74,24 @@ def scan(root: Path) -> list[tuple[Path, int, str]]:
     """Return locations and labels only; never echo a possible secret value."""
     findings: list[tuple[Path, int, str]] = []
     for path in _iter_files(root):
+        relative = path.relative_to(root)
+        lowered_parts = {part.lower() for part in relative.parts}
+        if (
+            lowered_parts.intersection(_PROHIBITED_TRACKED_PARTS)
+            or path.suffix.lower() in _PROHIBITED_TRACKED_SUFFIXES
+            or (path.name == ".env" or path.name.startswith(".env."))
+            and path.name != ".env.example"
+        ):
+            findings.append((relative, 1, "prohibited private artifact path"))
+            continue
         try:
             content = path.read_text(encoding="utf-8")
         except UnicodeDecodeError:
             continue
-        for label, pattern in _PATTERNS:
+        for label, pattern in (*CREDENTIAL_PATTERNS, *_REPOSITORY_ONLY_PATTERNS):
             for match in pattern.finditer(content):
                 line = content.count("\n", 0, match.start()) + 1
-                findings.append((path.relative_to(root), line, label))
+                findings.append((relative, line, label))
     return findings
 
 

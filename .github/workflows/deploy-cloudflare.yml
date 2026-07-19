@@ -1,0 +1,75 @@
+name: Deploy Cloudflare production
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: cloudflare-production
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Validate and deploy reviewed production
+    if: github.ref == 'refs/heads/main' && vars.CLOUDFLARE_DEPLOY_ENABLED == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    environment: production
+    env:
+      PYTHONDONTWRITEBYTECODE: "1"
+      PIP_DISABLE_PIP_VERSION_CHECK: "1"
+      CLOUDFLARE_LOAD_DEV_VARS_FROM_DOT_ENV: "false"
+      CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+    steps:
+      - name: Check out trusted main
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          persist-credentials: false
+          ref: main
+
+      - name: Set up Python
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6.3.0
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Set up Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: "22"
+          cache: npm
+
+      - name: Install locked dependencies
+        run: |
+          python -m pip install -r requirements-dev.txt
+          python -m pip install --no-build-isolation --no-deps .
+          npm ci --ignore-scripts --no-audit --no-fund
+
+      - name: Run complete public validation
+        run: |
+          python -m ruff format --check .
+          python -m ruff check .
+          python -m mypy
+          python -m pytest
+          python -m bandit -r evidenceops scripts -c pyproject.toml
+          python scripts/check_secrets.py
+          python -m pip_audit -r requirements-dev.txt
+          npm audit --audit-level=moderate
+          python -m evidenceops rebuild-static-demo
+          git diff --exit-code -- docs/assets/data
+          mkdocs build --strict
+          python scripts/check_public_artifacts.py site
+          npm run validate:worker
+
+      - name: Deploy production Worker
+        run: npm run deploy:production
+
+      - name: Verify production status and static boundary
+        run: |
+          curl --fail --silent --show-error --retry 3 --max-time 15 https://evidenceops.tmcoconsulting.com/api/status >/dev/null
+          curl --fail --silent --show-error --retry 3 --max-time 15 https://evidenceops.tmcoconsulting.com/ >/dev/null

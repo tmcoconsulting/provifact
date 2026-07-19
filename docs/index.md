@@ -13,8 +13,9 @@
 </div>
 
 <div class="synthetic-banner">
-Phase 0 is a documentation and validation foundation. The public demo is synthetic, the live
-collector is not implemented, and no production tenant data is present.
+Phase 1 is a narrow read-only proof. The static demo is synthetic, live TMCO validation is still
+outstanding, and no production tenant data is present. The Cloudflare Worker serves this synthetic
+fixture at `evidenceops.tmcoconsulting.com`; fixture mode makes no OpenAI request.
 </div>
 
 ## The problem
@@ -49,19 +50,20 @@ EvidenceOps starts from a different thesis:
   </div>
   <div class="evidence-card">
     <h3>5. Explain with boundaries</h3>
-    <p>Future GPT-5.6 narrative will be labeled generated analysis and grounded in evidence IDs.</p>
+    <p>Optional GPT-5.6 output is structured, evidence-referenced, and quarantined for human review.</p>
   </div>
 </div>
 
 ## Evidence first, narrative second
 
-| Layer | Authority | Phase 0 behavior |
+| Layer | Authority | Phase 1 behavior |
 | --- | --- | --- |
-| Desired state and approvals | Git history and reviewed change | Documented foundation |
-| Observed state | Read-only provider response | Provider contract only |
+| Desired state and approvals | Git history and reviewed change | Versioned synthetic fixture |
+| Observed state | Read-only provider response | GET-only Intune adapter; live validation pending |
 | Drift result | Deterministic comparison | Implemented and tested |
 | Public artifact | Sanitization policy and policy gate | Implemented and tested |
-| Narrative | GPT-generated analysis grounded in evidence | Planned; not operational |
+| Narrative | GPT-generated analysis grounded in evidence | Adapter/transport reached OpenAI; project capacity unavailable, so production is fixture mode |
+| Narrative claims | Typed deterministic claim codes | Verified; free prose quarantined |
 | Acceptance | Human reviewer | Required boundary |
 
 A model may help summarize why a set of deterministic findings matters. It cannot silently change
@@ -84,8 +86,8 @@ and Omnissa Workspace ONE adapters to normalize into the same evidence engine.
 ## Privacy and operating guarantees
 
 - No real tenant or device data is included in the repository or site.
-- Future Microsoft Graph access is read-only and least-privilege.
-- Raw live responses are never eligible for public Pages output.
+- Microsoft Graph access is read-only and least-privilege.
+- Raw live responses are never eligible for public static output.
 - Unknown fields stop sanitization until a human classifies them.
 - Pseudonymization key material stays outside the repository.
 - Fork-originated workflows never receive privileged collection credentials.
@@ -95,16 +97,19 @@ Read the [data-handling policy](data-handling.md), [threat model](threat-model.m
 
 ## Current limitations
 
-- The live Microsoft Graph/Intune collector is not implemented.
-- The site uses curated synthetic summary data rather than a generated evidence bundle.
+- Live TMCO Microsoft Graph/Intune validation has not been performed.
+- The site uses generated evidence objects derived only from curated synthetic input.
 - Control mappings, exception persistence, signed manifests, and auditor exports are deferred.
-- GPT-5.6 evidence narrative and grounding evaluations are planned, not operational.
+- Cloudflare same-origin API routes are operational in production with synthetic fixture data only.
+- The OpenAI path reached the API but returned capacity unavailable; no live narrative was accepted.
+- GitHub Pages is disabled; local `site/` output is deployed as Cloudflare Workers Static Assets.
 - Phase 0 was validated on Python 3.14 locally and targets Python 3.12 in CI; neither result is a
   production-readiness or compliance certification.
 
 ## Build Week contribution
 
 Codex with the GPT-5.6 Sol execution profile established the Phase 0 code, tests, workflows, and
-documentation in the primary implementation thread under human direction. GPT-5.6 is also the
-intended future narrative model, but runtime analysis is deliberately deferred until deterministic
-evidence, evaluations, and approval controls are ready. See [Codex collaboration](build-week/codex-collaboration.md).
+documentation in the primary implementation thread under human direction. Phase 1 adds a bounded
+GPT-5.6 adapter, exact deterministic claim verification, and prose quarantine; the public demo uses
+an offline fixture and makes no model request. See
+[Codex collaboration](build-week/codex-collaboration.md).

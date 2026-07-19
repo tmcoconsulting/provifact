@@ -26,7 +26,8 @@ Its methodology makes provenance, calculation, exception, and interpretation bou
 | Drift finding | Deterministic engine | Reproducible calculation |
 | Exception | Human workflow | Time-bounded risk decision |
 | Compliance mapping | Reviewed mapping content | Interpretation, not certification |
-| Narrative | Future GPT-5.6 analysis | Non-authoritative explanation |
+| Narrative | Optional GPT-5.6 or offline fixture analysis | Non-authoritative explanation |
+| Verification | Exact coverage and typed-claim verifier | Machine-checkable claims only; prose quarantined |
 
 ## Reproducibility
 
@@ -52,4 +53,9 @@ Generated analysis must:
 - preserve contradictory or incomplete evidence; and
 - remain reviewable by a human before use.
 
-Phase 0 includes no operational narrative generation.
+Phase 1 implements this contract with strict structured output and then treats the result as
+untrusted. The verifier requires unique, exact finding-ID coverage and accepts only the closed
+`finding_status` claim code when its typed value equals deterministic evidence. It also checks
+evidence references, unsupported framework/verdict language, required limitations, and human-review
+wording. Every unrestricted prose field is quarantined rather than semantically trusted. Human
+review remains required and is not a certification, exception, or risk-acceptance decision.

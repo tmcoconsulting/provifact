@@ -1,0 +1,59 @@
+{
+  "manifest_version": "1.0.0",
+  "service": "Microsoft Graph",
+  "source_api_version": "v1.0",
+  "profiles": {
+    "local_attended": {
+      "permission_type": "delegated",
+      "authentication": "public-client device-code flow",
+      "permissions": [
+        {
+          "name": "DeviceManagementConfiguration.Read.All",
+          "permission_id": "f1493658-876a-4c87-8fa7-edb559b3476a",
+          "admin_consent_required": true
+        }
+      ]
+    },
+    "private_automation": {
+      "permission_type": "application",
+      "authentication": "workload identity federation with a protected GitHub environment",
+      "permissions": [
+        {
+          "name": "DeviceManagementConfiguration.Read.All",
+          "permission_id": "dc377aa6-52d8-4e23-b271-2a7ae04cedf3",
+          "admin_consent_required": true
+        }
+      ]
+    }
+  },
+  "endpoints": [
+    {
+      "method": "GET",
+      "path": "/deviceManagement/deviceConfigurations",
+      "purpose": "Read macOS general device-configuration settings required for deterministic comparison.",
+      "permission": "DeviceManagementConfiguration.Read.All",
+      "data_accessed": "Intune device configuration and policy properties; unsupported types are counted and discarded."
+    },
+    {
+      "method": "GET",
+      "path": "/deviceManagement/deviceConfigurations/{deviceConfigurationId}/assignments",
+      "purpose": "Record assignment count and target kind without retaining target identifiers.",
+      "permission": "DeviceManagementConfiguration.Read.All",
+      "data_accessed": "Assignment objects can contain group or directory identifiers; EvidenceOps discards those identifiers during normalization."
+    }
+  ],
+  "deliberately_not_requested": [
+    "DeviceManagementConfiguration.ReadWrite.All",
+    "DeviceManagementManagedDevices.Read.All",
+    "DeviceManagementManagedDevices.ReadWrite.All",
+    "DeviceManagementManagedDevices.PrivilegedOperations.All",
+    "Directory.Read.All",
+    "Group.Read.All",
+    "User.Read.All"
+  ],
+  "official_sources": [
+    "https://learn.microsoft.com/en-us/graph/api/intune-deviceconfig-deviceconfiguration-list?view=graph-rest-1.0",
+    "https://learn.microsoft.com/en-us/graph/api/intune-deviceconfig-deviceconfigurationassignment-list?view=graph-rest-1.0",
+    "https://learn.microsoft.com/en-us/graph/permissions-reference#devicemanagementconfigurationreadall"
+  ]
+}

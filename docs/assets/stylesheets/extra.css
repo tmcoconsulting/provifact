@@ -106,8 +106,59 @@
   font-weight: 650;
 }
 
+.runtime-panel {
+  display: grid;
+  gap: 0.85rem;
+  padding: 1.2rem;
+  margin: 1.4rem 0 2rem;
+  border: 1px solid rgba(35, 88, 215, 0.3);
+  border-radius: 0.85rem;
+  background: rgba(238, 244, 251, 0.72);
+}
+
+.runtime-panel[data-runtime-state="fixture"],
+.runtime-panel[data-runtime-state="complete"] {
+  border-color: rgba(0, 126, 153, 0.55);
+}
+
+.runtime-panel[data-runtime-state="error"] {
+  border-color: rgba(174, 62, 62, 0.55);
+}
+
+.runtime-panel h2,
+.runtime-panel p {
+  margin: 0;
+}
+
+.runtime-panel button {
+  width: fit-content;
+  padding: 0.68rem 1rem;
+  border: 0;
+  border-radius: 0.55rem;
+  color: #fff;
+  background: var(--evidenceops-blue);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.runtime-panel button:disabled {
+  cursor: not-allowed;
+  opacity: 0.52;
+}
+
+.runtime-output {
+  padding-top: 0.4rem;
+  border-top: 1px solid rgba(80, 110, 150, 0.22);
+}
+
+.runtime-output p + p {
+  margin-top: 0.55rem;
+}
+
 [data-md-color-scheme="slate"] .evidence-hero,
-[data-md-color-scheme="slate"] .evidence-card {
+[data-md-color-scheme="slate"] .evidence-card,
+[data-md-color-scheme="slate"] .runtime-panel {
   color: #edf5ff;
   background: rgba(27, 45, 72, 0.84);
 }

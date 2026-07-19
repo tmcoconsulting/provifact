@@ -2,56 +2,51 @@
 
 ## Public-data rule
 
-GitHub Pages may contain only:
+Any public static artifact may contain only curated synthetic data or a live-derived package that
+passed schema validation, explicit field policy, reference validation, two content scans, and human
+publication review. This repository currently builds only synthetic data locally; no public hosting
+deployment is implemented in this checkpoint.
 
-1. curated synthetic data, or
-2. a live-derived package that passed the explicit sanitizer, schema/policy gate, and prohibited
-   pattern scan.
+## Collection minimization
 
-Phase 0 publishes only the first category.
+The Phase 1 adapter reads Intune configuration policies and assignments but normalizes only two
+macOS settings, modified time, assignment count, and assignment target kinds. Policy IDs are
+private-only. It excludes display names, descriptions, group/user/device data, tenant domains,
+managed-device inventory, network data, and raw response bodies.
 
 ## Prohibited or transformed values
 
 | Category | Examples | Public action |
 | --- | --- | --- |
-| Tenant and cloud identity | Tenant, subscription, application, service-principal identifiers | Pseudonymize or reject |
-| People | User principal names, email addresses, personal names | Pseudonymize or reject |
-| Devices | Names, serials, hardware identifiers, managed-device identifiers | Pseudonymize or reject |
-| Directory and assignment | Object identifiers, group identifiers, real group names | Pseudonymize or reject |
-| Network | Network addresses and internal domains | Pseudonymize or reject |
-| Credentials | Access and refresh tokens, client secrets, private keys, certificates, authorization headers | Drop and fail scans |
-| Correlation | Values that could re-identify a tenant or person | Classify explicitly; otherwise reject |
+| Tenant/cloud identity | Tenant, subscription, app, service-principal IDs | Pseudonymize or reject |
+| People | UPNs, emails, names | Pseudonymize or reject |
+| Devices | Names, serials, IMEI/MEID, hardware/managed-device IDs | Pseudonymize or reject |
+| Directory/assignment | Object/group IDs and real group names | Pseudonymize or reject |
+| Network | IP addresses and internal domains | Pseudonymize or reject |
+| Credentials | Tokens, secrets, keys, certificates, authorization headers | Drop and fail scans |
+| Correlation | Any value that can reasonably re-identify a tenant/person | Classify or reject |
 
-Deterministic pseudonyms are used only where the evidence engine needs stable cross-record
-relationships. They are HMAC-derived with runtime key material. The key is never committed,
-published, logged, or stored in workflow artifacts.
+Deterministic pseudonyms are used only where correlation is necessary. They are HMAC-derived with
+runtime key material of at least 32 bytes. EvidenceOps never persists that key.
 
-## Fail-closed contract
-
-- Every mapping key must have an explicit action.
-- An unknown field raises `UnknownFieldError`.
-- A sensitive-looking value that survives an allowed field raises `SensitiveValueError`.
-- A generated site containing prohibited patterns fails validation.
-- Raw fixture markers are forbidden from site output.
-
-This contract intentionally requires a human classification decision when a provider adds or
-renames a field.
-
-## Future live-data lifecycle
+## Lifecycle and retention
 
 | Stage | Location | Retention |
 | --- | --- | --- |
-| Read-only API response | Restricted job memory or encrypted temporary storage | Minimum necessary |
-| Normalized raw evidence | Private/restricted data plane | Policy-defined |
-| Sanitized evidence package | Validated workspace | Review window |
-| Public package | GitHub Pages artifact | Project retention |
-| Pseudonym key | Approved secret store | Rotated; never in repository |
+| Graph response | Process memory | Request lifetime only |
+| Private normalized package | Operator-selected ignored directory | Explicit 1–90 days |
+| Sanitized package | Reviewed workspace | Publication policy |
+| Public synthetic package | Tracked data/local static artifact | Repository/build policy |
+| Tokens/pseudonym key | Process environment/memory | Current operation only |
+| Future OpenAI production key | Cloudflare Worker secret | Platform-managed rotation policy |
 
-Workflow artifacts containing raw or sensitive data will be disabled where possible; if an
-incident requires one, access is restricted and retention is explicitly minimized.
+Private packages are written without overwrite at mode `0600` where supported. EvidenceOps records
+the deletion deadline but does not silently delete operator data; the operator must remove the
+package and backups securely at expiry.
 
 ## TMCO identity
 
-TMCO Consulting, LLC is the project sponsor and copyright holder for its original EvidenceOps
-work. The demo does not imply that TMCO's production environment, customers, users, or devices are
-represented. Public business identity is not a substitute for sanitized tenant data.
+TMCO Consulting, LLC is the project sponsor and copyright holder for its original EvidenceOps work.
+Public company identity may appear in documentation. That authorization does not extend to TMCO
+tenant identifiers, directory/device data, credentials, or configuration exports. The synthetic
+static demo does not represent TMCO production state.

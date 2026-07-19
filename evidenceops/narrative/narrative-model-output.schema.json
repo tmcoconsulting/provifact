@@ -1,0 +1,99 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "executive_summary": {
+      "type": "string"
+    },
+    "drift_explanations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "finding_evidence_id": {
+            "type": "string"
+          },
+          "deterministic_status": {
+            "type": "string",
+            "enum": [
+              "observed",
+              "matches desired state",
+              "differs from desired state",
+              "additional evidence required",
+              "human review required",
+              "not evaluated"
+            ]
+          },
+          "deterministic_claim": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "claim_code": {
+                "type": "string",
+                "enum": ["finding_status"]
+              },
+              "claim_value": {
+                "type": "string",
+                "enum": [
+                  "observed",
+                  "matches desired state",
+                  "differs from desired state",
+                  "additional evidence required",
+                  "human review required",
+                  "not evaluated"
+                ]
+              }
+            },
+            "required": ["claim_code", "claim_value"]
+          },
+          "change_or_drift_explanation": {
+            "type": "string"
+          },
+          "technical_impact": {
+            "type": "string"
+          },
+          "evidence_references": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "finding_evidence_id",
+          "deterministic_status",
+          "deterministic_claim",
+          "change_or_drift_explanation",
+          "technical_impact",
+          "evidence_references"
+        ]
+      }
+    },
+    "limitations": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "additional_evidence_required": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "suggested_human_review_questions": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "required": [
+    "executive_summary",
+    "drift_explanations",
+    "limitations",
+    "additional_evidence_required",
+    "suggested_human_review_questions"
+  ]
+}

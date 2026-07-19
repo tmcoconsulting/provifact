@@ -7,13 +7,15 @@ pseudonymize them.
 
 import hashlib
 import hmac
+import json
 import re
 from dataclasses import dataclass
 from enum import StrEnum
-from types import MappingProxyType
+from pathlib import Path
 from typing import Final
 
 from evidenceops.domain import JsonValue
+from evidenceops.sanitization.credentials import CREDENTIAL_PATTERNS
 
 
 class SanitizationError(ValueError):
@@ -40,88 +42,93 @@ class FieldAction(StrEnum):
 class SanitizationPolicy:
     """A complete field-action map and pseudonym namespace map."""
 
+    version: str
     actions: dict[str, FieldAction]
     pseudonym_prefixes: dict[str, str]
 
 
-_ALLOWED_FIELDS: Final = {
-    "schema_version",
-    "fixture_notice",
-    "provider",
-    "platform",
-    "control_id",
-    "title",
-    "description",
-    "baseline",
-    "observations",
-    "devices",
-    "settings",
-    "assignments",
-    "desired_value",
-    "observed_value",
-    "status",
-    "severity",
-    "source_type",
-    "collected_at",
-    "synthetic",
-    "os_version",
-    "compliance_state",
-    "value",
-}
+DEFAULT_POLICY_MANIFEST: Final = Path(__file__).with_name("publication-policy.v1.json")
 
-_PSEUDONYM_FIELDS: Final = {
-    "tenant_id": "tenant",
-    "subscription_id": "subscription",
-    "application_id": "application",
-    "service_principal_id": "service-principal",
-    "user_principal_name": "user",
-    "email": "user",
-    "personal_name": "person",
-    "device_name": "device",
-    "serial_number": "serial",
-    "imei": "imei",
-    "meid": "meid",
-    "hardware_id": "hardware",
-    "entra_object_id": "entra-object",
-    "managed_device_id": "managed-device",
-    "group_id": "group",
-    "group_name": "group-name",
-    "ip_address": "network-address",
-    "internal_domain": "internal-domain",
-    "correlation_id": "correlation",
-}
+_PUBLIC_VALUE_CATALOG: Final = Path(__file__).with_name("public-value-patterns.v1.json")
 
-_DROP_FIELDS: Final = {
-    "access_token",
-    "refresh_token",
-    "client_secret",
-    "private_key",
-    "certificate",
-    "authorization",
-}
 
-_actions = dict.fromkeys(_ALLOWED_FIELDS, FieldAction.ALLOW)
-_actions.update(dict.fromkeys(_PSEUDONYM_FIELDS, FieldAction.PSEUDONYMIZE))
-_actions.update(dict.fromkeys(_DROP_FIELDS, FieldAction.DROP))
+def _load_public_value_patterns() -> tuple[tuple[str, re.Pattern[str]], ...]:
+    try:
+        loaded = json.loads(_PUBLIC_VALUE_CATALOG.read_text(encoding="utf-8"))
+    except (OSError, UnicodeDecodeError, json.JSONDecodeError) as exc:
+        raise RuntimeError("public value pattern catalog could not be loaded") from exc
+    if not isinstance(loaded, dict) or set(loaded) != {"catalog_version", "patterns"}:
+        raise RuntimeError("public value pattern catalog has unexpected or missing fields")
+    patterns = loaded.get("patterns")
+    if not isinstance(loaded.get("catalog_version"), str) or not isinstance(patterns, list):
+        raise RuntimeError("public value pattern catalog metadata is invalid")
+    compiled: list[tuple[str, re.Pattern[str]]] = []
+    for entry in patterns:
+        if not isinstance(entry, dict) or set(entry) != {"label", "expression", "flags"}:
+            raise RuntimeError("public value pattern entry has unexpected or missing fields")
+        label = entry.get("label")
+        expression = entry.get("expression")
+        flags = entry.get("flags")
+        if (
+            not isinstance(label, str)
+            or not label
+            or not isinstance(expression, str)
+            or not expression
+            or flags not in {"", "i"}
+        ):
+            raise RuntimeError("public value pattern entry is invalid")
+        compiled.append((label, re.compile(expression, re.IGNORECASE if flags == "i" else 0)))
+    if not compiled:
+        raise RuntimeError("public value pattern catalog must not be empty")
+    return tuple(compiled)
 
-DEFAULT_PUBLIC_POLICY: Final = SanitizationPolicy(
-    actions=dict(MappingProxyType(_actions)),
-    pseudonym_prefixes=dict(MappingProxyType(_PSEUDONYM_FIELDS)),
-)
 
-_PROHIBITED_OUTPUT_PATTERNS: Final = (
-    ("email address", re.compile(r"\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b", re.IGNORECASE)),
-    ("IP address", re.compile(r"\b(?:\d{1,3}\.){3}\d{1,3}\b")),
-    (
-        "UUID-like identifier",
-        re.compile(
-            r"\b[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}\b",
-            re.IGNORECASE,
-        ),
-    ),
-    ("private-key material", re.compile(r"-----BEGIN [A-Z ]*PRIVATE KEY-----")),
-    ("bearer authorization", re.compile(r"\bBearer\s+[A-Za-z0-9._~+/-]+=*", re.IGNORECASE)),
-)
+_PROHIBITED_PUBLIC_VALUE_PATTERNS: Final = _load_public_value_patterns()
+
+
+def load_policy_manifest(path: Path = DEFAULT_POLICY_MANIFEST) -> SanitizationPolicy:
+    """Load an explicit field-classification manifest or stop publication."""
+    try:
+        loaded = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, UnicodeDecodeError, json.JSONDecodeError) as exc:
+        raise SanitizationError("publication policy manifest could not be loaded") from exc
+    if not isinstance(loaded, dict) or set(loaded) != {
+        "policy_version",
+        "fields",
+        "pseudonym_prefixes",
+    }:
+        raise SanitizationError("publication policy manifest has unexpected or missing fields")
+    version = loaded.get("policy_version")
+    fields = loaded.get("fields")
+    prefixes = loaded.get("pseudonym_prefixes")
+    if not isinstance(version, str) or not version:
+        raise SanitizationError("publication policy version is invalid")
+    if not isinstance(fields, dict) or not all(
+        isinstance(field, str) and isinstance(action, str) for field, action in fields.items()
+    ):
+        raise SanitizationError("publication field classifications are invalid")
+    if not isinstance(prefixes, dict) or not all(
+        isinstance(field, str) and isinstance(prefix, str) and prefix
+        for field, prefix in prefixes.items()
+    ):
+        raise SanitizationError("publication pseudonym prefixes are invalid")
+    try:
+        actions = {field: FieldAction(action) for field, action in fields.items()}
+    except ValueError as exc:
+        raise SanitizationError("publication field action is invalid") from exc
+    pseudonymized = {
+        field for field, action in actions.items() if action is FieldAction.PSEUDONYMIZE
+    }
+    if pseudonymized != set(prefixes):
+        raise SanitizationError("every pseudonymized field requires exactly one prefix")
+    return SanitizationPolicy(
+        version=version,
+        actions=actions,
+        pseudonym_prefixes={field: str(prefix) for field, prefix in prefixes.items()},
+    )
+
+
+DEFAULT_PUBLIC_POLICY: Final = load_policy_manifest()
 
 
 def sanitize_document(
@@ -138,7 +145,7 @@ def sanitize_document(
     if len(pseudonym_key) < 32:
         raise SanitizationError("pseudonym_key must contain at least 32 bytes")
     sanitized = _sanitize_mapping(document, policy=policy, pseudonym_key=pseudonym_key)
-    _assert_public_safe(sanitized)
+    assert_public_safe(sanitized)
     return sanitized
 
 
@@ -156,6 +163,7 @@ def _sanitize_mapping(
             raise UnknownFieldError(f"unclassified field: {field}") from exc
 
         if action is FieldAction.DROP:
+            _validate_nested_classifications(item, policy=policy)
             continue
         if action is FieldAction.PSEUDONYMIZE:
             if not isinstance(item, str) or not item:
@@ -169,6 +177,18 @@ def _sanitize_mapping(
             pseudonym_key=pseudonym_key,
         )
     return result
+
+
+def _validate_nested_classifications(value: JsonValue, *, policy: SanitizationPolicy) -> None:
+    """A dropped parent does not allow unknown nested fields to bypass classification."""
+    if isinstance(value, dict):
+        for field, item in value.items():
+            if field not in policy.actions:
+                raise UnknownFieldError(f"unclassified field: {field}")
+            _validate_nested_classifications(item, policy=policy)
+    elif isinstance(value, list):
+        for item in value:
+            _validate_nested_classifications(item, policy=policy)
 
 
 def _sanitize_allowed_value(
@@ -192,17 +212,18 @@ def _pseudonymize(prefix: str, value: str, key: bytes) -> str:
     return f"{prefix}-{digest}"
 
 
-def _assert_public_safe(value: JsonValue) -> None:
+def assert_public_safe(value: JsonValue) -> None:
+    """Reject sensitive public or external-egress values without transforming input."""
     if isinstance(value, dict):
         for item in value.values():
-            _assert_public_safe(item)
+            assert_public_safe(item)
         return
     if isinstance(value, list):
         for item in value:
-            _assert_public_safe(item)
+            assert_public_safe(item)
         return
     if not isinstance(value, str):
         return
-    for label, pattern in _PROHIBITED_OUTPUT_PATTERNS:
+    for label, pattern in (*CREDENTIAL_PATTERNS, *_PROHIBITED_PUBLIC_VALUE_PATTERNS):
         if pattern.search(value):
             raise SensitiveValueError(f"prohibited {label} survived sanitization")

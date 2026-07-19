@@ -5,9 +5,9 @@
 - **Project:** EvidenceOps
 - **Track:** Developer Tools
 - **Project start:** 2026-07-18
-- **Phase:** Phase 0 — identity, repository, safety boundaries, documentation, CI, and Pages
+- **Phase:** Phase 1 — narrow read-only Intune-to-verified-narrative proof
 - **Primary implementation thread:** This OpenAI Build Week Codex task
-- **Supporting implementation threads:** None during Phase 0 foundation
+- **Supporting implementation threads:** None during Phase 0 or this Phase 1 implementation
 
 ## Human decisions
 
@@ -18,21 +18,32 @@ Phase 0 completion criteria.
 
 ## Codex contributions
 
-Codex, using the requested GPT-5.6 Sol execution profile, performed verified environment and GitHub
-identity checks; created the repository after the gate passed; implemented the Phase 0 code, tests,
-workflows, documentation, and security controls; executed validation; and recorded verified results.
+Codex, using the requested GPT-5.6 Sol execution profile, implemented Phase 0 in this primary thread.
+In Phase 1 it inspected and validated the existing repository, researched official Microsoft and
+OpenAI contracts, implemented schema/provider/publication/narrative/verifier/CLI code, extended the
+synthetic static demo, updated the threat model, and executed the validation recorded in the Phase
+1 document. It then remediated four validated Codex Security findings in place and recorded the
+Cloudflare-next deployment decision. After TJ reviewed and committed that checkpoint, Codex added
+the separately reviewable Worker/static-assets runtime, same-origin API contracts, workerd tests,
+CI validation, protected workflow support, Cloudflare preview/production deployments, custom
+domain, secure OpenAI-to-Worker key transfer, and external validation. No supporting agent or
+unrelated repository supplied project code.
 
 The local Codex CLI reported version `0.145.0-alpha.18`. A current official Codex manual fetched
 during Phase 0 documented the GPT-5.6 Sol family and Extra High/Max reasoning controls. The manual
 also makes clear that model availability is selected in the Codex surface; this repository does not
 attempt to prove account-wide API entitlement.
 
-## Intended runtime contribution
+## Runtime contribution
 
-GPT-5.6 is intended to draft concise evidence narratives from deterministic, policy-approved
-evidence. That future output will be labeled generated analysis, cite evidence references, preserve
-limitations, pass grounding evaluations, and require human approval. No runtime model call or API
-credential is included in Phase 0.
+The optional adapter asks GPT-5.6 to draft concise structured analysis from a bounded sanitized
+package. It has no tools and cannot collect, publish, remediate, change a status, approve an
+exception, or decide compliance. A deterministic verifier checks exact finding coverage and typed
+status claims; it quarantines all unrestricted prose before human review. Public CI and the local
+static demo use an offline fixture and require no API key. The Worker OpenAI transport is mocked in
+tests. Production routing reached OpenAI during a bounded synthetic validation, but the project
+returned capacity unavailable and no model output was accepted. The public deployment therefore
+remains in explicit fixture mode.
 
 ## Authorship and ownership
 
@@ -56,9 +67,12 @@ Build Week milestone commits use:
 
 ```text
 Codex-Assisted: GPT-5.6 Sol / Max
-Build-Week-Phase: Phase-0
+Build-Week-Phase: Phase-1
 Human-Reviewed: TJ Olnhausen
 ```
+
+Autonomous changes made after the authorized Worker checkpoint use `Human-Review: Required` until
+TJ completes final pull-request review.
 
 The trailers record the collaboration process; they do not transfer copyright or replace human
 review.

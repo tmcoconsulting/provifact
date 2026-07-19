@@ -3,21 +3,22 @@
 
 import argparse
 import re
+import sys
 from collections.abc import Iterator
 from html.parser import HTMLParser
 from pathlib import Path
 from typing import Final
 
+_REPOSITORY_ROOT = Path(__file__).resolve().parents[1]
+if str(_REPOSITORY_ROOT) not in sys.path:
+    sys.path.insert(0, str(_REPOSITORY_ROOT))
+
+from evidenceops.sanitization.credentials import CREDENTIAL_PATTERNS  # noqa: E402
+
 _HIGH_CONFIDENCE_PATTERNS: Final = (
     ("raw fixture marker", re.compile(r"RAW_FIXTURE_MARKER")),
     ("synthetic raw serial marker", re.compile(r"SYNTH-SERIAL")),
     ("reserved fixture domain", re.compile(r"example\.invalid", re.IGNORECASE)),
-    ("private key", re.compile(r"-----BEGIN " r"(?:RSA |EC |OPENSSH )?PRIVATE KEY-----")),
-    (
-        "GitHub token",
-        re.compile(r"\b(?:gh[pousr]_[A-Za-z0-9]{30,}|github_pat_[A-Za-z0-9_]{30,})\b"),
-    ),
-    ("bearer credential", re.compile(r"\bBearer\s+[A-Za-z0-9._~+/-]{20,}=*", re.IGNORECASE)),
 )
 
 _PUBLIC_CONTENT_PATTERNS: Final = (
@@ -39,6 +40,12 @@ _PUBLIC_CONTENT_PATTERNS: Final = (
 )
 
 _NON_CONTENT_ASSET_DIRS: Final = {"javascripts", "stylesheets", "webfonts"}
+_PROHIBITED_PATH_PARTS: Final = {"artifacts", "exports", "private", "raw"}
+_PUBLIC_IDENTIFIER_ALLOWLIST: Final = {
+    # Microsoft Graph public permission identifiers documented in the checked-in manifest.
+    "dc377aa6-52d8-4e23-b271-2a7ae04cedf3",
+    "f1493658-876a-4c87-8fa7-edb559b3476a",
+}
 
 
 class _VisibleTextParser(HTMLParser):
@@ -76,11 +83,14 @@ def scan(root: Path) -> list[tuple[Path, int, str]]:
     findings: list[tuple[Path, int, str]] = []
     for path in _iter_files(root):
         relative = path.relative_to(root)
+        if any(part.lower() in _PROHIBITED_PATH_PARTS for part in relative.parts):
+            findings.append((relative, 1, "private-evidence path"))
+            continue
         try:
             content = path.read_text(encoding="utf-8")
         except UnicodeDecodeError:
             continue
-        for label, pattern in _HIGH_CONFIDENCE_PATTERNS:
+        for label, pattern in (*CREDENTIAL_PATTERNS, *_HIGH_CONFIDENCE_PATTERNS):
             for match in pattern.finditer(content):
                 line = content.count("\n", 0, match.start()) + 1
                 findings.append((relative, line, label))
@@ -90,6 +100,11 @@ def scan(root: Path) -> list[tuple[Path, int, str]]:
             continue
         for label, pattern in _PUBLIC_CONTENT_PATTERNS:
             for match in pattern.finditer(public_content):
+                if (
+                    label == "UUID-like identifier"
+                    and match.group(0) in _PUBLIC_IDENTIFIER_ALLOWLIST
+                ):
+                    continue
                 line = public_content.count("\n", 0, match.start()) + 1
                 findings.append((relative, line, label))
     return findings

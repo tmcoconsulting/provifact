@@ -1,0 +1,464 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/tmcoconsulting/evidenceops/main/schemas/evidenceops-v1.schema.json",
+  "title": "EvidenceOps evidence object catalog v1.0.0",
+  "oneOf": [
+    { "$ref": "#/$defs/provider_metadata" },
+    { "$ref": "#/$defs/collection_metadata" },
+    { "$ref": "#/$defs/desired_state_record" },
+    { "$ref": "#/$defs/normalized_configuration_observation" },
+    { "$ref": "#/$defs/deterministic_drift_finding" },
+    { "$ref": "#/$defs/evidence_reference" },
+    { "$ref": "#/$defs/private_evidence_package" },
+    { "$ref": "#/$defs/sanitized_public_evidence_package" },
+    { "$ref": "#/$defs/generated_narrative" },
+    { "$ref": "#/$defs/narrative_verification_result" }
+  ],
+  "$defs": {
+    "json_value": {
+      "oneOf": [
+        { "type": "null" },
+        { "type": "boolean" },
+        { "type": "number" },
+        { "type": "string" },
+        { "type": "array", "items": { "$ref": "#/$defs/json_value" } },
+        {
+          "type": "object",
+          "additionalProperties": { "$ref": "#/$defs/json_value" }
+        }
+      ]
+    },
+    "evidence_identity": {
+      "type": "object",
+      "required": ["schema_version", "object_type", "evidence_id", "content_fingerprint"],
+      "properties": {
+        "schema_version": { "const": "1.0.0" },
+        "object_type": { "type": "string" },
+        "evidence_id": { "type": "string", "pattern": "^ev1-[0-9a-f]{24}$" },
+        "content_fingerprint": {
+          "type": "string",
+          "pattern": "^sha256:[0-9a-f]{64}$"
+        }
+      }
+    },
+    "evidence_id": { "type": "string", "pattern": "^ev1-[0-9a-f]{24}$" },
+    "fingerprint": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
+    "git_sha": {
+      "oneOf": [
+        { "type": "null" },
+        { "type": "string", "pattern": "^(?:[0-9a-f]{40}|[0-9a-f]{64}|synthetic-[a-z0-9-]+)$" }
+      ]
+    },
+    "utc_timestamp": { "type": "string", "format": "date-time", "pattern": "Z$" },
+    "status": {
+      "enum": [
+        "observed",
+        "matches desired state",
+        "differs from desired state",
+        "additional evidence required",
+        "human review required",
+        "not evaluated"
+      ]
+    },
+    "freshness": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["as_of_utc", "max_age_seconds", "state"],
+      "properties": {
+        "as_of_utc": { "$ref": "#/$defs/utc_timestamp" },
+        "max_age_seconds": { "type": "integer", "minimum": 0 },
+        "state": { "enum": ["current", "stale", "unknown"] }
+      }
+    },
+    "provider_metadata": {
+      "allOf": [
+        { "$ref": "#/$defs/evidence_identity" },
+        {
+          "type": "object",
+          "required": ["provider", "provider_version", "source_api_version"],
+          "properties": {
+            "object_type": { "const": "provider_metadata" },
+            "provider": { "type": "string", "minLength": 1 },
+            "provider_version": { "type": "string", "minLength": 1 },
+            "source_api_version": { "type": "string", "minLength": 1 }
+          }
+        }
+      ],
+      "unevaluatedProperties": false
+    },
+    "collection_metadata": {
+      "allOf": [
+        { "$ref": "#/$defs/evidence_identity" },
+        {
+          "type": "object",
+          "required": [
+            "collection_timestamp_utc",
+            "provider_evidence_id",
+            "desired_state_git_commit_sha",
+            "deterministic_algorithm_version",
+            "freshness"
+          ],
+          "properties": {
+            "object_type": { "const": "collection_metadata" },
+            "collection_timestamp_utc": { "$ref": "#/$defs/utc_timestamp" },
+            "provider_evidence_id": { "$ref": "#/$defs/evidence_id" },
+            "desired_state_git_commit_sha": { "$ref": "#/$defs/git_sha" },
+            "deterministic_algorithm_version": { "type": "string", "minLength": 1 },
+            "freshness": { "$ref": "#/$defs/freshness" }
+          }
+        }
+      ],
+      "unevaluatedProperties": false
+    },
+    "desired_state_record": {
+      "allOf": [
+        { "$ref": "#/$defs/evidence_identity" },
+        {
+          "type": "object",
+          "required": [
+            "record_key",
+            "platform",
+            "setting_key",
+            "desired_value",
+            "evaluation_mode",
+            "title",
+            "description",
+            "desired_state_git_commit_sha"
+          ],
+          "properties": {
+            "object_type": { "const": "desired_state_record" },
+            "record_key": { "type": "string", "minLength": 1 },
+            "platform": { "type": "string", "minLength": 1 },
+            "setting_key": { "type": "string", "minLength": 1 },
+            "desired_value": { "$ref": "#/$defs/json_value" },
+            "evaluation_mode": { "type": "string", "minLength": 1 },
+            "title": { "type": "string", "minLength": 1 },
+            "description": { "type": "string", "minLength": 1 },
+            "desired_state_git_commit_sha": { "$ref": "#/$defs/git_sha" }
+          }
+        }
+      ],
+      "unevaluatedProperties": false
+    },
+    "normalized_configuration_observation": {
+      "allOf": [
+        { "$ref": "#/$defs/evidence_identity" },
+        {
+          "type": "object",
+          "required": [
+            "collection_evidence_id",
+            "provider_evidence_id",
+            "platform",
+            "setting_key",
+            "observed_value",
+            "observation_state",
+            "source_modified_at_utc",
+            "freshness"
+          ],
+          "properties": {
+            "object_type": { "const": "normalized_configuration_observation" },
+            "collection_evidence_id": { "$ref": "#/$defs/evidence_id" },
+            "provider_evidence_id": { "$ref": "#/$defs/evidence_id" },
+            "platform": { "type": "string", "minLength": 1 },
+            "setting_key": { "type": "string", "minLength": 1 },
+            "observed_value": { "$ref": "#/$defs/json_value" },
+            "observation_state": { "type": "string", "minLength": 1 },
+            "source_modified_at_utc": {
+              "oneOf": [{ "type": "null" }, { "$ref": "#/$defs/utc_timestamp" }]
+            },
+            "freshness": { "$ref": "#/$defs/freshness" },
+            "private_trace": {
+              "type": "object",
+              "additionalProperties": { "$ref": "#/$defs/json_value" }
+            }
+          }
+        }
+      ],
+      "unevaluatedProperties": false
+    },
+    "deterministic_drift_finding": {
+      "allOf": [
+        { "$ref": "#/$defs/evidence_identity" },
+        {
+          "type": "object",
+          "required": [
+            "collection_evidence_id",
+            "desired_state_evidence_id",
+            "observation_evidence_ids",
+            "status",
+            "desired_state_git_commit_sha",
+            "deterministic_algorithm_version",
+            "input_fingerprints",
+            "additional_evidence_required"
+          ],
+          "properties": {
+            "object_type": { "const": "deterministic_drift_finding" },
+            "collection_evidence_id": { "$ref": "#/$defs/evidence_id" },
+            "desired_state_evidence_id": { "$ref": "#/$defs/evidence_id" },
+            "observation_evidence_ids": {
+              "type": "array",
+              "items": { "$ref": "#/$defs/evidence_id" }
+            },
+            "status": { "$ref": "#/$defs/status" },
+            "desired_state_git_commit_sha": { "$ref": "#/$defs/git_sha" },
+            "deterministic_algorithm_version": { "type": "string", "minLength": 1 },
+            "input_fingerprints": {
+              "type": "array",
+              "items": { "$ref": "#/$defs/fingerprint" },
+              "minItems": 1
+            },
+            "additional_evidence_required": {
+              "type": "array",
+              "items": { "type": "string", "minLength": 1 }
+            }
+          }
+        }
+      ],
+      "unevaluatedProperties": false
+    },
+    "evidence_reference": {
+      "allOf": [
+        { "$ref": "#/$defs/evidence_identity" },
+        {
+          "type": "object",
+          "required": ["referenced_evidence_id", "reference_kind", "label"],
+          "properties": {
+            "object_type": { "const": "evidence_reference" },
+            "referenced_evidence_id": { "$ref": "#/$defs/evidence_id" },
+            "reference_kind": { "type": "string", "minLength": 1 },
+            "label": { "type": "string", "minLength": 1 }
+          }
+        }
+      ],
+      "unevaluatedProperties": false
+    },
+    "private_evidence_package": {
+      "allOf": [
+        { "$ref": "#/$defs/evidence_identity" },
+        {
+          "type": "object",
+          "required": [
+            "synthetic",
+            "provider",
+            "collection",
+            "desired_state",
+            "observations",
+            "findings",
+            "evidence_references",
+            "retention",
+            "private_trace",
+            "human_approval_status"
+          ],
+          "properties": {
+            "object_type": { "const": "private_evidence_package" },
+            "synthetic": { "type": "boolean" },
+            "provider": { "$ref": "#/$defs/provider_metadata" },
+            "collection": { "$ref": "#/$defs/collection_metadata" },
+            "desired_state": {
+              "type": "array",
+              "items": { "$ref": "#/$defs/desired_state_record" }
+            },
+            "observations": {
+              "type": "array",
+              "items": { "$ref": "#/$defs/normalized_configuration_observation" }
+            },
+            "findings": {
+              "type": "array",
+              "items": { "$ref": "#/$defs/deterministic_drift_finding" }
+            },
+            "evidence_references": {
+              "type": "array",
+              "items": { "$ref": "#/$defs/evidence_reference" }
+            },
+            "retention": {
+              "type": "object",
+              "required": ["policy", "delete_after_utc"],
+              "properties": {
+                "policy": { "type": "string", "minLength": 1 },
+                "delete_after_utc": { "$ref": "#/$defs/utc_timestamp" }
+              },
+              "additionalProperties": false
+            },
+            "private_trace": {
+              "type": "object",
+              "additionalProperties": { "$ref": "#/$defs/json_value" }
+            },
+            "human_approval_status": { "const": "human review required" }
+          }
+        }
+      ],
+      "unevaluatedProperties": false
+    },
+    "publication": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "publication_policy_version",
+        "published_at_utc",
+        "source_private_fingerprint",
+        "sanitized_content_fingerprint"
+      ],
+      "properties": {
+        "publication_policy_version": { "type": "string", "minLength": 1 },
+        "published_at_utc": { "$ref": "#/$defs/utc_timestamp" },
+        "source_private_fingerprint": { "$ref": "#/$defs/fingerprint" },
+        "sanitized_content_fingerprint": { "$ref": "#/$defs/fingerprint" }
+      }
+    },
+    "sanitized_public_evidence_package": {
+      "allOf": [
+        { "$ref": "#/$defs/evidence_identity" },
+        {
+          "type": "object",
+          "required": [
+            "synthetic",
+            "source_type",
+            "provider",
+            "collection",
+            "desired_state",
+            "observations",
+            "findings",
+            "evidence_references",
+            "publication",
+            "human_approval_status"
+          ],
+          "properties": {
+            "object_type": { "const": "sanitized_public_evidence_package" },
+            "synthetic": { "type": "boolean" },
+            "source_type": {
+              "enum": ["curated-synthetic-fixture", "sanitized-live-collection"]
+            },
+            "provider": { "$ref": "#/$defs/provider_metadata" },
+            "collection": { "$ref": "#/$defs/collection_metadata" },
+            "desired_state": {
+              "type": "array",
+              "items": { "$ref": "#/$defs/desired_state_record" }
+            },
+            "observations": {
+              "type": "array",
+              "items": { "$ref": "#/$defs/normalized_configuration_observation" }
+            },
+            "findings": {
+              "type": "array",
+              "items": { "$ref": "#/$defs/deterministic_drift_finding" }
+            },
+            "evidence_references": {
+              "type": "array",
+              "items": { "$ref": "#/$defs/evidence_reference" }
+            },
+            "publication": { "$ref": "#/$defs/publication" },
+            "human_approval_status": { "const": "human review required" }
+          }
+        }
+      ],
+      "unevaluatedProperties": false
+    },
+    "drift_explanation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "finding_evidence_id",
+        "deterministic_status",
+        "change_or_drift_explanation",
+        "technical_impact",
+        "evidence_references"
+      ],
+      "properties": {
+        "finding_evidence_id": { "$ref": "#/$defs/evidence_id" },
+        "deterministic_status": { "$ref": "#/$defs/status" },
+        "deterministic_claim": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["claim_code", "claim_value"],
+          "properties": {
+            "claim_code": { "const": "finding_status" },
+            "claim_value": { "$ref": "#/$defs/status" }
+          }
+        },
+        "change_or_drift_explanation": { "type": "string", "minLength": 1 },
+        "technical_impact": { "type": "string", "minLength": 1 },
+        "evidence_references": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/evidence_id" }
+        }
+      }
+    },
+    "generated_narrative": {
+      "allOf": [
+        { "$ref": "#/$defs/evidence_identity" },
+        {
+          "type": "object",
+          "required": [
+            "ai_generated_analysis",
+            "human_review_required",
+            "model",
+            "source_package_evidence_id",
+            "executive_summary",
+            "drift_explanations",
+            "limitations",
+            "additional_evidence_required",
+            "suggested_human_review_questions"
+          ],
+          "properties": {
+            "object_type": { "const": "generated_narrative" },
+            "ai_generated_analysis": { "const": true },
+            "human_review_required": { "const": true },
+            "model": { "type": "string", "minLength": 1 },
+            "source_package_evidence_id": { "$ref": "#/$defs/evidence_id" },
+            "executive_summary": { "type": "string", "minLength": 1 },
+            "drift_explanations": {
+              "type": "array",
+              "items": { "$ref": "#/$defs/drift_explanation" }
+            },
+            "limitations": {
+              "type": "array",
+              "minItems": 1,
+              "items": { "type": "string", "minLength": 1 }
+            },
+            "additional_evidence_required": {
+              "type": "array",
+              "minItems": 1,
+              "items": { "type": "string", "minLength": 1 }
+            },
+            "suggested_human_review_questions": {
+              "type": "array",
+              "minItems": 1,
+              "items": { "type": "string", "minLength": 1 }
+            }
+          }
+        }
+      ],
+      "unevaluatedProperties": false
+    },
+    "narrative_verification_result": {
+      "allOf": [
+        { "$ref": "#/$defs/evidence_identity" },
+        {
+          "type": "object",
+          "required": [
+            "narrative_evidence_id",
+            "source_package_evidence_id",
+            "verifier_version",
+            "accepted",
+            "accepted_claims",
+            "rejected_claims",
+            "reasons",
+            "human_review_required"
+          ],
+          "properties": {
+            "object_type": { "const": "narrative_verification_result" },
+            "narrative_evidence_id": { "$ref": "#/$defs/evidence_id" },
+            "source_package_evidence_id": { "$ref": "#/$defs/evidence_id" },
+            "verifier_version": { "type": "string", "minLength": 1 },
+            "accepted": { "type": "boolean" },
+            "accepted_claims": { "type": "array", "items": { "type": "string" } },
+            "rejected_claims": { "type": "array", "items": { "type": "string" } },
+            "reasons": { "type": "array", "items": { "type": "string" } },
+            "human_review_required": { "const": true }
+          }
+        }
+      ],
+      "unevaluatedProperties": false
+    }
+  }
+}

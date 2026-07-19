@@ -1,0 +1,36 @@
+{
+    "name": "evidenceops-worker",
+    "version": "0.1.0",
+    "private": true,
+    "type": "module",
+    "engines": {
+        "node": ">=22"
+    },
+    "scripts": {
+        "build:site": "mkdocs build --strict",
+        "dev": "CLOUDFLARE_LOAD_DEV_VARS_FROM_DOT_ENV=false wrangler dev --local",
+        "format": "prettier --write package.json wrangler.jsonc tsconfig.json vitest.config.ts .oxlintrc.json worker tests-worker docs/assets/javascripts",
+        "format:check": "prettier --check package.json wrangler.jsonc tsconfig.json vitest.config.ts .oxlintrc.json worker tests-worker docs/assets/javascripts",
+        "lint:worker": "oxlint --tsconfig tsconfig.json --type-aware --type-check --deny-warnings --report-unused-disable-directives worker && oxlint --tsconfig tsconfig.tests.json --type-aware --type-check --deny-warnings --report-unused-disable-directives tests-worker vitest.config.ts",
+        "test:worker": "CLOUDFLARE_LOAD_DEV_VARS_FROM_DOT_ENV=false vitest run",
+        "typecheck:worker": "tsc --noEmit -p tsconfig.json && tsc --noEmit -p tsconfig.tests.json",
+        "worker:dry-run": "CLOUDFLARE_LOAD_DEV_VARS_FROM_DOT_ENV=false wrangler deploy --env= --dry-run --outdir build/cloudflare-worker",
+        "worker:dry-run:preview": "CLOUDFLARE_LOAD_DEV_VARS_FROM_DOT_ENV=false wrangler deploy --env preview --dry-run --outdir build/cloudflare-worker-preview",
+        "worker:dry-run:production": "CLOUDFLARE_LOAD_DEV_VARS_FROM_DOT_ENV=false wrangler deploy --env production --dry-run --outdir build/cloudflare-worker-production",
+        "deploy:preview": "CLOUDFLARE_LOAD_DEV_VARS_FROM_DOT_ENV=false wrangler deploy --env preview --strict",
+        "deploy:production": "CLOUDFLARE_LOAD_DEV_VARS_FROM_DOT_ENV=false wrangler deploy --env production --strict",
+        "worker:types": "wrangler types worker-configuration.d.ts",
+        "worker:types:check": "wrangler types worker-configuration.d.ts --check",
+        "validate:worker": "npm run format:check && npm run lint:worker && npm run typecheck:worker && npm run test:worker && npm run worker:types:check && npm run worker:dry-run && npm run worker:dry-run:preview && npm run worker:dry-run:production"
+    },
+    "devDependencies": {
+        "@cloudflare/vitest-pool-workers": "0.18.6",
+        "@types/node": "26.1.1",
+        "oxlint": "1.74.0",
+        "oxlint-tsgolint": "0.25.0",
+        "prettier": "3.9.5",
+        "typescript": "7.0.2",
+        "vitest": "4.1.10",
+        "wrangler": "4.112.0"
+    }
+}

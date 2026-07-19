@@ -1,0 +1,37 @@
+{
+  "accepted": false,
+  "accepted_claims": [
+    "ev1-00692c1442a1aa1944950d0c:finding_status=differs from desired state",
+    "ev1-93beffaa2b16e7591f3f4a68:finding_status=additional evidence required",
+    "ev1-9fe83b2f63a9b9107943a194:finding_status=matches desired state",
+    "ev1-c1b0791bad7da5bee53c519d:finding_status=not evaluated"
+  ],
+  "content_fingerprint": "sha256:048c39f3e67897ffac289499f9347c92657aab40dae2f9fbbeb898299a0a09bd",
+  "evidence_id": "ev1-048c39f3e67897ffac289499",
+  "human_review_required": true,
+  "narrative_evidence_id": "ev1-0714cb68c310484868a9230c",
+  "object_type": "narrative_verification_result",
+  "reasons": [
+    "unsupported compliance or certification verdict",
+    "free-form generated analysis is not machine-verifiable and remains quarantined for human review"
+  ],
+  "rejected_claims": [
+    "generated prose quarantined: executive_summary",
+    "generated prose quarantined: limitations[0]",
+    "generated prose quarantined: limitations[1]",
+    "generated prose quarantined: additional_evidence_required[0]",
+    "generated prose quarantined: suggested_human_review_questions[0]",
+    "generated prose quarantined: suggested_human_review_questions[1]",
+    "generated prose quarantined: drift_explanations[0].change_or_drift_explanation",
+    "generated prose quarantined: drift_explanations[0].technical_impact",
+    "generated prose quarantined: drift_explanations[1].change_or_drift_explanation",
+    "generated prose quarantined: drift_explanations[1].technical_impact",
+    "generated prose quarantined: drift_explanations[2].change_or_drift_explanation",
+    "generated prose quarantined: drift_explanations[2].technical_impact",
+    "generated prose quarantined: drift_explanations[3].change_or_drift_explanation",
+    "generated prose quarantined: drift_explanations[3].technical_impact"
+  ],
+  "schema_version": "1.0.0",
+  "source_package_evidence_id": "ev1-bf5788de43a3d43d37454d25",
+  "verifier_version": "evidenceops-narrative-verifier-v1.1.0"
+}

@@ -1,0 +1,56 @@
+# NON-EXECUTABLE REFERENCE: copy only after tenant-specific security review.
+# This file is intentionally outside .github/workflows in the public repository.
+name: Private Intune read-only collection example
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  collect:
+    runs-on: ubuntu-latest
+    environment: private-intune-collection
+    timeout-minutes: 15
+    env:
+      AZURE_CORE_OUTPUT: none
+      PYTHONDONTWRITEBYTECODE: "1"
+    steps:
+      - name: Check out reviewed desired state
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6.3.0
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Exchange GitHub OIDC identity for Entra access
+        uses: azure/login@532459ea530d8321f2fb9bb10d1e0bcf23869a43 # v3.0.0
+        with:
+          client-id: ${{ vars.AZURE_CLIENT_ID }}
+          tenant-id: ${{ vars.AZURE_TENANT_ID }}
+          allow-no-subscriptions: true
+
+      - name: Install reviewed locked dependencies
+        run: |
+          python -m pip install -r requirements-dev.txt
+          python -m pip install --no-build-isolation --no-deps .
+
+      - name: Collect privately with a process-scoped Graph token
+        shell: bash
+        run: |
+          token="$(az account get-access-token --resource-type ms-graph --query accessToken -o tsv)"
+          echo "::add-mask::$token"
+          EVIDENCEOPS_GRAPH_ACCESS_TOKEN="$token" \
+            python -m evidenceops live-collect --auth environment-token \
+              --private-dir artifacts/private --retention-days 1
+          unset token
+
+      # Deliberately no artifact upload or public deployment. A reviewed private-repository
+      # implementation must add publication, public scanning, protected approval, and minimal
+      # artifact retention as separate gates. Raw/private evidence must never be uploaded.
