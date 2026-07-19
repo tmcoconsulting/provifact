@@ -91,6 +91,7 @@ or proprietary material from `intune-apple-gitops` or any other repository.
 | 2026-07-19 | Browser-proven responsive Mission Control containment | `73d6b2b` |
 | 2026-07-19 | Responsive desktop/mobile browser evidence record | `214f1bf` |
 | 2026-07-19 | Reviewed Mission Control slice squash merge | `7d7f8bca0ac7b652e515a360755b534af99c0b46` |
+| 2026-07-19 | Reviewed Graph fallback fix squash merge | `0f6f3b4fc8897528a5d66383802f578e87dbfd4e` |
 
 Exact Phase 1 commands, results, limitations, and commit hashes are maintained in the
 [Phase 1 validation record](phase-1-validation.md).
@@ -121,4 +122,7 @@ task deployed the reviewed fixture to production, accepted one bounded Terra res
 typed-claim verification and prose quarantine, and restored fixture mode. A protected-main OIDC
 audit completed private GET-only collection but correctly failed public publication on a
 domain-shaped fallback value; cleanup removed the ephemeral evidence. The follow-up normalization
-fix preserves the detector and requires separate human review.
+fix preserved the detector, was separately reviewed and merged, and the authorized retry completed
+OIDC collection, sanitization, public scanning, aggregate reporting, and cleanup. The next review
+boundary is a one-day scanned-public-package handoff; it retains no private package and does not
+weaken the fixture-safe deployment default.

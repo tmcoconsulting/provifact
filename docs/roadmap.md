@@ -22,8 +22,9 @@ Roadmap items describe intent, not operational capability or delivery commitment
 - [x] Preserve fixture mode, typed-claim verification, and prose quarantine
 - [x] Configure the exact environment-scoped Entra federated identity
 - [x] Grant and independently verify the complete four-permission read-only application set
-- [ ] Run the expanded manual protected post-merge audit and record sanitized counts only
-- [ ] Perform one bounded service-account GPT-5.6 request and return production to fixture mode
+- [x] Run the expanded manual protected post-merge audit and retain no private artifact
+- [x] Perform one bounded service-account GPT-5.6 request and return production to fixture mode
+- [ ] Publish one separately reviewed sanitized live Mission package through the protected handoff
 
 Public CI never performs live collection.
 
@@ -42,7 +43,7 @@ Public CI never performs live collection.
 - [ ] Verify the Cloudflare token scope and enable the protected workflow; deployment remains
       disabled with `CLOUDFLARE_DEPLOY_ENABLED=false`
 - [x] Configure the EvidenceOps OpenAI project budget alerts and model limits
-- [ ] Validate one bounded live `gpt-5.6-terra` response; keep fixture mode as the public default
+- [x] Validate one bounded live `gpt-5.6-terra` response; keep fixture mode as the public default
 
 ## Later application scope
 

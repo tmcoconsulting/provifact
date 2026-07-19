@@ -316,3 +316,16 @@ boundary correctly rejected the dotted fallback as a domain-shaped value. Dotted
 namespaces are unnecessary in the public resource summary. Reducing the fallback to the existing
 closed taxonomy retains useful resource-family evidence without allowlisting an arbitrary domain
 pattern or exposing a tenant value.
+
+## 2026-07-19 — Separate live collection from public deployment
+
+**Decision:** Keep live collection manual and main-only. Add an opt-in, disabled-by-default handoff
+that retains exactly one already scanned public Mission file for one day. Require a separate
+protected deployment run, selected by the exact audit run ID, to redownload, strictly revalidate,
+rebuild, scan, and publish it. Never upload the private package or containing directory.
+
+**Why:** A successful sanitizer is necessary but not sufficient authorization to publish
+tenant-derived evidence. The two-workflow boundary preserves a human inspection point, prevents
+private artifact retention, and gives the deployed revision an auditable source without adding a
+database or a scheduled live workflow. Nested public metadata now uses explicit field allowlists so
+a recomputed fingerprint cannot legitimize an unknown field.

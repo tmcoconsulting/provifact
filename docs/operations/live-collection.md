@@ -89,23 +89,35 @@ The publisher reconstructs an allowlisted public package, validates its canonica
 and performs the credential/content scan. Unknown fields fail closed. A human must inspect any live
 sanitized package before it can replace the public synthetic artifact.
 
+The protected workflow has an explicit `prepare_publication` input, disabled by default. When a
+reviewer selects it, the workflow may retain exactly one already validated and scanned
+`mission-control.json` as a one-day GitHub Actions artifact. It never uploads the private package,
+Graph response, access token, pseudonym key, or containing directory. A separate reviewed
+deployment accepts the exact successful audit run ID, downloads that named public artifact,
+revalidates the schema, fingerprint, nested field allowlists, credential/content policy, and full
+static site, then deploys only when the protected deployment gate is enabled. Collection and
+deployment remain two separate human actions.
+
 ## GitHub OIDC workflow
 
 `.github/workflows/intune-audit.yml` is manual, main-only, and targets the protected `production`
 environment. It checks out trusted `main`, requests only `contents: read` and `id-token: write`,
 uses the exact environment-scoped Entra federation, runs contract tests with repository-wide
 coverage addopts explicitly disabled for that smoke step, collects privately, publishes and scans
-the derived package, writes only aggregate counts to the job summary, and deletes all evidence at
-job end. Pull requests and arbitrary branches cannot obtain the production identity.
+the derived package, writes only aggregate counts to the job summary, and deletes private and
+working evidence at job end. Its optional one-day handoff contains only the scanned public Mission
+file. Pull requests and arbitrary branches cannot obtain the production identity.
 
 ## Validation status
 
 Mocked provider and contract tests cover every configured resource family, pagination, retry,
-partial failure, schema changes, and GET-only enforcement. The original narrow configuration-only
-OIDC proof succeeded. All four required application permissions now show tenant administrator
-consent, but the expanded collector has not yet been run against the TMCO tenant from reviewed
-`main`; until that protected run succeeds, live Mission Control remains an implemented but
-unvalidated path and production continues to serve synthetic data.
+partial failure, schema changes, and GET-only enforcement. All four required application
+permissions show tenant administrator consent. Protected-main run `29701160503` acquired its token
+through the exact environment-scoped OIDC trust, completed the expanded GET-only collection,
+constructed and scanned the sanitized Mission package, wrote only its aggregate report, and ran
+ephemeral cleanup successfully. It retained no artifact because publication preparation was not
+selected. Production therefore continues to serve synthetic data pending the separate reviewed
+publication handoff.
 
 The Entra application retains pre-existing delegated permissions that are not used by the
 application-permission workflow. EvidenceOps does not remove unrelated permissions automatically.

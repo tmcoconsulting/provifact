@@ -12,8 +12,9 @@ inventory to a bounded GET-only Microsoft Intune Apple collector, deterministic 
 fail-closed publication, a dynamic Mission Control dashboard, and a constrained GPT-5.6 assistant.
 The 98-rule baseline is visible in full; five settings have explicit deterministic demo mappings,
 and unsupported rules remain visible instead of being guessed. iOS and iPadOS posture is shown but
-is never scored against the macOS baseline. The public deployment remains synthetic until a
-trusted-main live audit has passed human publication review. Nothing in this repository can create,
+is never scored against the macOS baseline. The public deployment remains synthetic even though a
+trusted-main live audit has now passed; publishing its sanitized projection still requires a
+separate human-reviewed deployment. Nothing in this repository can create,
 assign, update, delete, deploy, remediate, or roll back an Intune configuration.
 
 ## Safety model
@@ -53,12 +54,14 @@ See the [getting-started guide](docs/getting-started.md) and
 ## Project status
 
 EvidenceOps is a **Phase 1 technical proof**, not a compliance product or autonomous endpoint
-manager. The expanded collector is implemented and mocked; live validation of the expanded
-permission set remains a protected, trusted-main gate. GitHub Pages is disabled. Cloudflare serves
+manager. The expanded collector and four-permission application identity completed a protected,
+trusted-main GET-only audit; its private package was deleted and production remains synthetic.
+GitHub Pages is disabled. Cloudflare serves
 the scanned synthetic application at
 [evidenceops.tmcoconsulting.com](https://evidenceops.tmcoconsulting.com/) with bounded same-origin
-`/api/status`, `/api/narrative`, and `/api/ask` routes. Production remains fixture-first while the
-new service-account credential and bounded live model path are validated. See the
+`/api/status`, `/api/narrative`, and `/api/ask` routes. A bounded service-account Terra response
+passed deterministic verification, but production remains fixture-first until the sanitized live
+Mission package passes the separate publication-review gate. See the
 [live-collection guide](docs/operations/live-collection.md), [demo package](docs/build-week/demo-package.md),
 and [roadmap](docs/roadmap.md).
 

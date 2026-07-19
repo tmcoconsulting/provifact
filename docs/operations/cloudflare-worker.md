@@ -58,10 +58,11 @@ Upstream error inspection reads at most 16 KiB and retains only a strictly forma
 or `error.type` long enough to distinguish quota exhaustion from request-rate limiting. Upstream
 messages and bodies are never returned or logged; an unknown or oversized 429 remains a generic
 capacity failure.
-The public production deployment remains in explicit fixture mode while the OpenAI project returns
-capacity unavailable. A bounded production request proved that the Worker reached OpenAI, but no
-model output was returned or accepted. Fixture mode makes no OpenAI request and does not silently
-fall back from a failed live call.
+One bounded production request through the dedicated service-account key returned structured
+`gpt-5.6-terra` output. The deterministic verifier accepted the complete typed-claim set, rejected
+none, quarantined every prose field, and retained the human-review boundary. Production was then
+returned to explicit fixture mode. Fixture mode makes no OpenAI request and does not silently fall
+back from a failed live call.
 
 ## Secret and logging boundary
 
@@ -86,10 +87,10 @@ requires its own browser storage, transit, redaction, support, exfiltration, and
 ## Production validation and remaining gates
 
 Completed: account/zone verification, preview and production deployment, custom-domain/TLS checks,
-static/API/header tests, fixture verification, rate-limit proof, initial secure Worker-secret
-transfer, exact Entra environment federation, and required Graph application consent. The bounded
-live request reached OpenAI and returned capacity unavailable; no output was accepted. Production
-was returned to fixture mode.
+static/API/header tests, fixture verification, rate-limit proof, secure Worker-secret transfer,
+exact Entra environment federation, required Graph application consent, one bounded verified Terra
+response, and one successful expanded protected-main GET-only Intune audit. Production remains in
+fixture mode until the resulting public projection passes the separate publication-review gate.
 
 Repository-controlled static and JSON responses declare CSP, HSTS, MIME, referrer, permissions,
 cross-origin, and frame protections. `/api/ready` validates the Mission schema, fingerprint, data
@@ -98,23 +99,20 @@ signal.
 
 Remaining:
 
-1. make one bounded synthetic live request with the service-account key and verify structured
-   output, typed claims, references, prose quarantine, and safe logs. The configured `$5` monthly
-   project budget is an alert, not a hard cap;
-2. independently verify that the token stored as the protected GitHub environment secret
+1. independently verify that the token stored as the protected GitHub environment secret
    `CLOUDFLARE_API_TOKEN` is restricted to the TMCO Consulting account with Account `Workers
    Scripts Edit`; do not add zone, route, DNS, KV, R2, account-settings, membership, user-details,
    billing, or unrelated-account access. The workflow supplies the exact account ID, so it does not
    need membership discovery. The secret exists by name, but its value and scope have not been
    retrieved or claimed as verified;
-3. keep `CLOUDFLARE_DEPLOY_ENABLED=false` until the token scope is validated against the exact
+2. keep `CLOUDFLARE_DEPLOY_ENABLED=false` until the token scope is validated against the exact
    workflow, then enable deployment only after review;
-4. review Cloudflare observability/alert retention in the dashboard;
-5. after merge, manually run the protected expanded GET-only Intune audit and retain only sanitized counts;
-6. use `wrangler deployments list --env production` and
+3. review Cloudflare observability/alert retention in the dashboard;
+4. review and merge the one-day sanitized-public-package handoff, run it once from protected main,
+   inspect only the public package, and use the separate deployment selector to publish it;
+5. use `wrangler deployments list --env production` and
    `wrangler rollback <known-good-version> --env production` for rollback; and
-7. enable OpenAI mode only after a single bounded request succeeds and the dashboard label is
-   revalidated.
+6. leave OpenAI mode off by default unless a separately reviewed operational policy authorizes it.
 
 The current workflow uses `wrangler deploy` while the custom domain remains declarative in
 `wrangler.jsonc`. Cloudflare's [Attach Domain API](https://developers.cloudflare.com/api/resources/workers/subresources/domains/methods/update/)

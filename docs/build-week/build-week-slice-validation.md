@@ -197,14 +197,69 @@ an absent `@odata.type` normalized as `microsoft.graph.unknown`, which the publi
 correctly refused. The follow-up changes that fallback to the non-domain taxonomy value `unknown`
 and adds an end-to-end regression test. The domain detector is not relaxed.
 
+TJ reviewed that follow-up through `f21636066d7348f3ff8f86bffa4ae01485de5bba`; PR #3 was
+squash-merged as `0f6f3b4fc8897528a5d66383802f578e87dbfd4e`. The one authorized retry,
+protected-main run `29701160503`, then completed Entra OIDC authentication, the expanded GET-only
+collection, fail-closed Mission publication, the complete public-artifact scan, aggregate summary,
+and cleanup. The run succeeded with zero retained artifacts. No tenant names, identifiers,
+configuration values, raw Graph responses, or pseudonym key are included in this validation
+record.
+
+## Sanitized-publication handoff checkpoint
+
+The unreviewed follow-up keeps the default audit non-retaining and adds a second explicit input for
+preparing one scanned public package. The package receives one-day retention, a run-ID-bound name,
+and no private sibling files. The deployment workflow downloads only that exact artifact from this
+repository, then repeats schema/fingerprint validation, strict nested field classification, secret
+and public-content scanning, full site build, Worker validation, deployment, and runtime mode
+verification. Both workflows remain trusted-main and `production`-environment only; deployment is
+still disabled while `CLOUDFLARE_DEPLOY_ENABLED=false`.
+
+Validation on the pending branch:
+
+```text
+temporary Python 3.14 virtual environment + requirements-dev.txt + project wheel
+  PASS — exact lock installed independently
+
+.venv/bin/python -m ruff format --check .
+.venv/bin/python -m ruff check .
+.venv/bin/python -m mypy
+  PASS — 55 files formatted; lint clean; no issues in 55 typed files
+
+.venv/bin/python -m pytest
+  PASS — 201 passed, 1 credential-gated live test skipped, 91.16% branch coverage
+
+.venv/bin/python -m bandit -r evidenceops scripts -c pyproject.toml
+.venv/bin/python scripts/check_secrets.py
+.venv/bin/python -m pip_audit -r requirements-dev.txt
+  PASS — no findings, prohibited credentials, or known Python vulnerabilities
+
+npm ci --ignore-scripts --no-audit --no-fund
+npm audit --audit-level=moderate
+npm run validate:worker
+  PASS — exact lock, 0 vulnerabilities, 43 Worker tests, generated bindings, and all three dry-runs
+
+.venv/bin/python -m evidenceops rebuild-static-demo (twice)
+.venv/bin/mkdocs build --strict
+.venv/bin/python scripts/check_public_artifacts.py site
+git diff --check
+  PASS — identical generated-data hashes, 81-file static site, public scan, and patch whitespace
+```
+
+The only skipped test is the local credential-gated Intune test. No feature-branch Graph request,
+OpenAI request, Cloudflare deployment, or production mutation occurred while validating this
+checkpoint.
+
 ## Outstanding gates
 
-1. TJ reviews and merges the narrow live-publication normalization follow-up.
-2. Rerun the protected-main audit once. Accept completion only if publication, public scanning,
-   sanitized aggregate reporting, and ephemeral cleanup all succeed.
+1. Review and merge the narrow one-day scanned-public-package handoff. It must never upload the
+   private normalized package or a raw response.
+2. Run the publication-preparation input once from protected main, review the sanitized package,
+   and pass only that successful run ID to the separate deployment workflow.
 3. Keep the Cloudflare deployment workflow disabled until the environment token's least-privilege
    scope is independently verified.
 4. Run `/feedback` in the primary Codex task and preserve the Session ID privately.
 
-Phase 1 must not be called technically complete until the bounded model response and the protected
-post-merge expanded Intune audit both succeed.
+The bounded model response and protected expanded Intune audit are complete. Phase 1 still must not
+be called technically complete until the reviewed sanitized live package is the source of the
+production dashboard and production validation confirms that boundary.
