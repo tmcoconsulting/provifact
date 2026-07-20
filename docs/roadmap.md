@@ -67,7 +67,8 @@ Public CI never performs live collection.
 - [x] Independently review the Worker runtime and production configuration
 - [x] Configure a project-scoped Provifact runtime key as a Worker secret (never a repository/CI secret)
 - [ ] Verify Cloudflare/OpenAI abuse monitoring, log retention, alert ownership, and rollback rehearsal
-- [ ] Attach and verify the renamed production custom domain at `provifact.tmcoconsulting.com`
+- [x] Attach and verify the renamed production custom domain at `provifact.tmcoconsulting.com`;
+      retain the old hostname temporarily as a tested rollback surface
 - [x] Add disabled-by-default least-privilege GitHub deployment orchestration after manual validation
 - [x] Store `CLOUDFLARE_API_TOKEN` by name in the protected production environment
 - [x] Verify the account deployment token has only `Workers Scripts Write` and prove its GitHub
@@ -75,8 +76,9 @@ Public CI never performs live collection.
 - [x] Merge the Bot-Fight-safe control-plane deployment proof and complete one green orchestration
       retry; the emergency enable flag remains `false`
 - [x] Configure the dedicated OpenAI project budget alerts and model limits
-- [ ] Complete the coordinated external brand cutover: repository/OIDC subject, custom domain,
-      OpenAI project label, and infrastructure display names with rollback redirects
+- [x] Complete the coordinated external brand cutover for the repository, immutable OIDC subject,
+      custom domain, TLS, and public metadata; intentionally retain internal Worker, OpenAI project,
+      key, namespace, and artifact identifiers for secret continuity and rollback
 - [x] Validate bounded live `gpt-5.6-terra`; keep fixture mode only for local and preview
 
 Phase 1 technical completion is recorded in the

@@ -67,10 +67,10 @@ relationships—not framework or organizational compliance. A model never select
 to audit-ready proof.** Phase 1 retains legacy technical identifiers—including the `evidenceops`
 Python package, `EVIDENCEOPS_*` environment variables, versioned schema identifiers, Cloudflare
 Worker name, and OpenAI project/key labels—for compatibility and rollback. The GitHub repository
-and public hostname migrate together to `tmcoconsulting/provifact` and
-`provifact.tmcoconsulting.com`; the environment-scoped Entra trust is reverified against GitHub's
-post-rename immutable subject before any protected audit. The `provifact` CLI is preferred; the old
-command remains a compatibility alias.
+and public hostname are `tmcoconsulting/provifact` and `provifact.tmcoconsulting.com`. The
+environment-scoped Entra trust was reverified against GitHub's post-rename immutable subject in a
+protected GET-only audit before the old repository-name credential was retired. The `provifact`
+CLI is preferred; the old command remains a compatibility alias.
 
 Mission Control presents the approved desired state beside normalized observed state in a dense
 operational view. Its selector opens the full profile-membership catalog. A real baseline switch

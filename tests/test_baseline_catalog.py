@@ -112,13 +112,42 @@ def test_filevault_membership_is_visible_without_importing_benchmark_prose() -> 
     assert set(filevault) == {"profile_ids", "rule_id", "section", "title"}
 
 
+def test_catalog_rule_ids_match_the_normalized_mission_baseline_exactly() -> None:
+    catalog = _catalog()
+    profiles_value = catalog["profiles"]
+    assert isinstance(profiles_value, list)
+    tmco = next(
+        item
+        for item in profiles_value
+        if isinstance(item, dict) and item.get("profile_id") == "tmco_approved"
+    )
+    rule_ids = tmco["rule_ids"]
+    assert isinstance(rule_ids, list)
+    assert "os_safari_prevent_cross-site_tracking_enable" not in rule_ids
+    assert "os_safari_prevent_cross_site_tracking_enable" in rule_ids
+
+    mission = json.loads(
+        (REPOSITORY_ROOT / "docs/assets/data/mission-control.json").read_text(encoding="utf-8")
+    )
+    assert {item["rule_id"] for item in mission["requirements"]} == set(rule_ids)
+
+
 def test_matrix_loads_the_catalog_and_never_claims_reference_compliance() -> None:
     script = (REPOSITORY_ROOT / "docs/assets/javascripts/settings-matrix.js").read_text(
         encoding="utf-8"
     )
     page = (REPOSITORY_ROOT / "docs/settings-matrix.md").read_text(encoding="utf-8")
-    assert 'const CATALOG_URL = "/assets/data/baseline-catalog.json"' in script
+    fingerprint = _catalog()["catalog_fingerprint"]
+    assert isinstance(fingerprint, str)
+    assert f'const CATALOG_FINGERPRINT =\n    "{fingerprint}"' in script
+    assert (
+        'const CATALOG_URL =\n    "/assets/data/baseline-catalog.json?v='
+        f'{fingerprint.removeprefix("sha256:")}"' in script
+    )
+    assert "value.catalog_fingerprint !== CATALOG_FINGERPRINT" in script
     assert "catalog_fingerprint" in script
+    assert "missionRuleIds.size !== tmco.rule_ids.length" in script
+    assert "tmco.rule_ids.every((ruleId) => missionRuleIds.has(ruleId))" in script
     assert "reference_only" in script
     assert "Not in TMCO Consulting approved baseline" in script
     assert "Sixteen pinned public mSCP reference profiles are loaded" in page
