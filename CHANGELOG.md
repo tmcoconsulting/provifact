@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased — Live audit cockpit
+## 2026-07-20 — Live audit cockpit
 
 - Replaced semantic-key substring matching with a versioned registry of exact reviewed Microsoft
   Intune provider definition IDs and explicit mapping-review/value-normalization states.
@@ -15,6 +15,9 @@
   assets, and a company-name content gate.
 - Added fail-closed regression tests for exact mappings, unsupported values, prior-package
   validation, deployment provenance, assistant intents, model egress, and browser boundaries.
+- Merged the cockpit through protected `main`, completed two GET-only live audits with an exact
+  sanitized prior-snapshot comparison, deployed the reviewed live package to Cloudflare, and
+  accepted one bounded `gpt-5.6-terra` response only after deterministic verification.
 
 ## Evidence navigation and settings matrix
 

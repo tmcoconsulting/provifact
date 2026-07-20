@@ -109,6 +109,16 @@ shared change, added TMCO Consulting branding and documentation, ran the complet
 and retained sole responsibility for Git, PR, merge, live audit, deployment, and production checks.
 Implementation commit: `143f694f7183f1a2ce117a3a0867aad316f7a1ae`.
 
+The integrated cockpit was squash-merged through PR #10 as
+`d71da96b6b3770e96b3b7e715a51ca5b602ef852`. A generated-artifact-dependent Worker test stopped the
+first protected deployment before Cloudflare; the production gate was closed, the focused fix
+passed CI and CodeQL in PR #11, and it was squash-merged as
+`1662cd1b631bfa3051eac071f442f70a48ca9b68`. Protected audit runs `29757456114` and `29759424410`
+then completed GET-only OIDC collection, sanitization, scanning, current/prior comparison, and
+ephemeral cleanup. Deployment runs `29758740795` and `29759572945` published only their exact
+reviewed snapshots. One bounded production `gpt-5.6-terra` call passed deterministic verification;
+its prose and input were not retained in the repository record.
+
 The follow-on Cloudflare runtime and deployment were completed in this same primary thread on
 `codex/cloudflare-worker-runtime` with no supporting-agent contribution. No Graph access or real
 tenant data occurred. Cloudflare resources, the custom domain, a project-scoped OpenAI key/Worker

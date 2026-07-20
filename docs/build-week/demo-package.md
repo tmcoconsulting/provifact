@@ -143,14 +143,14 @@ assistant’s static fixture presentation is available, but same-origin Worker A
 
 ## Final submission checklist
 
-- [ ] CI and Worker validation pass on the reviewed pull request
-- [ ] Public artifact scan passes over the exact deployed `site/`
-- [ ] Custom domain, TLS, headers, desktop, and mobile behavior are rechecked
-- [ ] Production data mode and model-call label match reality
-- [ ] No private/raw artifact or secret appears in Git, Actions logs, or public assets
-- [ ] Expanded Graph application permissions and admin consent are independently verified
-- [ ] Protected trusted-main Intune audit succeeds, or the live limitation is disclosed
-- [ ] One bounded GPT-5.6 response succeeds, or fixture-only status is disclosed
+- [x] CI and Worker validation pass on the reviewed pull request
+- [x] Public artifact scan passes over the exact deployed `site/`
+- [x] Custom domain, TLS, headers, desktop, and mobile behavior are rechecked
+- [x] Production data mode and model-call label match reality
+- [x] No private/raw artifact or secret appears in Git, Actions logs, or public assets
+- [x] Expanded Graph application permissions and admin consent are independently verified
+- [x] Protected trusted-main Intune audit succeeds, or the live limitation is disclosed
+- [x] One bounded GPT-5.6 response succeeds, or fixture-only status is disclosed
 - [ ] TJ reviews all commits after the last human-reviewed checkpoint
 - [ ] Demo video and screenshots use no tenant identifiers
 - [ ] DevPost text avoids certification or compliance-verdict claims
