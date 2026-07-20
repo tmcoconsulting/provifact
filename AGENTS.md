@@ -40,3 +40,18 @@ resolved environment pinned in `requirements-dev.txt`, and update dependency rat
 - Drift results must be reproducible without a language model.
 - Unknown fields stop public sanitization until explicitly classified.
 - Prefer small, typed modules and tests that a new engineer can explain.
+
+## Build Week finalization constraints
+
+- Production must use live sanitized tenant data. Synthetic data is limited to local and preview
+  demonstrations and must never be a production fallback.
+- Do not implement, request, or perform any Intune write operation.
+- Provider mappings must be exact and explicitly reviewed; do not guess mappings or match tenant
+  display names.
+- Use plain language first and expose detailed technical evidence on demand.
+- Use `TMCO Consulting` in ordinary product copy and `TMCO Consulting, LLC` for legal, approval,
+  ownership, and copyright contexts.
+- Keep Material for MkDocs for the submission; do not migrate frontend frameworks during this
+  milestone.
+- Complete the reviewed merge, protected live collection, production deployment, and public
+  verification rather than stopping at an open pull request.
