@@ -18,9 +18,15 @@ from typing import Final, Protocol, cast
 from evidenceops.domain import JsonValue, fingerprint
 from evidenceops.providers.intune import GraphErrorCategory, GraphProviderError
 
-APPLE_PROVIDER_VERSION: Final = "2.0.0"
+APPLE_PROVIDER_VERSION: Final = "2.1.0"
 APPLE_COLLECTION_SCHEMA_VERSION: Final = "2.0.0"
 MAX_CONCURRENCY: Final = 4
+MAX_SETTING_DEPTH: Final = 8
+MAX_SETTINGS_PER_RESPONSE_ITEM: Final = 512
+
+
+class _OutOfScopeRecordError(ValueError):
+    """A well-formed provider record for a platform outside the Apple slice."""
 
 
 class GraphReader(Protocol):
@@ -206,6 +212,8 @@ class AppleIntuneProvider:
             for position, item in enumerate(items):
                 try:
                     normalized = _normalize_item(spec, item, collected_at)
+                except _OutOfScopeRecordError:
+                    continue
                 except (TypeError, ValueError):
                     gaps.append(_gap(spec, "record_schema_change", None, position=position))
                     continue
@@ -275,8 +283,8 @@ class AppleIntuneProvider:
                 statuses.append(_endpoint_status(spec, "collected", len(items)))
                 for position, item in enumerate(items):
                     try:
-                        expansions.append(
-                            _normalize_expansion(parent, relationship, item, collected_at)
+                        expansions.extend(
+                            _normalize_expansion_records(parent, relationship, item, collected_at)
                         )
                     except (TypeError, ValueError):
                         gaps.append(_gap(spec, "record_schema_change", None, position=position))
@@ -302,6 +310,8 @@ def _normalize_item(
         "settings_catalog",
         "compliance_policies",
     } and not platforms.intersection({"macOS", "iOS", "iPadOS", "iOS/iPadOS"}):
+        if platforms != {"unknown"}:
+            raise _OutOfScopeRecordError("provider record is outside the Apple collection slice")
         return None
     properties: dict[str, JsonValue] = {
         "odata_type": _safe_odata_type(odata_type),
@@ -489,6 +499,93 @@ def _normalize_expansion(
     )
 
 
+def _normalize_expansion_records(
+    parent: dict[str, JsonValue],
+    relationship: str,
+    item: dict[str, JsonValue],
+    collected_at: str,
+) -> list[dict[str, JsonValue]]:
+    """Flatten documented nested Settings Catalog instances into evidence records."""
+    if relationship != "settings":
+        return [_normalize_expansion(parent, relationship, item, collected_at)]
+    return [
+        _normalize_expansion(parent, relationship, flattened, collected_at)
+        for flattened in _flatten_setting_items(item)
+    ]
+
+
+def _flatten_setting_items(item: dict[str, JsonValue]) -> list[dict[str, JsonValue]]:
+    """Return scalar leaf instances from one documented Graph setting tree.
+
+    Microsoft Graph represents Settings Catalog groups as parent instances whose
+    values contain child instances.  The parent definition identifies a container,
+    not the configured setting.  Unknown or empty shapes remain as one unsupported
+    leaf so deterministic evaluation still fails closed.
+    """
+    root_id = _optional_string(item, "id") or fingerprint(cast(JsonValue, item))[7:31]
+    root = item.get("settingInstance")
+    if not isinstance(root, dict):
+        raise TypeError("Settings Catalog entry lacks a settingInstance object")
+    leaves: list[tuple[str, dict[str, JsonValue]]] = []
+
+    def visit(instance: dict[str, JsonValue], path: str, depth: int) -> None:
+        if depth > MAX_SETTING_DEPTH:
+            raise ValueError("Settings Catalog setting nesting exceeds the supported bound")
+        _safe_setting_definition_id(_required_string(instance, "settingDefinitionId"))
+        direct_value = False
+        child_instances: list[dict[str, JsonValue]] = []
+        for value_key in ("simpleSettingValue", "choiceSettingValue"):
+            value = instance.get(value_key)
+            if value is None:
+                continue
+            if not isinstance(value, dict):
+                raise TypeError(f"{value_key} must be an object when present")
+            if "value" in value:
+                direct_value = True
+            children = value.get("children", [])
+            child_instances.extend(_setting_children(children, f"{value_key}.children"))
+        group_value = instance.get("groupSettingValue")
+        if group_value is not None:
+            if not isinstance(group_value, dict):
+                raise TypeError("groupSettingValue must be an object when present")
+            child_instances.extend(
+                _setting_children(group_value.get("children", []), "groupSettingValue.children")
+            )
+        group_collection = instance.get("groupSettingCollectionValue")
+        if group_collection is not None:
+            if not isinstance(group_collection, list):
+                raise TypeError("groupSettingCollectionValue must be an array when present")
+            for group_index, group in enumerate(group_collection):
+                if not isinstance(group, dict):
+                    raise TypeError("groupSettingCollectionValue entries must be objects")
+                child_instances.extend(
+                    _setting_children(
+                        group.get("children", []),
+                        f"groupSettingCollectionValue[{group_index}].children",
+                    )
+                )
+        if direct_value or not child_instances:
+            leaves.append((path, instance))
+            if len(leaves) > MAX_SETTINGS_PER_RESPONSE_ITEM:
+                raise ValueError("Settings Catalog response item exceeds the supported leaf bound")
+        for child_index, child in enumerate(child_instances):
+            visit(child, f"{path}.{child_index}", depth + 1)
+
+    visit(root, "0", 0)
+    return [{"id": f"{root_id}:{path}", "settingInstance": instance} for path, instance in leaves]
+
+
+def _setting_children(value: JsonValue, field: str) -> list[dict[str, JsonValue]]:
+    if not isinstance(value, list):
+        raise TypeError(f"{field} must be an array when present")
+    result: list[dict[str, JsonValue]] = []
+    for child in value:
+        if not isinstance(child, dict):
+            raise TypeError(f"{field} entries must be objects")
+        result.append(child)
+    return result
+
+
 def _extract_setting(item: dict[str, JsonValue]) -> tuple[str, JsonValue, str]:
     instance = item.get("settingInstance")
     if not isinstance(instance, dict):
@@ -589,6 +686,12 @@ def _platform_token(value: str) -> set[str]:
         result.add("macOS")
     if "ios" in lowered:
         result.add("iOS/iPadOS")
+    if "windows" in lowered:
+        result.add("Windows")
+    if "android" in lowered or "aosp" in lowered:
+        result.add("Android")
+    if "linux" in lowered:
+        result.add("Linux")
     return result
 
 

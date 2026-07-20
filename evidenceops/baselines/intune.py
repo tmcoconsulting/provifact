@@ -15,7 +15,7 @@ from typing import Final
 
 from evidenceops.domain import JsonValue
 
-PROVIDER_MAPPING_REGISTRY_VERSION: Final = "microsoft-intune-macos-v1.0.0"
+PROVIDER_MAPPING_REGISTRY_VERSION: Final = "microsoft-intune-macos-v1.1.0"
 PROVIDER_MAPPING_REVIEW_SOURCE: Final = (
     "https://github.com/microsoft/intune-my-macs/blob/main/INTUNE-MY-MACS-DOCUMENTATION.md"
 )
@@ -163,9 +163,10 @@ def normalize_provider_value(alias: ProviderAlias, value: JsonValue) -> JsonValu
         raise UnsupportedProviderValueError("identity mapping received an unsupported value shape")
     if alias.transform is ValueTransform.FILEVAULT_ENABLE_CHOICE:
         # Microsoft's published Intune macOS reference export represents the
-        # Settings Catalog FileVault `Enable` choice as numeric value zero.  No
-        # other choice value is interpreted until it is explicitly reviewed.
-        if type(value) is int and value == 0:
+        # Settings Catalog FileVault `Enable` choice as the exact provider token
+        # below.  Older normalized fixtures used numeric zero for the same closed
+        # choice.  No other value is interpreted until it is explicitly reviewed.
+        if (type(value) is int and value == 0) or (value == "com.apple.mcx.filevault2_enable_0"):
             return True
         raise UnsupportedProviderValueError("unreviewed FileVault enable choice value")
     raise UnsupportedProviderValueError("unknown provider value transform")

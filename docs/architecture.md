@@ -26,7 +26,11 @@ Settings Catalog. It covers managed-device aggregates, legacy and Settings Catal
 compliance policies, managed apps and application-policy metadata, enrollment configuration,
 device categories, Automated Device Enrollment, Apps and Books token health, APNs certificate
 health, assignments, and scheduled actions. Resource-family adapters normalize materially
-different response shapes independently.
+different response shapes independently. Settings Catalog normalization walks Microsoft's bounded,
+documented group/choice/simple instance tree and emits scalar child settings as individual evidence
+records. Container definition IDs never substitute for their configured child definitions. A
+well-formed non-Apple policy is filtered from this Apple slice without declaring the Apple
+collection incomplete; an unknown platform or unsupported value shape still fails closed.
 
 The common Graph client implements pagination, bounded retry with jitter and `Retry-After`, request
 timeouts, same-host/version next-link validation, and structured 401/403/404/409/429/5xx errors.
@@ -49,6 +53,12 @@ finding links the baseline requirement, source evidence IDs, Git SHA, algorithm 
 fingerprints. Outcomes include aligned, missing, value drift, assignment drift, conflict,
 collection gap, unsupported, not applicable, and human review. These describe technical evidence
 relationships—not framework or organizational compliance. A model never selects an outcome.
+
+Mission Control presents the approved CIS Level 1 desired state beside the normalized observed
+state in a dense operational view. Its STIG selector is a comparison lens over already reviewed
+technical cross-references, not a loaded STIG baseline, assessment, or score. A real baseline switch
+requires a pinned authoritative release, human approval, reviewed requirement mappings, and exact
+provider mappings before any STIG rule enters deterministic evaluation.
 
 ## Private-to-public boundary
 

@@ -222,7 +222,11 @@ def test_comprehensive_provider_collects_every_family_and_normalizes_joins() -> 
     summary = summarize_devices(result.records)
     assert summary["total"] == 1
     assert summary["by_platform"] == {"iPadOS": 1}
-    assert any(gap["reason"] == "unsupported_resource_type" for gap in result.collection_gaps)
+    assert not any(
+        gap["source_endpoint_key"] == "settings-catalog"
+        and gap["reason"] == "unsupported_resource_type"
+        for gap in result.collection_gaps
+    )
 
 
 def test_missing_odata_type_uses_public_safe_unknown_taxonomy() -> None:
@@ -361,3 +365,117 @@ def test_setting_shapes_and_platform_helpers_are_explicit() -> None:
     assert apple_module._model_family("Mac Studio") == "mac-studio"
     assert apple_module._model_family("Vision Pro") == "other-apple"
     assert apple_module._model_family(None) == "unknown"
+
+
+def test_grouped_filevault_setting_children_are_flattened_with_exact_values() -> None:
+    paths = {spec.key: spec.path for spec in ENDPOINTS}
+    policy_id = "synthetic-grouped-filevault-policy"
+    reader = FakeReader(
+        collections={
+            paths["settings-catalog"]: [
+                {
+                    "id": policy_id,
+                    "@odata.type": "#microsoft.graph.deviceManagementConfigurationPolicy",
+                    "platforms": "macOS",
+                }
+            ],
+            f"/beta/deviceManagement/configurationPolicies/{policy_id}/settings": [
+                {
+                    "id": "synthetic-grouped-setting",
+                    "settingInstance": {
+                        "@odata.type": (
+                            "#microsoft.graph."
+                            "deviceManagementConfigurationGroupSettingCollectionInstance"
+                        ),
+                        "settingDefinitionId": (
+                            "com.apple.mcx.filevault2_com.apple.mcx.filevault2"
+                        ),
+                        "groupSettingCollectionValue": [
+                            {
+                                "children": [
+                                    {
+                                        "@odata.type": (
+                                            "#microsoft.graph."
+                                            "deviceManagementConfigurationChoiceSettingInstance"
+                                        ),
+                                        "settingDefinitionId": ("com.apple.mcx.filevault2_enable"),
+                                        "choiceSettingValue": {
+                                            "value": "com.apple.mcx.filevault2_enable_0"
+                                        },
+                                    },
+                                    {
+                                        "@odata.type": (
+                                            "#microsoft.graph."
+                                            "deviceManagementConfigurationChoiceSettingInstance"
+                                        ),
+                                        "settingDefinitionId": ("com.apple.mcx.filevault2_defer"),
+                                        "choiceSettingValue": {
+                                            "value": "com.apple.mcx.filevault2_defer_true"
+                                        },
+                                    },
+                                ]
+                            }
+                        ],
+                    },
+                }
+            ],
+            f"/beta/deviceManagement/configurationPolicies/{policy_id}/assignments": [],
+        }
+    )
+
+    result = AppleIntuneProvider(reader, max_concurrency=1, now=lambda: NOW).collect()
+    settings = [
+        cast(dict[str, JsonValue], record["properties"])
+        for record in result.records
+        if record["resource_family"] == "settings_catalog_settings"
+    ]
+    assert {item["setting_definition_id"] for item in settings} == {
+        "com.apple.mcx.filevault2_enable",
+        "com.apple.mcx.filevault2_defer",
+    }
+    filevault = next(
+        item
+        for item in settings
+        if item["setting_definition_id"] == "com.apple.mcx.filevault2_enable"
+    )
+    assert filevault["normalized_value"] == "com.apple.mcx.filevault2_enable_0"
+    assert filevault["normalization_state"] == "normalized"
+    assert not result.collection_gaps
+
+
+def test_unknown_nested_setting_shape_remains_fail_closed() -> None:
+    flattened = apple_module._flatten_setting_items(
+        {
+            "id": "synthetic-unknown-setting",
+            "settingInstance": {
+                "settingDefinitionId": "com.apple.synthetic.unknown-container",
+                "futureValueShape": {"value": True},
+            },
+        }
+    )
+    assert len(flattened) == 1
+    assert apple_module._extract_setting(flattened[0]) == (
+        "com.apple.synthetic.unknown-container",
+        None,
+        "unsupported_value_shape",
+    )
+
+
+def test_known_non_apple_settings_policy_is_filtered_without_collection_gap() -> None:
+    paths = {spec.key: spec.path for spec in ENDPOINTS}
+    reader = FakeReader(
+        collections={
+            paths["settings-catalog"]: [
+                {
+                    "id": "synthetic-windows-policy",
+                    "@odata.type": "#microsoft.graph.deviceManagementConfigurationPolicy",
+                    "platforms": "windows10",
+                }
+            ]
+        }
+    )
+    result = AppleIntuneProvider(reader, max_concurrency=1, now=lambda: NOW).collect()
+    assert not any(record["resource_family"] == "settings_catalog" for record in result.records)
+    assert not any(
+        gap["source_endpoint_key"] == "settings-catalog" for gap in result.collection_gaps
+    )

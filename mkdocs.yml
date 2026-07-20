@@ -67,6 +67,7 @@ nav:
           - Worker Validation: build-week/cloudflare-worker-validation.md
           - Build Week Slice Validation: build-week/build-week-slice-validation.md
           - Final Live MVP Validation: build-week/final-live-mvp-validation.md
+          - FileVault & NOC Validation: build-week/filevault-noc-validation.md
           - Final Implementation Report: build-week/final-implementation-report.md
           - Demo Package: build-week/demo-package.md
           - Final Video Runbook: build-week/video-runbook.md
@@ -87,15 +88,15 @@ markdown_extensions:
       alternate_style: true
 
 extra_css:
-  - assets/stylesheets/extra.css?v=20260720-final
+  - assets/stylesheets/extra.css?v=20260720-noc1
   - assets/stylesheets/settings-matrix.css?v=20260720-final
   - assets/stylesheets/assistant-evidence-context.css?v=20260720-final
 
 extra_javascript:
-  - assets/javascripts/mission-control.js?v=20260720-final
+  - assets/javascripts/mission-control.js?v=20260720-noc1
   - assets/javascripts/evidenceops-api.js?v=20260720-final
   - assets/javascripts/settings-matrix.js?v=20260720-final
-  - assets/javascripts/assistant-evidence-context.js?v=20260720-final
+  - assets/javascripts/assistant-evidence-context.js?v=20260720-noc1
 
 plugins:
   - search

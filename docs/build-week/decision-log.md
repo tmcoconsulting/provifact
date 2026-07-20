@@ -413,3 +413,35 @@ typed claims, reference verification, prose quarantine, and BYOK rejection.
 **Why:** A site-wide assistant is useful only when it can explain the current published evidence
 without becoming an evidence source or credential processor. A failed production model request must
 remain a visible failure rather than silently returning a fixture that appears live.
+
+## 2026-07-20 — Flatten documented Settings Catalog groups and keep platform scope explicit
+
+**Decision:** Traverse only Microsoft Graph's documented bounded group, choice, and simple setting
+instance containers. Emit scalar child instances as separate evidence records and retain exact
+`settingDefinitionId` values. Accept the public Microsoft FileVault `Enable` choice token only as a
+closed reviewed alias value. Filter policies that explicitly declare a known non-Apple platform
+without creating an Apple collection gap; keep unknown platform and value shapes fail closed.
+
+**Why:** The production package showed Settings Catalog as globally incomplete even though the
+FileVault policy existed. Two distinct issues caused the false gap: the FileVault setting lived
+under a group collection parent that the adapter treated as the setting, and a known out-of-scope
+policy was recorded as an Apple collection failure. Broader Graph permission cannot repair a parser
+that does not follow the documented response shape.
+
+**Sources:** Microsoft Graph
+[`deviceManagementConfigurationSetting`](https://learn.microsoft.com/en-us/graph/api/resources/intune-deviceconfigv2-devicemanagementconfigurationsetting?view=graph-rest-beta),
+[`deviceManagementConfigurationGroupSettingCollectionInstance`](https://learn.microsoft.com/en-us/graph/api/resources/intune-deviceconfigv2-devicemanagementconfigurationgroupsettingcollectioninstance?view=graph-rest-beta),
+and Microsoft's public
+[`intune-my-macs` FileVault policy](https://github.com/microsoft/intune-my-macs/blob/main/macOS/configurations/intune/pol-sec-001-filevault.json).
+
+## 2026-07-20 — Make Mission Control operational without pretending STIG is loaded
+
+**Decision:** Keep the reviewable MkDocs/Static Assets stack but render the operational page as a
+full-width NOC-style console. Show desired versus observed state, exact evidence counts, collection
+flow, deterministic findings, blind spots, and an interactive STIG technical-reference lens. Label
+STIG `NOT LOADED` and explain the approval and mapping work required for a real baseline switch.
+
+**Why:** Documentation navigation is useful for operators, but it should not dominate the evidence
+decision surface. A visual framework change does not alter the authority boundary: the current CIS
+desired state and deterministic evidence remain authoritative, and cross-references never become a
+STIG score or compliance verdict.

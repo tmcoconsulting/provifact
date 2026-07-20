@@ -306,6 +306,7 @@
       `Collected ${mission.collection.collected_at_utc} · ${mission.collection.provider} ${mission.collection.provider_version}`,
     );
     text("[data-mission-mode]", mission.data_mode);
+    text("[data-priority-count]", `${mission.findings.length} open`);
 
     const list = select("[data-attention-list]");
     if (list instanceof HTMLElement) {
@@ -361,6 +362,258 @@
       ["Inventory", `${mission.baseline.rule_count} rules`],
       ["Extracted hash", mission.baseline.extracted_baseline_sha256, true],
     ]);
+  };
+
+  const actionForRequirement = (requirement) => {
+    switch (requirement.outcome) {
+      case "Aligned":
+        return "Monitor; no tenant change inferred.";
+      case "Collection gap":
+        return "Repair collection or parser coverage before changing Intune.";
+      case "Missing from tenant":
+        return "Confirm absence, then use the approved human change process.";
+      case "Provider mapping not reviewed":
+        return "Review an exact provider definition before evaluation.";
+      case "Unsupported value shape":
+        return "Review the provider shape; do not infer a value.";
+      default:
+        return "Human review in Intune; re-collect after any approved change.";
+    }
+  };
+
+  const renderPostureRows = (lens) => {
+    const body = select("[data-posture-rows]");
+    if (!(body instanceof HTMLElement)) return;
+    const requirements = mission.requirements.filter(
+      (requirement) =>
+        requirement.evaluation_included === true &&
+        (lens !== "stig" ||
+          (Array.isArray(requirement.mappings?.stig) &&
+            requirement.mappings.stig.length > 0)),
+    );
+    body.replaceChildren();
+    for (const requirement of requirements) {
+      const row = document.createElement("tr");
+      const objective = create("td");
+      objective.append(
+        create("strong", "", requirement.title),
+        create(
+          "small",
+          "",
+          lens === "stig"
+            ? `STIG ${requirement.mappings.stig.join(", ")}`
+            : requirement.setting_key,
+        ),
+      );
+      const state = create(
+        "span",
+        `mission-state mission-state-${String(requirement.outcome)
+          .toLowerCase()
+          .replaceAll(" ", "-")}`,
+        requirement.outcome,
+      );
+      const evidenceCount = Array.isArray(requirement.source_evidence_ids)
+        ? requirement.source_evidence_ids.length
+        : 0;
+      const evidence = create("td");
+      evidence.append(
+        create(
+          "strong",
+          "",
+          evidenceCount
+            ? `${evidenceCount} linked record(s)`
+            : "No linked observation",
+        ),
+        create(
+          "small",
+          "",
+          `${requirement.mapping_review_status} mapping · ${requirement.assignment_summary}`,
+        ),
+      );
+      const action = create("td", "", actionForRequirement(requirement));
+      const finding = findingForRule(requirement.rule_id);
+      if (finding) {
+        const review = create("button", "mission-row-action", "Open evidence");
+        review.type = "button";
+        review.addEventListener("click", () => openFinding(finding));
+        action.append(review);
+      }
+      const stateCell = create("td");
+      stateCell.append(state);
+      row.append(
+        objective,
+        create(
+          "td",
+          "mission-observed-target",
+          formatValue(requirement.expected_value),
+        ),
+        create(
+          "td",
+          "mission-observed-target",
+          formatValue(requirement.observed_value),
+        ),
+        stateCell,
+        evidence,
+        action,
+      );
+      body.append(row);
+    }
+    if (!requirements.length) {
+      const row = document.createElement("tr");
+      const cell = create(
+        "td",
+        "mission-empty",
+        "No reviewed settings in the current package carry this technical cross-reference.",
+      );
+      cell.colSpan = 6;
+      row.append(cell);
+      body.append(row);
+    }
+  };
+
+  const renderBaselineConsole = () => {
+    const selector = select("[data-baseline-view]");
+    const readout = select("[data-baseline-readout]");
+    const next = select("[data-baseline-next]");
+    if (
+      !(selector instanceof HTMLSelectElement) ||
+      !(readout instanceof HTMLElement) ||
+      !(next instanceof HTMLElement)
+    )
+      return;
+    const render = () => {
+      const stig = selector.value === "stig";
+      const framework = mission.framework_coverage.STIG || {
+        identifiers: [],
+        technical_evidence_identifier_count: 0,
+      };
+      const evaluated = mission.requirements.filter(
+        (requirement) => requirement.evaluation_included === true,
+      );
+      const stigEvaluated = evaluated.filter(
+        (requirement) =>
+          Array.isArray(requirement.mappings?.stig) &&
+          requirement.mappings.stig.length,
+      );
+      const aligned = (stig ? stigEvaluated : evaluated).filter(
+        (requirement) => requirement.outcome === "Aligned",
+      ).length;
+      const scoped = stig ? stigEvaluated : evaluated;
+      readout.replaceChildren(
+        metricCard(
+          stig ? "STIG-linked evaluated settings" : "Pinned baseline inventory",
+          stig ? stigEvaluated.length : mission.baseline.rule_count,
+          stig
+            ? `${framework.technical_evidence_identifier_count} technical identifier(s)`
+            : mission.baseline.benchmark_version,
+        ),
+        metricCard(
+          "Deterministically evaluated",
+          scoped.length,
+          stig ? "Cross-reference lens only" : "Exact reviewed Intune mappings",
+        ),
+        metricCard(
+          "Matches desired state",
+          aligned,
+          `${scoped.length - aligned} differ, are missing, or need evidence`,
+          aligned === scoped.length ? "good" : "warning",
+        ),
+        metricCard(
+          stig ? "STIG baseline status" : "Authority",
+          stig ? "NOT LOADED" : "APPROVED",
+          stig
+            ? "No STIG assessment or score is produced"
+            : mission.baseline.approval_status,
+          stig ? "warning" : "good",
+        ),
+      );
+      next.replaceChildren();
+      if (stig) {
+        next.append(
+          create("strong", "", "What switching to STIG would require"),
+          create(
+            "p",
+            "",
+            "EvidenceOps can reuse the same observations, but a real STIG evaluation requires a pinned authoritative STIG release, an approved desired-state profile, reviewed requirement-to-setting mappings, exact Intune definition mappings, and human acceptance of the new scope. The current view is only a technical cross-reference.",
+          ),
+          create(
+            "p",
+            "",
+            `Current evidence references: ${Array.isArray(framework.identifiers) && framework.identifiers.length ? framework.identifiers.join(", ") : "none published"}.`,
+          ),
+        );
+      } else {
+        next.append(
+          create("strong", "", mission.baseline.benchmark),
+          create(
+            "p",
+            "",
+            `${mission.baseline.rule_count} rules are inventoried; ${mission.metrics.alignment_denominator} currently have reviewed exact provider mappings and sufficient support for deterministic comparison. Open the baseline matrix to see every not-yet-evaluated rule.`,
+          ),
+        );
+      }
+      renderPostureRows(selector.value);
+    };
+    selector.addEventListener("change", render);
+    render();
+  };
+
+  const renderCollectionPipeline = () => {
+    const container = select("[data-collection-pipeline]");
+    if (!(container instanceof HTMLElement)) return;
+    const statuses = mission.collection.endpoint_statuses;
+    const root = statuses.find((item) => item.key === "settings-catalog");
+    const settingCount = mission.resources.filter(
+      (item) => item.resource_family === "settings_catalog_settings",
+    ).length;
+    const assignmentCount = mission.resources.filter(
+      (item) => item.resource_family === "settings_catalog_assignments",
+    ).length;
+    const steps = [
+      [
+        "01",
+        "Git desired state",
+        `${mission.baseline.rule_count} pinned rules`,
+        "complete",
+      ],
+      [
+        "02",
+        "Settings Catalog",
+        `${root?.record_count || 0} policy records`,
+        root?.status || "unknown",
+      ],
+      [
+        "03",
+        "Normalized evidence",
+        `${settingCount} settings · ${assignmentCount} assignments`,
+        "complete",
+      ],
+      [
+        "04",
+        "Deterministic engine",
+        `${mission.metrics.alignment_denominator} reviewed joins`,
+        "complete",
+      ],
+      [
+        "05",
+        "Publication gate",
+        `${mission.collection_gaps.length} collection gap(s)`,
+        mission.collection_gaps.length ? "warning" : "complete",
+      ],
+    ];
+    container.replaceChildren();
+    for (const [index, label, detail, state] of steps) {
+      const step = create(
+        "div",
+        `mission-pipeline-step mission-pipeline-${state}`,
+      );
+      step.append(
+        create("span", "mission-pipeline-index", index),
+        create("strong", "", label),
+        create("small", "", detail),
+      );
+      container.append(step);
+    }
   };
 
   const renderChanges = () => {
@@ -550,7 +803,7 @@
     }
     const platform = select("[data-platform-summary]");
     if (platform instanceof HTMLElement) {
-      platform.className = "mission-panel";
+      platform.className = "mission-identity-boundary";
       platform.replaceChildren(
         create("h3", "", "Identity boundary"),
         create(
@@ -760,11 +1013,19 @@
             : "fixture";
       }
       renderOverview();
+      renderBaselineConsole();
+      renderCollectionPipeline();
       renderChanges();
       renderFindings();
       renderPosture();
       renderCoverage();
       renderEvidence();
+      text("[data-rail-state]", stale ? "DEGRADED" : "VERIFIED");
+      const copilot = select("[data-open-copilot]");
+      if (copilot instanceof HTMLButtonElement)
+        copilot.addEventListener("click", () =>
+          window.EvidenceOpsCopilot?.open(),
+        );
       root.setAttribute("aria-busy", "false");
       const linked = mission.findings.find(
         (finding) => `#${finding.finding_id}` === window.location.hash,

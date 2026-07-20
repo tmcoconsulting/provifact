@@ -38,10 +38,13 @@ def test_registry_contains_only_exact_reviewed_provider_aliases() -> None:
     alias = matching_alias(filevault, "COM.APPLE.MCX.FILEVAULT2_ENABLE")
     assert alias is not None
     assert normalize_provider_value(alias, 0) is True
+    assert normalize_provider_value(alias, "com.apple.mcx.filevault2_enable_0") is True
     assert matching_alias(filevault, "prefix.com.apple.mcx.filevault2_enable") is None
     assert matching_alias(filevault, "com.apple.mcx.filevault2_enable.suffix") is None
     with pytest.raises(UnsupportedProviderValueError, match="unreviewed"):
         normalize_provider_value(alias, 1)
+    with pytest.raises(UnsupportedProviderValueError, match="unreviewed"):
+        normalize_provider_value(alias, "com.apple.mcx.filevault2_enable_1")
 
     stealth = INTUNE_PROVIDER_MAPPINGS["system_settings_firewall_stealth_mode_enable"]
     assert stealth.review_status is MappingReviewStatus.NOT_REVIEWED

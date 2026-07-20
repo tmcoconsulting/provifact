@@ -43,6 +43,10 @@ Public CI never performs live collection.
 - [ ] Expand exact reviewed provider mappings beyond the current four macOS settings
 - [x] Add matrix/evidence tests for aligned, value-drift, assignment, conflict, missing, collection-gap,
       unsupported, and baseline-not-loaded states
+- [x] Flatten documented nested Settings Catalog groups so FileVault child settings join by exact
+      provider ID without treating non-Apple policies as Apple collection gaps
+- [x] Present desired, observed, missing/evidence-gap, and technical STIG cross-reference views in a
+      full-width NOC-style Mission Control while keeping STIG explicitly not loaded
 - [x] Add a bounded site-wide assistant contract with exact typed claims, selected evidence, and
       deterministic context selection; free prose remains quarantined
 

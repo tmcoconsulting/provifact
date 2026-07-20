@@ -25,6 +25,15 @@ Settings Catalog is the only beta dependency. The adapter attributes it as beta,
 pagination separately, and records a visible gap if it is unavailable or changes shape. It does
 not silently substitute another endpoint.
 
+The `configurationPolicies/{id}/settings` response can contain group collection instances whose
+configured settings are nested child instances. EvidenceOps traverses only Microsoft's documented
+group, choice, and simple value containers, with depth and leaf-count bounds, and emits each scalar
+child under its exact `settingDefinitionId`. This is required for FileVault: Microsoft's public
+reference policy represents the FileVault payload as grouped settings, including the exact
+`com.apple.mcx.filevault2_enable` child and its closed choice token. Unknown containers remain
+unsupported rather than being guessed. Policies with an explicit non-Apple platform are outside
+this provider slice and do not create a false Apple collection gap; unknown platform shapes do.
+
 The Graph client supports complete pagination, concurrency bounded to four operations, exponential
 retry with jitter, `Retry-After`, timeouts, and structured handling for 401, 403, 404, 409, 429,
 transient 5xx, malformed responses, empty collections, and hostile next links. A failure in one
@@ -33,11 +42,17 @@ resource family becomes a collection gap; successful families remain usable.
 Microsoft documents the [Graph permissions reference](https://learn.microsoft.com/en-us/graph/permissions-reference),
 [managed-device list](https://learn.microsoft.com/en-us/graph/api/intune-devices-manageddevice-list?view=graph-rest-1.0),
 [device configuration list](https://learn.microsoft.com/en-us/graph/api/intune-deviceconfig-deviceconfiguration-list?view=graph-rest-1.0),
+[Settings Catalog policy](https://learn.microsoft.com/en-us/graph/api/resources/intune-deviceconfigv2-devicemanagementconfigurationpolicy?view=graph-rest-beta),
+[Settings Catalog setting](https://learn.microsoft.com/en-us/graph/api/resources/intune-deviceconfigv2-devicemanagementconfigurationsetting?view=graph-rest-beta),
+[group setting collection instance](https://learn.microsoft.com/en-us/graph/api/resources/intune-deviceconfigv2-devicemanagementconfigurationgroupsettingcollectioninstance?view=graph-rest-beta),
 [mobile app list](https://learn.microsoft.com/en-us/graph/api/intune-apps-mobileapp-list?view=graph-rest-1.0),
 [Apps and Books tokens](https://learn.microsoft.com/en-us/graph/api/intune-onboarding-vpptoken-list?view=graph-rest-1.0),
 [APNs certificate](https://learn.microsoft.com/en-us/graph/api/intune-devices-applepushnotificationcertificate-get?view=graph-rest-1.0),
 [paging](https://learn.microsoft.com/en-us/graph/paging), and
 [throttling](https://learn.microsoft.com/en-us/graph/throttling).
+
+The reviewed FileVault provider vocabulary is independently visible in Microsoft's public
+[`intune-my-macs` FileVault policy](https://github.com/microsoft/intune-my-macs/blob/main/macOS/configurations/intune/pol-sec-001-filevault.json).
 
 ## Exact permissions
 
