@@ -137,7 +137,14 @@ def test_matrix_loads_the_catalog_and_never_claims_reference_compliance() -> Non
         encoding="utf-8"
     )
     page = (REPOSITORY_ROOT / "docs/settings-matrix.md").read_text(encoding="utf-8")
-    assert 'const CATALOG_URL = "/assets/data/baseline-catalog.json"' in script
+    fingerprint = _catalog()["catalog_fingerprint"]
+    assert isinstance(fingerprint, str)
+    assert f'const CATALOG_FINGERPRINT =\n    "{fingerprint}"' in script
+    assert (
+        'const CATALOG_URL =\n    "/assets/data/baseline-catalog.json?v='
+        f'{fingerprint.removeprefix("sha256:")}"' in script
+    )
+    assert "value.catalog_fingerprint !== CATALOG_FINGERPRINT" in script
     assert "catalog_fingerprint" in script
     assert "missionRuleIds.size !== tmco.rule_ids.length" in script
     assert "tmco.rule_ids.every((ruleId) => missionRuleIds.has(ruleId))" in script

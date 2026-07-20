@@ -4,7 +4,10 @@
   const root = document.querySelector("[data-settings-matrix]");
   if (!(root instanceof HTMLElement)) return;
 
-  const CATALOG_URL = "/assets/data/baseline-catalog.json";
+  const CATALOG_FINGERPRINT =
+    "sha256:2c30e3996b6070dc8a748aa84701689a3d813933682a66222b4afd1960b14e47";
+  const CATALOG_URL =
+    "/assets/data/baseline-catalog.json?v=2c30e3996b6070dc8a748aa84701689a3d813933682a66222b4afd1960b14e47";
   const banner = root.querySelector("[data-matrix-banner]");
   const summary = root.querySelector("[data-matrix-summary]");
   const table = root.querySelector("[data-matrix-table]");
@@ -338,6 +341,7 @@
         "catalog_fingerprint,comparison_boundary,metadata_fallback_rule_ids,profiles,rules,schema_version,source" ||
       value.schema_version !== "1.0.0" ||
       !/^sha256:[0-9a-f]{64}$/.test(value.catalog_fingerprint) ||
+      value.catalog_fingerprint !== CATALOG_FINGERPRINT ||
       !isRecord(value.source) ||
       Object.keys(value.source).sort().join(",") !==
         "attribution,license,platform,repository,revision" ||

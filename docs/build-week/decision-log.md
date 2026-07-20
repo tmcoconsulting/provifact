@@ -571,3 +571,9 @@ reviewed normalized baseline uses an underscore. Count-only validation let the c
 render a false 99th reference-only row even though the overlap summary was correct. A narrow alias
 plus fail-closed set validation fixes the known source variance without broadly rewriting future
 identifiers or merging unrelated rules.
+
+The browser initially rejected an already-open page after deployment because its prior
+`force-cache` response contained the old catalog. The catalog URL is now version-bound to the
+expected fingerprint, and validation requires both that expected fingerprint and a recomputed
+canonical hash. New code therefore selects its matching immutable cache key while altered or stale
+catalog content continues to fail closed.
