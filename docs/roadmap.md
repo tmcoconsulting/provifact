@@ -58,7 +58,7 @@ Public CI never performs live collection.
 - [x] Preserve explicit fixture mode with no model call or synthetic fallback from OpenAI mode
 - [x] Add workerd tests, allowlisted logging, shared egress scans, security headers, and dry-run CI
 - [x] Independently review the Worker runtime and production configuration
-- [x] Configure an EvidenceOps Project key as a Worker secret (never a repository/CI secret)
+- [x] Configure a project-scoped Provifact runtime key as a Worker secret (never a repository/CI secret)
 - [ ] Verify Cloudflare/OpenAI abuse monitoring, log retention, alert ownership, and rollback rehearsal
 - [x] Create the Worker/custom domain at `evidenceops.tmcoconsulting.com` and verify DNS/TLS
 - [x] Add disabled-by-default least-privilege GitHub deployment orchestration after manual validation
@@ -67,7 +67,9 @@ Public CI never performs live collection.
       secret binding without exposing the value
 - [x] Merge the Bot-Fight-safe control-plane deployment proof and complete one green orchestration
       retry; the emergency enable flag remains `false`
-- [x] Configure the EvidenceOps OpenAI project budget alerts and model limits
+- [x] Configure the dedicated OpenAI project budget alerts and model limits
+- [ ] Complete the coordinated external brand cutover: repository/OIDC subject, custom domain,
+      OpenAI project label, and infrastructure display names with rollback redirects
 - [x] Validate bounded live `gpt-5.6-terra`; keep fixture mode only for local and preview
 
 Phase 1 technical completion is recorded in the

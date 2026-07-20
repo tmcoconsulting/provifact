@@ -1,16 +1,18 @@
-EvidenceOps
+Provifact™ by TMCO Consulting
 Copyright 2026 TMCO Consulting, LLC
+
+Provifact™ is a trademark of TMCO Consulting, LLC.
 
 Licensed under the Apache License, Version 2.0.
 
 TMCO Consulting names and brand assets identify TMCO Consulting, LLC and are included in this
 project with the company owner's authorization. The Apache License does not grant trademark rights.
 
-EvidenceOps does not include or claim ownership of third-party security baselines, proprietary
+Provifact does not include or claim ownership of third-party security baselines, proprietary
 endpoint-management repositories, or vendor documentation. Any future third-party material must
 retain its own notices and license terms.
 
-The EvidenceOps Build Week demonstration includes a derived inventory of rule identifiers, section
+The Provifact Build Week demonstration includes a derived inventory of rule identifiers, section
 labels, expected configuration values, and selected deterministic framework identifiers from the
 macOS Security Compliance Project (mSCP), copyright its contributors and licensed under Creative
 Commons Attribution 4.0 International (CC BY 4.0):

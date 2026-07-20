@@ -237,7 +237,7 @@ def test_worker_toolchain_is_exact_pinned_and_private() -> None:
 
 
 def test_browser_boundary_uses_session_only_history_and_does_not_accept_byok() -> None:
-    browser = (REPOSITORY_ROOT / "docs/assets/javascripts/evidenceops-api.js").read_text(
+    browser = (REPOSITORY_ROOT / "docs/assets/javascripts/provifact-api.js").read_text(
         encoding="utf-8"
     )
     assistant_browser = (
@@ -248,7 +248,7 @@ def test_browser_boundary_uses_session_only_history_and_does_not_accept_byok() -
         assert prohibited not in browser
     for prohibited in ("localStorage", "innerHTML", "X-OpenAI-Key", "Authorization"):
         assert prohibited not in assistant_browser
-    assert 'const HISTORY_KEY = "evidenceops-copilot-history-v1"' in assistant_browser
+    assert 'const HISTORY_KEY = "provifact-copilot-history-v1"' in assistant_browser
     assert "sessionStorage.getItem(HISTORY_KEY)" in assistant_browser
     assert "sessionStorage.setItem(" in assistant_browser
     assert 'request.headers.has("X-OpenAI-Key")' in router
@@ -291,9 +291,9 @@ def test_mission_control_bounds_grid_content_on_narrow_viewports() -> None:
     assert "min-width: 0;" in stylesheet
     assert ".mission-table-wrap {\n  overflow-x: auto;" in stylesheet
     mkdocs = (REPOSITORY_ROOT / "mkdocs.yml").read_text(encoding="utf-8")
-    assert "assets/stylesheets/extra.css?v=20260720-noc1" in mkdocs
-    assert "assets/javascripts/mission-control.js?v=20260720-noc1" in mkdocs
-    assert "assets/javascripts/assistant-evidence-context.js?v=20260720-noc1" in mkdocs
+    assert "assets/stylesheets/extra.css?v=20260720-provifact1" in mkdocs
+    assert "assets/javascripts/mission-control.js?v=20260720-provifact1" in mkdocs
+    assert "assets/javascripts/assistant-evidence-context.js?v=20260720-provifact1" in mkdocs
 
 
 def test_mission_control_is_an_operational_dashboard_with_honest_stig_lens() -> None:

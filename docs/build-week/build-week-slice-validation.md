@@ -137,7 +137,7 @@ generated bindings, and all three Wrangler dry-runs passed.
 
 ### OpenAI
 
-- Exact project: EvidenceOps.
+- Exact project: Provifact.
 - Dedicated service account: `evidenceops-cloudflare-production`.
 - Only active project key belongs to that service account; Cloudflare lists `OPENAI_API_KEY` as an
   encrypted production secret. No value was retrieved or printed.

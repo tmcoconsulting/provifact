@@ -1,4 +1,4 @@
-"""Deterministic EvidenceOps Mission Control evidence and drift model."""
+"""Deterministic Provifact Mission Control evidence and drift model."""
 
 from __future__ import annotations
 
@@ -195,7 +195,7 @@ def build_public_mission_snapshot(
             "output_label": "AI-generated analysis — human review required",
             "verifier_required": True,
             "insufficient_evidence_response": (
-                "EvidenceOps does not have sufficient collected evidence to answer this question."
+                "Provifact does not have sufficient collected evidence to answer this question."
             ),
         },
         "human_approval_status": "Human review required",
@@ -532,7 +532,7 @@ def _finding(
             "Review the observed value against approved desired state before changing Intune."
         ),
         DriftOutcome.ASSIGNMENT_DRIFT.value: (
-            "Review assignment scope and exclusions; EvidenceOps cannot assign policies."
+            "Review assignment scope and exclusions; Provifact cannot assign policies."
         ),
         DriftOutcome.CONFLICTING.value: (
             "Review overlapping policies and effective precedence with an endpoint administrator."
@@ -565,7 +565,7 @@ def _finding(
         "baseline_rule_fingerprint": requirement["fingerprint"],
         "remediation_guidance": recommendations.get(
             outcome,
-            "Human review is required; EvidenceOps has no Intune write or remediation capability.",
+            "Human review is required; Provifact has no Intune write or remediation capability.",
         ),
         "limitations": [
             "Technical evidence does not establish organizational compliance.",

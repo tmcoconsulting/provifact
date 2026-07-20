@@ -1,5 +1,17 @@
 # Changelog
 
+## 2026-07-20 — Provifact public identity
+
+- Adopted **Provifact™ by TMCO Consulting** as the public product name and **From approved change to
+  audit-ready proof.** as the product tagline.
+- Rebranded the static site, Mission Control, Copilot, Worker responses, package metadata, synthetic
+  artifacts, documentation, and tests without changing deterministic evidence semantics.
+- Added the preferred `provifact` Python module and console command while preserving the legacy
+  `evidenceops` engine namespace and command as compatibility interfaces.
+- Retained the existing repository slug, Entra-bound workflow provenance, Cloudflare Worker,
+  OpenAI-project identifier, schema/algorithm identifiers, environment variables, and transition
+  hostname pending a coordinated, rollback-safe external cutover.
+
 ## 2026-07-20 — Live audit cockpit
 
 - Replaced semantic-key substring matching with a versioned registry of exact reviewed Microsoft
@@ -9,7 +21,7 @@
   and its exact reviewed snapshot ID; removed every synthetic production fallback.
 - Redesigned Mission Control around current attention, changes, findings, collection health, and
   expandable evidence; reduced Settings to a readable six-column view with accessible detail.
-- Added site-wide Evidence Copilot with session-only history, current-page/snapshot context, selected
+- Added site-wide Provifact Copilot with session-only history, current-page/snapshot context, selected
   evidence, fixed `gpt-5.6-terra` production mode, and useful deterministic local fallback.
 - Added global live/synthetic/stale provenance, no-store snapshot refresh, official TMCO Consulting
   assets, and a company-name content gate.

@@ -5,8 +5,8 @@ submission description, technical summary, and backup material.
 
 ## Less-than-three-minute script
 
-**0:00–0:20 — thesis.** Open EvidenceOps Mission Control. “Regulated endpoint teams should not
-reconstruct months of change history before an audit. EvidenceOps turns approved configuration,
+**0:00–0:20 — thesis.** Open Provifact Mission Control. “Regulated endpoint teams should not
+reconstruct months of change history before an audit. Provifact turns approved configuration,
 read-only observation, deterministic drift, and constrained AI explanation into one traceable
 evidence chain.” Point out the `LIVE SANITIZED TENANT DATA` badge and explain that raw tenant data
 never crossed the publication boundary.
@@ -24,7 +24,7 @@ read-only guidance.
 health, resources not currently evaluated, and collection gaps. Explain that iOS/iPadOS is visible but not scored
 against a macOS baseline and that unavailable evidence remains visible.
 
-**1:45–2:20 — constrained GPT-5.6.** Open the site-wide Evidence Copilot and ask “What requires my
+**1:45–2:20 — constrained GPT-5.6.** Open the site-wide Provifact Copilot and ask “What requires my
 attention?” Show cited evidence, typed-claim verification, prose quarantine, and human-review
 language. Production uses fixed `gpt-5.6-terra`; local/preview fixture mode must be labeled as no
 model call.
@@ -33,7 +33,7 @@ model call.
 private normalized evidence, allowlist publication, Cloudflare rate limits, server-side OpenAI
 secret, `store: false`, no tools, and no BYOK.
 
-**2:45–2:55 — close.** “EvidenceOps does not change Intune and does not decide compliance. It makes
+**2:45–2:55 — close.** “Provifact does not change Intune and does not decide compliance. It makes
 approved intent, observed state, drift, limitations, and evidence references reviewable before the
 audit.”
 
@@ -53,7 +53,7 @@ audit.”
 9. Show Framework cross-references and read its non-certification warning.
 10. Show Collection health, including endpoint API versions, the beta Settings Catalog label, and the
     collection gap.
-11. Open Evidence Copilot, choose What requires my attention?, and inspect the evidence links and
+11. Open Provifact Copilot, choose What requires my attention?, and inspect the evidence links and
     verifier state.
 12. Ask the unsupported question from the backup card below and show insufficient evidence only if
     time permits.
@@ -61,7 +61,7 @@ audit.”
 
 ## Suggested DevPost project description
 
-EvidenceOps is a continuous compliance-evidence platform for regulated endpoint teams. It connects
+Provifact is a continuous compliance-evidence platform for regulated endpoint teams. It connects
 a Git-approved security baseline to read-only Microsoft Intune collection, deterministic drift,
 privacy-safe evidence publication, a Cloudflare-hosted Mission Control dashboard, and GPT-5.6
 explanations that remain subordinate to verified evidence and human judgment. The Build Week demo
@@ -70,7 +70,7 @@ vendor-neutral.
 
 ## Suggested DevPost technical description
 
-EvidenceOps uses a GET-only Python Microsoft Graph provider with bounded concurrency, pagination,
+Provifact uses a GET-only Python Microsoft Graph provider with bounded concurrency, pagination,
 retry, and per-endpoint gaps. A pinned mSCP macOS CIS Level 1 inventory is hash-verified and four
 settings are mapped through reviewed, deterministic identifiers. The engine emits stable evidence
 IDs, canonical fingerprints, assignment/value/conflict findings, freshness, history deltas, and
@@ -161,4 +161,4 @@ assistant’s static fixture presentation is available, but same-origin Worker A
 
 Ask: “Who approved the annual corporate risk assessment?” The expected response is exactly:
 
-> EvidenceOps does not have sufficient collected evidence to answer this question.
+> Provifact does not have sufficient collected evidence to answer this question.

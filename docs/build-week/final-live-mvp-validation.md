@@ -22,7 +22,7 @@
 - Mission schema `2.1.0`, public-safe parent references, and current/prior live snapshot comparison
 - Live-artifact-only production workflow with exact audit-run and snapshot provenance
 - Action-first Mission Control, compact Settings detail, global provenance, and snapshot refresh
-- Site-wide bounded Evidence Copilot with production `gpt-5.6-terra` and local/preview fixture mode
+- Site-wide bounded Provifact Copilot with production `gpt-5.6-terra` and local/preview fixture mode
 - Official owner-approved TMCO Consulting assets and standalone-company-name content gate
 - Preserved GET-only Graph provider, fail-closed publication, deterministic authority, and no BYOK
 
@@ -158,5 +158,5 @@ representation. A visible resolved live finding still requires TJ to make the se
 manual Intune change. The lowest-risk reviewed path is a dedicated test-Mac Settings Catalog policy
 for exact provider ID `com.apple.screensaver.user_idleTime`: collect an assigned value greater than
 the approved 900-second maximum as snapshot A, manually set it to 900 seconds or lower, then run
-audit B with A's sanitized audit run ID as `prior_sanitized_audit_run_id`. EvidenceOps must remain
+audit B with A's sanitized audit run ID as `prior_sanitized_audit_run_id`. Provifact must remain
 read-only throughout and may call the result resolved only after audit B observes it.

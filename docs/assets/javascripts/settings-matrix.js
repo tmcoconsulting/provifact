@@ -101,7 +101,7 @@
       case "Assignment drift":
         return `Review intended assignments and exclusions for ${key}; re-collect after any human change.`;
       case "Conflicting policy":
-        return `Review overlapping policy sources and effective precedence for ${key}; EvidenceOps will not choose or apply a policy.`;
+        return `Review overlapping policy sources and effective precedence for ${key}; Provifact will not choose or apply a policy.`;
       case "Missing from tenant":
         return `Confirm every reviewed exact provider alias is absent before treating ${key} as missing.`;
       case "Collection gap":
@@ -112,7 +112,7 @@
       case "Unsupported by provider":
         return "Review and approve an exact provider definition mapping before this rule enters technical alignment.";
       default:
-        return "Human review is required; EvidenceOps has no Intune write capability.";
+        return "Human review is required; Provifact has no Intune write capability.";
     }
   };
 
@@ -212,19 +212,19 @@
       create(
         "p",
         "",
-        "This setting-level evidence does not establish organizational compliance or control satisfaction. EvidenceOps cannot write, assign, or remediate Intune. Human review is required.",
+        "This setting-level evidence does not establish organizational compliance or control satisfaction. Provifact cannot write, assign, or remediate Intune. Human review is required.",
       ),
     );
     const ask = create(
       "button",
       "md-button md-button--primary",
-      "Ask Evidence Copilot about this setting",
+      "Ask Provifact Copilot about this setting",
     );
     ask.type = "button";
     ask.addEventListener("click", () => {
       dialog.close();
       window.dispatchEvent(
-        new CustomEvent("evidenceops:select-evidence", {
+        new CustomEvent("provifact:select-evidence", {
           detail: {
             evidenceId: requirement.requirement_id,
             question:
@@ -458,7 +458,7 @@
         if (!filtered.length)
           empty.textContent =
             selectedFramework === "cis_lvl2"
-              ? "CIS Level 2 is not loaded. EvidenceOps does not infer it from Level 1 or a framework cross-reference."
+              ? "CIS Level 2 is not loaded. Provifact does not infer it from Level 1 or a framework cross-reference."
               : "No settings match the selected filters.";
       };
 

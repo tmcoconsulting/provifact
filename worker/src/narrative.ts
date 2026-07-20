@@ -289,7 +289,7 @@ export async function readUpstreamErrorMetadata(
       if (total > MAX_UPSTREAM_ERROR_BYTES) {
         await cancelUpstreamErrorBody(
           reader,
-          "EvidenceOps suppresses oversized error bodies",
+          "Provifact suppresses oversized error bodies",
         );
         return { code: null, type: null };
       }
@@ -298,7 +298,7 @@ export async function readUpstreamErrorMetadata(
   } catch {
     await cancelUpstreamErrorBody(
       reader,
-      "EvidenceOps suppresses unreadable error bodies",
+      "Provifact suppresses unreadable error bodies",
     );
     return { code: null, type: null };
   }
@@ -359,13 +359,13 @@ function openAIRequest(
       "from the deterministic finding. Cite only supplied evidence IDs. State limitations " +
       "and human-review questions. All prose is AI-generated analysis subject to human review.",
     input:
-      "Create the bounded narrative from this sanitized EvidenceOps package:\n" +
+      "Create the bounded narrative from this sanitized Provifact package:\n" +
       JSON.stringify(packageDocument),
     text: {
       verbosity: "low",
       format: {
         type: "json_schema",
-        name: "evidenceops_narrative_v1",
+        name: "provifact_narrative_v1",
         strict: true,
         schema: narrativeSchema,
       },

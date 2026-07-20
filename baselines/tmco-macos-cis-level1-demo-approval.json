@@ -1,6 +1,6 @@
 {
   "approval_date": "2026-07-19",
-  "approval_rationale": "Provide reproducible technical drift detection for the EvidenceOps Build Week demo.",
+  "approval_rationale": "Provide reproducible technical drift detection for the Provifact Build Week demo.",
   "approval_status": "internally approved demo baseline",
   "approver": "TMCO Consulting, LLC — Build Week Demo Authority",
   "baseline_name": "TMCO Consulting macOS CIS Level 1 Demo Baseline",

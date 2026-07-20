@@ -1,6 +1,6 @@
 # Local Demo Mode
 
-Local demo mode is the credential-free way to reproduce EvidenceOps from curated synthetic input.
+Local demo mode is the credential-free way to reproduce Provifact from curated synthetic input.
 It is separate from the production Cloudflare deployment, which serves a reviewed sanitized live
 Mission package while keeping the assistant in fixture narrative mode by default.
 
@@ -13,9 +13,9 @@ connection or OpenAI key.
 ## Procedure
 
 1. Create a clean Python virtual environment and install the exact locked dependencies.
-2. Run `python -m evidenceops run-mission-demo --output-dir build/mission-demo`.
+2. Run `python -m provifact run-mission-demo --output-dir build/mission-demo`.
 3. Run `python scripts/check_public_artifacts.py build/mission-demo`.
-4. Run `python -m evidenceops rebuild-static-demo`.
+4. Run `python -m provifact rebuild-static-demo`.
 5. Build with `mkdocs build --strict` and scan `site/`.
 6. Serve the full Worker boundary with `npm run dev`; open **Mission Control**, **Settings &
    Baselines**, and **Runtime Demo**.

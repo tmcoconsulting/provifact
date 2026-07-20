@@ -69,7 +69,7 @@ mode is fixed-model OpenAI; local and preview remain fixture-based.
 ## Assumptions and exclusions
 
 The model assumes GitHub, Entra, and OpenAI administrative accounts are separately protected and
-that an operator does not deliberately publish private files outside EvidenceOps. Endpoint
+that an operator does not deliberately publish private files outside Provifact. Endpoint
 compromise, assessment-framework interpretation, remediation, tenant rollback, and external
 service availability are outside this proof.
 

@@ -3,7 +3,7 @@ requires = ["hatchling==1.31.0"]
 build-backend = "hatchling.build"
 
 [project]
-name = "evidenceops"
+name = "provifact"
 version = "0.1.0"
 description = "Deterministic, sanitized compliance evidence for endpoint-management teams."
 readme = "README.md"
@@ -20,6 +20,7 @@ classifiers = [
 dependencies = []
 
 [project.scripts]
+provifact = "evidenceops.cli:main"
 evidenceops = "evidenceops.cli:main"
 
 [project.optional-dependencies]
@@ -48,7 +49,7 @@ Issues = "https://github.com/tmcoconsulting/evidenceops/issues"
 Repository = "https://github.com/tmcoconsulting/evidenceops"
 
 [tool.hatch.build.targets.wheel]
-packages = ["evidenceops"]
+packages = ["evidenceops", "provifact"]
 
 [tool.ruff]
 target-version = "py312"
@@ -65,7 +66,7 @@ ignore = ["S101"]
 [tool.mypy]
 python_version = "3.12"
 strict = true
-files = ["evidenceops", "scripts", "tests"]
+files = ["evidenceops", "provifact", "scripts", "tests"]
 exclude = ["site"]
 
 [tool.pytest.ini_options]

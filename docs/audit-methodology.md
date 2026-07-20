@@ -1,6 +1,6 @@
 # Audit Methodology
 
-EvidenceOps is an evidence-production system, not an auditor and not a certification authority.
+Provifact is an evidence-production system, not an auditor and not a certification authority.
 Its methodology makes provenance, calculation, exception, and interpretation boundaries explicit.
 
 ## Evidence chain
@@ -37,7 +37,7 @@ silently reuse the previous version's identity.
 
 ## Mapping discipline
 
-EvidenceOps will link evidence to control statements without copying restricted standards text or
+Provifact will link evidence to control statements without copying restricted standards text or
 claiming requirements not established by authoritative sources. A mapping records its source,
 version, reviewer, rationale, and known ambiguity. Passing a technical check does not by itself
 prove organizational compliance.

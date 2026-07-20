@@ -1,7 +1,7 @@
 {
   "ai": {
     "authoritative": false,
-    "insufficient_evidence_response": "EvidenceOps does not have sufficient collected evidence to answer this question.",
+    "insufficient_evidence_response": "Provifact does not have sufficient collected evidence to answer this question.",
     "mode": "fixture",
     "model": "gpt-5.6-terra",
     "output_label": "AI-generated analysis \u2014 human review required",
@@ -42,7 +42,7 @@
       "system_settings_screensaver_password_enforce"
     ],
     "previous_collection_timestamp_utc": "2026-07-18T15:00:00Z",
-    "previous_snapshot_id": "mission-7a27c30417b382dcb2677a6a",
+    "previous_snapshot_id": "mission-49953689c71a799967e9abb9",
     "resolved_drift": [],
     "unchanged_requirements": [
       "audit_acls_files_configure",
@@ -310,7 +310,7 @@
       "source_endpoint_key": "app-protection-policies"
     }
   ],
-  "content_fingerprint": "sha256:97b23d31a133d90ba828468c8444f64732188ec0ba8044caba12ecdcdf0696af",
+  "content_fingerprint": "sha256:26a863f933e6d84a06a19d636bfdf8b28b47362c2aaa19cbafae8638cae230dc",
   "data_mode": "SYNTHETIC DEMO DATA",
   "devices": {
     "by_compliance_state": {
@@ -340,8 +340,8 @@
       "baseline_rule_fingerprint": "sha256:c7b6a8dadae05802c9f58986ac1340dcfd989a092f0811e20d44dd3ef31da2b8",
       "drift_type": "Assignment drift",
       "expected_value": true,
-      "finding_id": "finding-8234c5dff762bcdd11a41ba3",
-      "fingerprint": "sha256:8234c5dff762bcdd11a41ba30955a68d90261ba2e7b13dbbccea8b7caceb9e77",
+      "finding_id": "finding-d178b8008f747d85038995b7",
+      "fingerprint": "sha256:d178b8008f747d85038995b7b2a8c283543a656f54b3515bc691ccca41b2de83",
       "limitations": [
         "Technical evidence does not establish organizational compliance.",
         "No Intune write or automatic remediation operation exists."
@@ -378,7 +378,7 @@
         "com.apple.mcx.filevault2_enable"
       ],
       "provider_mapping_registry_version": "microsoft-intune-macos-v1.1.0",
-      "remediation_guidance": "Review assignment scope and exclusions; EvidenceOps cannot assign policies.",
+      "remediation_guidance": "Review assignment scope and exclusions; Provifact cannot assign policies.",
       "requirement_id": "req-c7b6a8dadae05802c9f58986",
       "rule_id": "system_settings_filevault_enforce",
       "setting_key": "macos.security.filevault.enabled",
@@ -3430,7 +3430,7 @@
     }
   ],
   "schema_version": "2.1.0",
-  "snapshot_id": "mission-97b23d31a133d90ba828468c",
+  "snapshot_id": "mission-26a863f933e6d84a06a19d63",
   "unmapped_objects": [
     {
       "action_expected": "No posture action is inferred from inventory alone.",

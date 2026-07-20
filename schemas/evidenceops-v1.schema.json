@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://raw.githubusercontent.com/tmcoconsulting/evidenceops/main/schemas/evidenceops-v1.schema.json",
-  "title": "EvidenceOps evidence object catalog v1.0.0",
+  "title": "Provifact evidence object catalog v1.0.0",
   "oneOf": [
     { "$ref": "#/$defs/provider_metadata" },
     { "$ref": "#/$defs/collection_metadata" },

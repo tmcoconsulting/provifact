@@ -1,6 +1,6 @@
 # Architecture
 
-EvidenceOps separates collection, deterministic evaluation, publication policy, generated
+Provifact separates collection, deterministic evaluation, publication policy, generated
 analysis, and human judgment so no layer silently inherits another layer's authority.
 
 ```mermaid
@@ -53,6 +53,16 @@ finding links the baseline requirement, source evidence IDs, Git SHA, algorithm 
 fingerprints. Outcomes include aligned, missing, value drift, assignment drift, conflict,
 collection gap, unsupported, not applicable, and human review. These describe technical evidence
 relationships—not framework or organizational compliance. A model never selects an outcome.
+
+## Brand and compatibility boundary
+
+**Provifact™ by TMCO Consulting** is the public product name. The tagline is **From approved change
+to audit-ready proof.** Phase 1 intentionally retains legacy technical identifiers—including the
+`evidenceops` Python package, `EVIDENCEOPS_*` environment variables, versioned schema identifiers,
+GitHub repository slug, Cloudflare Worker name, and current transition hostname—until a coordinated
+migration can update Entra's repository-bound OIDC subject, Cloudflare secrets/custom domains, and
+GitHub workflow provenance together. The `provifact` CLI is the preferred public command; the old
+command remains a compatibility alias.
 
 Mission Control presents the approved CIS Level 1 desired state beside the normalized observed
 state in a dense operational view. Its STIG selector is a comparison lens over already reviewed

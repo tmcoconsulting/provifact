@@ -1,7 +1,7 @@
 # Brand asset provenance
 
 The checked-in TMCO Consulting assets were downloaded from the company’s public website on
-2026-07-20 with the company owner’s explicit authorization for EvidenceOps.
+2026-07-20 with the company owner’s explicit authorization for Provifact.
 
 | File | Authoritative source | SHA-256 |
 | --- | --- | --- |
@@ -9,5 +9,5 @@ The checked-in TMCO Consulting assets were downloaded from the company’s publi
 | `tmco-consulting-social.png` | `https://tmcoconsulting.com/assets/social/default-og.png` | `decdfac134a97181c5969d863e529b221d8ec4c26a7882da980a521cf36c55c4` |
 
 The favicon’s accessible label is expanded to “TMCO Consulting”; its vector artwork is otherwise
-unchanged. These brand assets identify TMCO Consulting, LLC. The Apache-2.0 license for EvidenceOps
+unchanged. These brand assets identify TMCO Consulting, LLC. The Apache-2.0 license for Provifact
 source code does not grant rights to use TMCO Consulting names or marks outside this project.

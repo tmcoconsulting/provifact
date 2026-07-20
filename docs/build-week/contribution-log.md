@@ -104,7 +104,7 @@ Exact Phase 1 commands, results, limitations, and commit hashes are maintained i
 The July 20 finalization remained owned by the primary Codex task and used three bounded supporting
 agents in the same shared checkout: one implemented exact provider mappings and sanitized snapshot
 history; one hardened protected audit/deployment workflows; and one implemented Mission Control and
-Evidence Copilot. The primary agent read the governing instructions, integrated and reviewed every
+Provifact Copilot. The primary agent read the governing instructions, integrated and reviewed every
 shared change, added TMCO Consulting branding and documentation, ran the complete validation gate,
 and retained sole responsibility for Git, PR, merge, live audit, deployment, and production checks.
 Implementation commit: `143f694f7183f1a2ce117a3a0867aad316f7a1ae`.

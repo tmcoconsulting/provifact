@@ -1,4 +1,4 @@
-"""Strict, JSON-serializable EvidenceOps schema-v1 objects.
+"""Strict, JSON-serializable Provifact schema-v1 objects.
 
 The Phase 0 dataclasses remain available for backward compatibility.  New evidence
 packages use these self-fingerprinting dictionaries so artifacts can be inspected

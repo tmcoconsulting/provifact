@@ -90,7 +90,7 @@ def _load_public_value_patterns() -> tuple[tuple[str, re.Pattern[str]], ...]:
 _PROHIBITED_PUBLIC_VALUE_PATTERNS: Final = _load_public_value_patterns()
 
 # These exact strings are public vendor permission identifiers or approved
-# EvidenceOps taxonomy keys, not network domains. Exact membership prevents the
+# Provifact taxonomy keys, not network domains. Exact membership prevents the
 # domain detector from being weakened for arbitrary dotted strings.
 _PUBLIC_SAFE_TECHNICAL_VALUES: Final = frozenset(
     {
@@ -161,7 +161,7 @@ def sanitize_document(
     """Return a public-safe copy or raise before producing an artifact.
 
     The caller supplies pseudonym key material at runtime. A key shorter than 32 bytes is
-    rejected, and EvidenceOps never persists it.
+    rejected, and Provifact never persists it.
     """
     if len(pseudonym_key) < 32:
         raise SanitizationError("pseudonym_key must contain at least 32 bytes")

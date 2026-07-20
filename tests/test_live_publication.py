@@ -29,7 +29,7 @@ def _status(mission: dict[str, JsonValue]) -> dict[str, JsonValue]:
     collection = cast(dict[str, JsonValue], mission["collection"])
     return {
         "schema_version": "1.0.0",
-        "service": "EvidenceOps narrative boundary",
+        "service": "Provifact narrative boundary",
         "status": "ok",
         "narrative_mode": "fixture",
         "model": "gpt-5.6-terra",

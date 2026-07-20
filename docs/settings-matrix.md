@@ -18,7 +18,7 @@
 
 <div class="matrix-scope-note">
   <strong>Current approved baseline:</strong> the pinned macOS 26 CIS Level 1 demo profile.
-  CIS Level 2 is shown explicitly as <em>not loaded</em>; EvidenceOps does not infer Level 2 coverage
+  CIS Level 2 is shown explicitly as <em>not loaded</em>; Provifact does not infer Level 2 coverage
   from Level 1 or from another framework's cross-reference.
 </div>
 
@@ -113,4 +113,4 @@ next data-model priority; the public matrix never guesses it from a display name
 - STIG, NIST, and CMMC cells are cross-reference identifiers associated with the setting. They are
   supporting technical evidence, not independent baseline scores.
 - Unsupported rules say so directly. AI does not create missing mappings or fill evidence gaps.
-- EvidenceOps remains GET-only and cannot change, assign, or remediate an Intune policy.
+- Provifact remains GET-only and cannot change, assign, or remediate an Intune policy.

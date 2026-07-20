@@ -159,13 +159,12 @@ class OpenAINarrativeAdapter:
                 "review."
             ),
             "input": (
-                "Create the bounded narrative from this sanitized EvidenceOps package:\n"
-                + serialized
+                "Create the bounded narrative from this sanitized Provifact package:\n" + serialized
             ),
             "text": {
                 "format": {
                     "type": "json_schema",
-                    "name": "evidenceops_narrative_v1",
+                    "name": "provifact_narrative_v1",
                     "strict": True,
                     "schema": _model_output_schema(),
                 }
