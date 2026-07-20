@@ -13,7 +13,7 @@ repos:
         language: system
         types: [python]
       - id: secret-scan
-        name: EvidenceOps secret scan
+        name: Provifact secret scan
         entry: python scripts/check_secrets.py
         language: system
         pass_filenames: false

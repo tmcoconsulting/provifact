@@ -18,7 +18,8 @@ def test_provifact_public_brand_and_tagline_are_consistent() -> None:
 
     assert readme.startswith("# Provifact™ by TMCO Consulting\n")
     assert "**From approved change to audit-ready proof.**" in readme
-    assert '<div class="hero-kicker">Provifact™ by TMCO Consulting</div>' in landing
+    assert '<div class="hero-kicker"><img src="assets/images/provifact-mark.svg"' in landing
+    assert "Provifact™ by TMCO Consulting</div>" in landing
     assert "<h1>From approved change to audit-ready proof.</h1>" in landing
     assert "<strong>Provifact™</strong><small>by TMCO Consulting</small>" in dashboard
     assert "site_name: Provifact™ by TMCO Consulting" in mkdocs

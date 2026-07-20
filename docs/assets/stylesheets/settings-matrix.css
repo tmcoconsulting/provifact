@@ -65,6 +65,42 @@
   margin: 1rem 0;
 }
 
+.matrix-plan {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 0.55rem;
+  margin: 0 0 1rem;
+}
+
+.matrix-plan-card {
+  display: grid;
+  gap: 0.25rem;
+  min-width: 0;
+  padding: 0.7rem;
+  border: 1px solid var(--md-default-fg-color--lightest);
+  border-left: 0.2rem solid var(--md-accent-fg-color);
+  border-radius: 0.45rem;
+  background: var(--md-code-bg-color);
+}
+
+.matrix-plan-card strong {
+  font-size: 0.72rem;
+}
+
+.matrix-plan-card span,
+.matrix-plan-note {
+  color: var(--md-default-fg-color--light);
+  font-size: 0.64rem;
+}
+
+.matrix-plan-note {
+  grid-column: 1 / -1;
+  margin: 0;
+  padding: 0.65rem 0.75rem;
+  border-left: 0.2rem solid var(--md-primary-fg-color);
+  background: color-mix(in srgb, var(--md-primary-fg-color) 8%, transparent);
+}
+
 .matrix-summary-card {
   min-width: 0;
   padding: 0.9rem;
@@ -92,7 +128,7 @@
 .matrix-controls {
   display: grid;
   grid-template-columns: minmax(12rem, 2fr) repeat(
-      2,
+      3,
       minmax(10rem, 1fr)
     ) auto auto;
   gap: 0.75rem;
@@ -377,7 +413,8 @@
 }
 
 @media (max-width: 76rem) {
-  .matrix-summary {
+  .matrix-summary,
+  .matrix-plan {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
@@ -393,6 +430,7 @@
   }
 
   .matrix-summary,
+  .matrix-plan,
   .matrix-controls {
     grid-template-columns: 1fr;
   }

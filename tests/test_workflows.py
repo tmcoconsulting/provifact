@@ -248,7 +248,7 @@ def test_browser_boundary_uses_session_only_history_and_does_not_accept_byok() -
         assert prohibited not in browser
     for prohibited in ("localStorage", "innerHTML", "X-OpenAI-Key", "Authorization"):
         assert prohibited not in assistant_browser
-    assert 'const HISTORY_KEY = "provifact-copilot-history-v1"' in assistant_browser
+    assert 'const HISTORY_KEY = "provifact-assistant-history-v1"' in assistant_browser
     assert "sessionStorage.getItem(HISTORY_KEY)" in assistant_browser
     assert "sessionStorage.setItem(" in assistant_browser
     assert 'request.headers.has("X-OpenAI-Key")' in router
@@ -291,9 +291,9 @@ def test_mission_control_bounds_grid_content_on_narrow_viewports() -> None:
     assert "min-width: 0;" in stylesheet
     assert ".mission-table-wrap {\n  overflow-x: auto;" in stylesheet
     mkdocs = (REPOSITORY_ROOT / "mkdocs.yml").read_text(encoding="utf-8")
-    assert "assets/stylesheets/extra.css?v=20260720-provifact1" in mkdocs
-    assert "assets/javascripts/mission-control.js?v=20260720-provifact1" in mkdocs
-    assert "assets/javascripts/assistant-evidence-context.js?v=20260720-provifact1" in mkdocs
+    assert "assets/stylesheets/extra.css?v=20260720-judge2" in mkdocs
+    assert "assets/javascripts/mission-control.js?v=20260720-judge2" in mkdocs
+    assert "assets/javascripts/assistant-evidence-context.js?v=20260720-judge2" in mkdocs
 
 
 def test_mission_control_is_an_operational_dashboard_with_honest_stig_lens() -> None:
@@ -309,12 +309,21 @@ def test_mission_control_is_an_operational_dashboard_with_honest_stig_lens() -> 
         "STIG · technical cross-reference only",
         "data-collection-pipeline",
         "data-posture-rows",
+        "data-planning-groups",
+        "CIS Level 1 · full implementation plan",
+        "CIS Level 1 · evaluated rules only",
         "No Intune writes",
     ):
         assert required in dashboard
-    assert 'stig ? "NOT LOADED" : "APPROVED"' in script
+    assert '"NOT LOADED"' in script
+    assert '"APPROVED"' in script
     assert "No STIG assessment or score is produced" in script
     assert "exact provider mappings" in script
+    assert 'if (lens === "active") return true' in script
+    assert 'return "Implementation planning required"' in script
+    assert 'return "Provider mapping review required"' in script
+    assert 'const synthetic = mission.data_mode.startsWith("SYNTHETIC")' in script
+    assert "reproducible fixed-time fixture" in script
     assert "body:has(.mission-shell) .md-header" in stylesheet
     assert ".mission-commandbar" in stylesheet
     assert ".mission-rail" in stylesheet
@@ -327,10 +336,10 @@ def test_operational_frontend_is_compact_and_keyboard_accessible() -> None:
     matrix_css = (
         REPOSITORY_ROOT / "docs" / "assets" / "stylesheets" / "settings-matrix.css"
     ).read_text(encoding="utf-8")
-    copilot = (
+    assistant = (
         REPOSITORY_ROOT / "docs" / "assets" / "javascripts" / "assistant-evidence-context.js"
     ).read_text(encoding="utf-8")
-    copilot_css = (
+    assistant_css = (
         REPOSITORY_ROOT / "docs" / "assets" / "stylesheets" / "assistant-evidence-context.css"
     ).read_text(encoding="utf-8")
     for heading in (
@@ -345,9 +354,56 @@ def test_operational_frontend_is_compact_and_keyboard_accessible() -> None:
     assert "table-layout: fixed" in matrix_css
     assert "min-width: 0" in matrix_css
     assert "dialog.showModal()" in matrix
-    assert 'launcher.setAttribute("aria-haspopup", "dialog")' in copilot
-    assert "if (!dialog.open) dialog.showModal()" in copilot
-    assert "input.focus()" in copilot
-    assert "launcher.focus()" in copilot
-    assert "@media (max-width: 52rem)" in copilot_css
-    assert "@media (max-width: 35rem)" in copilot_css
+    assert 'launcher.setAttribute("aria-haspopup", "dialog")' in assistant
+    assert "if (!dialog.open) dialog.showModal()" in assistant
+    assert "input.focus()" in assistant
+    assert "launcher.focus()" in assistant
+    assert "@media (max-width: 52rem)" in assistant_css
+    assert "@media (max-width: 35rem)" in assistant_css
+
+
+def test_public_brand_uses_original_mark_and_provifact_assistant() -> None:
+    mkdocs = (REPOSITORY_ROOT / "mkdocs.yml").read_text(encoding="utf-8")
+    dashboard = (REPOSITORY_ROOT / "docs" / "evidence-dashboard.md").read_text(encoding="utf-8")
+    assistant = (
+        REPOSITORY_ROOT / "docs" / "assets" / "javascripts" / "assistant-evidence-context.js"
+    ).read_text(encoding="utf-8")
+    logo = REPOSITORY_ROOT / "docs" / "assets" / "images" / "provifact-mark.svg"
+
+    assert "logo: assets/images/provifact-mark.svg" in mkdocs
+    assert "favicon: assets/images/provifact-mark.svg" in mkdocs
+    assert 'class="mission-brand-mark"' in dashboard
+    assert "PV</span>" not in dashboard
+    assert "Ask Provifact Assistant" in dashboard
+    assert "Provifact Assistant" in assistant
+    assert "Copilot" not in assistant
+    assert logo.is_file()
+
+
+def test_baseline_plan_shows_all_rules_by_default_without_false_findings() -> None:
+    page = (REPOSITORY_ROOT / "docs" / "settings-matrix.md").read_text(encoding="utf-8")
+    matrix = (REPOSITORY_ROOT / "docs" / "assets" / "javascripts" / "settings-matrix.js").read_text(
+        encoding="utf-8"
+    )
+    assert "data-matrix-mapped-only>" in page
+    assert "data-matrix-mapped-only checked" not in page
+    assert "Limit to deterministically evaluated rules" in page
+    assert "Approved Level 1 rules" in matrix
+    assert "Implementation backlog" in matrix
+    assert "Provider mapping review required" in matrix
+    assert "Implementation planning required" in matrix
+    assert "mappedOnly.checked = false" in matrix
+    assert "Target pending approved mapping" in matrix
+    assert "a backlog state—not a failed control" in page
+
+
+def test_public_navigation_prioritizes_judge_path_and_current_evidence() -> None:
+    mkdocs = (REPOSITORY_ROOT / "mkdocs.yml").read_text(encoding="utf-8")
+    judge = (REPOSITORY_ROOT / "docs" / "judge-guide.md").read_text(encoding="utf-8")
+    assert "- Mission Control: evidence-dashboard.md" in mkdocs
+    assert "- Baseline Plan: settings-matrix.md" in mkdocs
+    assert "- Judge Guide: judge-guide.md" in mkdocs
+    assert "Phase 1 Validation: build-week/phase-1-validation.md" not in mkdocs
+    assert "Worker Validation: build-week/cloudflare-worker-validation.md" not in mkdocs
+    assert "a backlog state" in judge or "not mislabeled as a failed control" in judge
+    assert "not a statement of any competition's judging rules" in judge

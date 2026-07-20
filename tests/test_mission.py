@@ -11,6 +11,7 @@ import pytest
 
 from evidenceops.baselines import (
     APPROVAL_RECORD,
+    BASELINE_RULE_TITLES,
     BASELINE_RULES,
     DEMO_RULE_MAPPINGS,
     EXTRACTED_INVENTORY_SHA256,
@@ -63,6 +64,9 @@ def test_pinned_mscp_inventory_and_approval_are_complete() -> None:
     verify_approved_baseline()
     rules = [rule for _, section_rules in BASELINE_RULES for rule in section_rules]
     assert len(rules) == len(set(rules)) == 98
+    assert set(BASELINE_RULE_TITLES) == set(rules)
+    assert BASELINE_RULE_TITLES["system_settings_filevault_enforce"] == "Enforce FileVault"
+    assert BASELINE_RULE_TITLES["audit_auditd_enabled"] == "Enable Security Auditing"
     assert set(DEMO_RULE_MAPPINGS).issubset(rules)
     assert EXTRACTED_INVENTORY_SHA256 == (
         "5cced0709c90885ede600f00a640a35b0679aed933cda456db80ee629ee54d41"
@@ -125,6 +129,24 @@ def test_mission_fixture_is_deterministic_private_safe_and_complete() -> None:
     requirements = cast(list[dict[str, JsonValue]], first["requirements"])
     assert len(requirements) == 98
     assert sum(item["evaluation_included"] is True for item in requirements) == 4
+    assert sum(item["mapping_review_status"] == "reviewed" for item in requirements) == 4
+    assert (
+        sum(
+            item["mapping_review_status"] == "not reviewed" and item["setting_key"] != "not mapped"
+            for item in requirements
+        )
+        == 1
+    )
+    assert (
+        sum(
+            item["mapping_review_status"] == "not reviewed" and item["setting_key"] == "not mapped"
+            for item in requirements
+        )
+        == 93
+    )
+    assert all(
+        item["title"] == BASELINE_RULE_TITLES[cast(str, item["rule_id"])] for item in requirements
+    )
     assert cast(dict[str, JsonValue], first["metrics"])["alignment_denominator"] == 4
     assert cast(dict[str, JsonValue], first["devices"])["by_platform"] == {
         "iOS": 1,
@@ -136,6 +158,7 @@ def test_mission_fixture_is_deterministic_private_safe_and_complete() -> None:
         DriftOutcome.ASSIGNMENT_DRIFT.value,
         DriftOutcome.CONFLICTING.value,
     }
+    assert len(cast(list[dict[str, JsonValue]], first["findings"])) == 3
     serialized = json.dumps(first)
     for private_marker in (
         "synthetic-device-mac",

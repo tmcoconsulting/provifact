@@ -403,7 +403,7 @@ sanitized collection—not tenant display names or AI inference—the authority.
 for the reviewed macOS provider definition IDs. The pinned mSCP revision remains the desired-state
 and framework cross-reference source.
 
-## 2026-07-20 — Run live Copilot only in production and never fall back to fixtures
+## 2026-07-20 — Run live Assistant only in production and never fall back to fixtures
 
 **Decision:** Keep local and preview deployments in deterministic fixture mode. Configure production
 for exactly `gpt-5.6-terra` and require its encrypted Worker secret. Accept only a question, closed
@@ -474,3 +474,37 @@ the Entra federated credential subject bound to the GitHub repository, detach de
 encrypted Worker secrets, invalidate stable fingerprints/schema contracts, and complicate rollback.
 Brand presentation can change immediately while infrastructure identifiers migrate through a
 separately reviewed cutover.
+
+## 2026-07-20 — Treat the complete Level 1 inventory as an implementation plan
+
+**Decision:** Show all 98 internally approved Level 1 rules by default, using human-readable titles
+from the already-pinned NIST mSCP revision. Keep the four exact reviewed Intune joins as the only
+deterministic alignment denominator. Classify the other 94 rules as either exact provider-mapping
+review or management/evidence-path planning, grouped by baseline section. Do not generate drift
+findings, failed-control language, or framework verdicts for unevaluated rules.
+
+**Why:** The prior interface technically carried all 98 rules but hid 94 behind a checked filter and
+rendered only evaluated rows in Mission Control. That made a complete approved inventory look like
+a four-rule baseline. A visible implementation backlog helps teams onboarding Macs plan Settings
+Catalog, custom-profile, script/agent, and alternate-evidence work without weakening the exact-ID
+join or pretending uncollected evidence proves noncompliance.
+
+**Source:** The title catalog was checked against the repository's pinned revision of the
+[NIST macOS Security Compliance Project](https://github.com/usnistgov/macos_security). Dotted
+product-like tokens in two titles are expanded to ordinary words so the public fail-closed domain
+scanner remains unchanged.
+
+## 2026-07-20 — Use an original Provifact mark and Provifact Assistant name
+
+**Decision:** Replace the temporary letter tile with an original project-local Provifact vector
+mark. Name the bounded evidence explainer **Provifact Assistant**, not “Copilot,” throughout the
+public interface, documentation, browser state, and code-facing UI hooks.
+
+**Why:** Provifact needs a recognizable identity at navigation, favicon, dashboard, and small-icon
+sizes. Microsoft permits truthful wordmark references to its products, but its current trademark
+guidance says third-party app names and brand assets must remain unique and must not use Microsoft's
+brand assets in a product or service name without permission. Provifact Assistant is also more
+specific: it explains sanitized deterministic evidence and is not a general-purpose coding or
+productivity copilot.
+
+**Source:** [Microsoft Trademark and Brand Guidelines](https://www.microsoft.com/en-us/legal/intellectualproperty/trademarks).

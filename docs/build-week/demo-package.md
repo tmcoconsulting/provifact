@@ -12,19 +12,21 @@ evidence chain.” Point out the `LIVE SANITIZED TENANT DATA` badge and explain 
 never crossed the publication boundary.
 
 **0:20–0:45 — approved baseline.** Show the 98-rule pinned macOS CIS Level 1 demo inventory, its
-mSCP revision and hashes, and the four-rule alignment denominator. Explain that the internal TMCO Consulting
-approval is for technical drift detection—not CIS certification.
+mSCP revision and hashes, the four-rule alignment denominator, and the visible 94-rule
+implementation backlog. Explain that the internal TMCO Consulting approval is for technical drift
+detection—not CIS certification.
 
 **0:45–1:20 — deterministic drift.** Open the highest-priority genuine live finding; do not
 predetermine its setting or state. Show expected/observed values, assignment summary, exact provider
 definition, source evidence IDs, fingerprints, framework cross-references, limitations, and
 read-only guidance.
 
-**1:20–1:45 — complete evidence, honest gaps.** Show the Mac/iPhone/iPad aggregate, application
-health, resources not currently evaluated, and collection gaps. Explain that iOS/iPadOS is visible but not scored
-against a macOS baseline and that unavailable evidence remains visible.
+**1:20–1:45 — complete evidence, honest gaps.** Show the full implementation plan, Mac/iPhone/iPad
+aggregate, resources not currently evaluated, and collection gaps. Explain that planning work is
+not a failed control, iOS/iPadOS is visible but not scored against a macOS baseline, and unavailable
+evidence remains visible.
 
-**1:45–2:20 — constrained GPT-5.6.** Open the site-wide Provifact Copilot and ask “What requires my
+**1:45–2:20 — constrained GPT-5.6.** Open the site-wide Provifact Assistant and ask “What requires my
 attention?” Show cited evidence, typed-claim verification, prose quarantine, and human-review
 language. Production uses fixed `gpt-5.6-terra`; local/preview fixture mode must be labeled as no
 model call.
@@ -42,18 +44,19 @@ audit.”
 1. Open `https://evidenceops.tmcoconsulting.com/evidence-dashboard/`.
 2. Confirm the data-mode badge says `LIVE SANITIZED TENANT DATA`, the assistant says OpenAI mode,
    and the banner does not indicate stale or invalid evidence.
-3. Point to Findings requiring review, New drift, Resolved, Collection gaps, and Evaluated settings.
+3. Point to Approved Level 1 rules, Exact Intune joins, Deterministic drift, Implementation backlog,
+   and Collection gaps.
 4. Read the denominator explanation immediately below the cards.
 5. Under Findings requiring review, choose `high` in Severity.
 6. Open one row with keyboard Enter or mouse click; close the dialog after showing its traceability
    chain.
 7. Open Changes and show the truthful current/prior result.
-8. Scroll to Managed Apple posture and Coverage and blind spots; show aggregate posture,
-   collection coverage, and resources not currently evaluated.
+8. Switch Baseline posture between the full plan and evaluated-only lens. Scroll to the grouped
+   implementation backlog, Managed Apple aggregate, and collection/parser blind spots.
 9. Show Framework cross-references and read its non-certification warning.
 10. Show Collection health, including endpoint API versions, the beta Settings Catalog label, and the
     collection gap.
-11. Open Provifact Copilot, choose What requires my attention?, and inspect the evidence links and
+11. Open Provifact Assistant, choose What requires my attention?, and inspect the evidence links and
     verifier state.
 12. Ask the unsupported question from the backup card below and show insufficient evidence only if
     time permits.

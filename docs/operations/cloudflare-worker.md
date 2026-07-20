@@ -3,7 +3,7 @@
 ## Current state
 
 The production configuration at `https://evidenceops.tmcoconsulting.com/` requires a reviewed live
-sanitized Mission package and fixed `gpt-5.6-terra` Provifact Copilot. The credential-free preview
+sanitized Mission package and fixed `gpt-5.6-terra` Provifact Assistant. The credential-free preview
 configuration remains explicit fixture mode. The custom domain/TLS, Static Assets, dual native rate
 limiters, and encrypted `OPENAI_API_KEY` binding are active.
 

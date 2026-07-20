@@ -1085,7 +1085,7 @@ function fixtureDirectAnswer(context: AssistantContext): string {
   }
   if (context.intent === "evidence" && isRecord(context.facts)) {
     if (typeof context.facts.evidence_missing === "string") {
-      return `${context.facts.evidence_missing} Open a finding or setting detail and choose Ask Provifact Copilot.`;
+      return `${context.facts.evidence_missing} Open a finding or setting detail and choose Ask Provifact Assistant.`;
     }
     return `The selected evidence chain is: ${summarizeFindingFacts([context.facts])} Open the linked finding or requirement for identifiers and fingerprints.`;
   }

@@ -95,7 +95,7 @@
   cursor: pointer;
 }
 
-.evidence-copilot-launcher {
+.provifact-assistant-launcher {
   position: fixed;
   right: max(1rem, env(safe-area-inset-right));
   bottom: max(1rem, env(safe-area-inset-bottom));
@@ -112,7 +112,7 @@
   cursor: pointer;
 }
 
-.evidence-copilot {
+.provifact-assistant {
   width: min(31rem, calc(100vw - 1.5rem));
   height: min(46rem, calc(100dvh - 1.5rem));
   max-width: none;
@@ -127,17 +127,17 @@
   box-shadow: 0 1rem 3rem rgb(6 21 44 / 28%);
 }
 
-.evidence-copilot[open] {
+.provifact-assistant[open] {
   display: grid;
   grid-template-rows: auto auto minmax(8rem, 1fr) auto auto auto;
 }
 
-.evidence-copilot::backdrop {
+.provifact-assistant::backdrop {
   background: rgb(6 18 36 / 42%);
   backdrop-filter: blur(0.08rem);
 }
 
-.evidence-copilot-header {
+.provifact-assistant-header {
   display: flex;
   gap: 0.75rem;
   align-items: flex-start;
@@ -147,20 +147,20 @@
   background: linear-gradient(120deg, #172a57, #234fbd 62%, #007e99);
 }
 
-.evidence-copilot-eyebrow {
+.provifact-assistant-eyebrow {
   font-size: 0.58rem;
   font-weight: 800;
   letter-spacing: 0.075em;
   text-transform: uppercase;
 }
 
-.evidence-copilot-header h2 {
+.provifact-assistant-header h2 {
   margin: 0.12rem 0 0;
   color: inherit;
   font-size: 1.15rem;
 }
 
-.evidence-copilot-runtime {
+.provifact-assistant-runtime {
   max-width: 36rem;
   margin: 0.3rem 0 0;
   color: rgb(255 255 255 / 82%);
@@ -168,10 +168,10 @@
   line-height: 1.35;
 }
 
-.evidence-copilot-close,
-.evidence-copilot-selected button,
-.evidence-copilot-suggestions button,
-.evidence-copilot-form button {
+.provifact-assistant-close,
+.provifact-assistant-selected button,
+.provifact-assistant-suggestions button,
+.provifact-assistant-form button {
   border: 1px solid var(--md-default-fg-color--lightest);
   border-radius: 0.45rem;
   background: var(--md-code-bg-color);
@@ -180,7 +180,7 @@
   cursor: pointer;
 }
 
-.evidence-copilot-close {
+.provifact-assistant-close {
   border-color: rgb(255 255 255 / 38%);
   color: #fff;
   background: rgb(255 255 255 / 12%);
@@ -188,7 +188,7 @@
   font-size: 0.65rem;
 }
 
-.evidence-copilot-selected {
+.provifact-assistant-selected {
   display: flex;
   gap: 0.55rem;
   align-items: center;
@@ -200,23 +200,23 @@
   font-size: 0.62rem;
 }
 
-.evidence-copilot-selected[hidden] {
+.provifact-assistant-selected[hidden] {
   display: none;
 }
 
-.evidence-copilot-selected button {
+.provifact-assistant-selected button {
   padding: 0.3rem 0.42rem;
   font-family: inherit;
   font-size: 0.58rem;
 }
 
-.evidence-copilot-transcript {
+.provifact-assistant-transcript {
   min-height: 0;
   overflow-y: auto;
   padding: 0.8rem;
 }
 
-.evidence-copilot-message {
+.provifact-assistant-message {
   max-width: 92%;
   margin: 0 0 0.7rem;
   padding: 0.65rem 0.75rem;
@@ -226,25 +226,25 @@
   font-size: 0.72rem;
 }
 
-.evidence-copilot-user {
+.provifact-assistant-user {
   margin-left: auto;
   color: #fff;
   border-color: #2358d7;
   background: #2358d7;
 }
 
-.evidence-copilot-message p {
+.provifact-assistant-message p {
   margin: 0.25rem 0 0;
 }
 
-.evidence-copilot-links {
+.provifact-assistant-links {
   display: flex;
   flex-wrap: wrap;
   gap: 0.3rem;
   margin-top: 0.45rem;
 }
 
-.evidence-copilot-links a {
+.provifact-assistant-links a {
   padding: 0.18rem 0.36rem;
   border-radius: 0.3rem;
   background: var(--md-default-bg-color);
@@ -252,7 +252,7 @@
   font-size: 0.56rem;
 }
 
-.evidence-copilot-suggestions {
+.provifact-assistant-suggestions {
   display: flex;
   gap: 0.35rem;
   overflow-x: auto;
@@ -260,7 +260,7 @@
   border-top: 1px solid var(--md-default-fg-color--lightest);
 }
 
-.evidence-copilot-suggestions button {
+.provifact-assistant-suggestions button {
   flex: 0 0 auto;
   max-width: 13rem;
   padding: 0.38rem 0.5rem;
@@ -268,7 +268,7 @@
   text-align: left;
 }
 
-.evidence-copilot-form {
+.provifact-assistant-form {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
   gap: 0.45rem;
@@ -276,14 +276,14 @@
   border-top: 1px solid var(--md-default-fg-color--lightest);
 }
 
-.evidence-copilot-form label {
+.provifact-assistant-form label {
   display: grid;
   gap: 0.2rem;
   font-size: 0.62rem;
   font-weight: 700;
 }
 
-.evidence-copilot-form textarea {
+.provifact-assistant-form textarea {
   width: 100%;
   min-height: 3rem;
   resize: vertical;
@@ -296,7 +296,7 @@
   font-size: 0.7rem;
 }
 
-.evidence-copilot-form button {
+.provifact-assistant-form button {
   align-self: end;
   min-height: 3rem;
   padding: 0.45rem 0.65rem;
@@ -307,12 +307,12 @@
   font-weight: 800;
 }
 
-.evidence-copilot-form button:disabled {
+.provifact-assistant-form button:disabled {
   cursor: not-allowed;
   opacity: 0.5;
 }
 
-.evidence-copilot-form-status {
+.provifact-assistant-form-status {
   grid-column: 1 / -1;
   min-height: 1rem;
   margin: 0;
@@ -320,7 +320,7 @@
   font-size: 0.6rem;
 }
 
-.evidence-copilot-boundary {
+.provifact-assistant-boundary {
   margin: 0;
   padding: 0.45rem 0.8rem 0.7rem;
   color: var(--md-default-fg-color--light);
@@ -344,7 +344,7 @@
 }
 
 @media (max-width: 35rem) {
-  .evidence-copilot {
+  .provifact-assistant {
     inset: 0;
     width: 100vw;
     height: 100dvh;
@@ -352,18 +352,18 @@
     border-radius: 0;
   }
 
-  .evidence-copilot-form {
+  .provifact-assistant-form {
     grid-template-columns: 1fr;
   }
 
-  .evidence-copilot-form-status {
+  .provifact-assistant-form-status {
     grid-column: 1;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .evidence-copilot,
-  .evidence-copilot-launcher {
+  .provifact-assistant,
+  .provifact-assistant-launcher {
     scroll-behavior: auto;
   }
 }

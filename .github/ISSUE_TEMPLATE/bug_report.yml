@@ -1,5 +1,5 @@
 name: Bug report
-description: Report a reproducible EvidenceOps defect using synthetic data only.
+description: Report a reproducible Provifact defect using synthetic data only.
 title: "[Bug]: "
 labels: [bug]
 body:
@@ -25,7 +25,7 @@ body:
   - type: input
     id: revision
     attributes:
-      label: EvidenceOps revision
+      label: Provifact revision
       description: Commit hash or release tag.
     validations:
       required: true

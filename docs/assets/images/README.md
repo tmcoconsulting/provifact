@@ -11,3 +11,8 @@ The checked-in TMCO Consulting assets were downloaded from the company’s publi
 The favicon’s accessible label is expanded to “TMCO Consulting”; its vector artwork is otherwise
 unchanged. These brand assets identify TMCO Consulting, LLC. The Apache-2.0 license for Provifact
 source code does not grant rights to use TMCO Consulting names or marks outside this project.
+
+`provifact-mark.svg` is an original, project-local vector mark created for Provifact on 2026-07-20.
+Its linked evidence path, proof glyph, and verified check express the product flow from approved
+intent to traceable evidence. It contains no Microsoft, CIS, NIST, Apple, or third-party brand
+asset.
