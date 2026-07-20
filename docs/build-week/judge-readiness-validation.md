@@ -2,9 +2,9 @@
 
 **Date:** 2026-07-20
 
-**Protected-main merge:** `48a67aea60e5759f54ed5aee1396f68274b57f3b`
+**Protected-main merge:** `9dae1363c0019022062c844a3725e0b537de658c`
 
-**Validated product commit:** `cde773cdd0f3820a46cd59205e8b883706f0ae58`
+**Validated product commit:** `2ca6073`
 
 **Human review:** required
 
@@ -16,10 +16,19 @@ operational design, original Provifact mark, Provifact Assistant naming, protect
 Cloudflare deployment, and judge path. It supersedes mutable counts in earlier checkpoint reports
 without deleting their audit history.
 
+The public cutover uses repository `tmcoconsulting/provifact` and custom domain
+`provifact.tmcoconsulting.com`. Legacy Worker, OpenAI project/key, namespace, schema, environment,
+and artifact names remain compatibility identifiers; this is intentional, not incomplete branding.
+
 ## Product evidence
 
 - The approved inventory contains exactly 98 unique CIS Level 1 rule IDs from pinned NIST mSCP
   revision `11b5896e4f12f43410686024f543792742562c91`.
+- Sixteen additional pinned public technical profiles are available for exact rule-ID membership
+  comparison. They are planning references, never compliance scores or assessor conclusions.
+- The one pinned upstream Safari rule-ID punctuation variance is explicitly canonicalized. Browser
+  loading now fails closed unless the approved catalog and Mission requirement sets are exactly
+  equal; the CIS Level 1 table renders 98 rows rather than a false 99th reference-only row.
 - All 98 rules have checked human-readable titles and are visible by default.
 - Four rules have reviewed exact Intune provider joins and enter the deterministic denominator.
 - One desired setting requires exact provider-mapping review; 93 rules require an approved
@@ -47,10 +56,10 @@ python -m ruff check .
   PASS
 
 python -m mypy
-  PASS — no issues in 63 source files
+  PASS — no issues in 65 source files
 
 python -m pytest
-  PASS — 238 passed, 1 skipped, 90.03% branch coverage
+  PASS — 245 passed, 1 skipped, 90.03% branch coverage
 
 python -m bandit -r evidenceops scripts -c pyproject.toml
   PASS — no findings
@@ -71,11 +80,11 @@ npm audit --audit-level=moderate
   PASS — 0 vulnerabilities
 
 npm run validate:worker
-  PASS — Prettier, Oxlint, strict TypeScript, 56 Worker tests, generated bindings,
+  PASS — Prettier, Oxlint, strict TypeScript, 57 Worker tests, generated bindings,
   and default/preview/production Wrangler dry-runs
 
 mkdocs build --strict
-  PASS — 135 static assets
+  PASS — strict static build; 102 generated files; public-artifact scan passed
 
 python scripts/check_public_artifacts.py site
   PASS
@@ -155,7 +164,53 @@ Independent production verification confirmed:
 - the baseline plan shows `98 of 98 baseline requirements shown` by default with its evaluated-only
   filter disabled.
 
-No new paid model request was made for this presentation and documentation change. The existing
-bounded live Terra validation remains recorded in the historical live validation evidence. Final
-human review still covers product copy, the original mark, and submission materials; it is not an
-unmet automated security or deployment gate.
+The earlier presentation-only deployment made no paid request. The later cutover proof below made
+exactly one bounded live Terra request. Final human review still covers product copy, the original
+mark, and submission materials; it is not an unmet automated security or deployment gate.
+
+## Provifact repository and production cutover proof
+
+The repository was renamed to `tmcoconsulting/provifact` without changing its immutable repository
+ID. GitHub's default immutable-subject template produces the production-environment subject for the
+renamed repository. Entra credential `github-provifact-production` matches that subject, issuer
+`https://token.actions.githubusercontent.com`, and audience `api://AzureADTokenExchange`.
+
+Protected-main audit
+[`29780265224`](https://github.com/tmcoconsulting/provifact/actions/runs/29780265224)
+completed the new OIDC exchange, GET-only collection, publication-policy application, public scan,
+artifact upload, and unconditional ephemeral cleanup. Only after that proof was the obsolete
+repository-name federated credential removed. The app has zero client secrets. Four application
+permissions are present, all read-only and admin-consented:
+
+- `DeviceManagementApps.Read.All`;
+- `DeviceManagementConfiguration.Read.All`;
+- `DeviceManagementManagedDevices.Read.All`; and
+- `DeviceManagementServiceConfig.Read.All`.
+
+The app also retains pre-existing delegated read permissions. They are not used by the production
+federated workflow and were not silently removed during this cutover.
+
+The independently rescanned public package reported snapshot
+`mission-c62d533f8d58f76cef9afb1a`, 98 approved requirements, 13 evaluated policies, one aligned
+requirement, three deterministic missing findings, three collection gaps, and 82 deliberately
+unmapped objects. No raw response, policy name, assignment name, object ID, user, device, or tenant
+identifier entered this record.
+
+Cloudflare custom domain `provifact.tmcoconsulting.com` was attached without deleting the old
+rollback hostname. Protected deployment
+[`29780852414`](https://github.com/tmcoconsulting/provifact/actions/runs/29780852414)
+selected only the audit artifact and exact snapshot above, reran the complete public gate, deployed
+the merged `9dae1363c0019022062c844a3725e0b537de658c` source, and verified the active version through
+Cloudflare's authenticated control plane. The environment variable was then independently verified
+as `CLOUDFLARE_DEPLOY_ENABLED=false`.
+
+Independent HTTPS checks proved the new hostname, TLS, root, health/readiness/status endpoints,
+dashboard, profile catalog, and social image. The response includes HSTS, CSP, frame denial,
+no-sniff, referrer, permissions, cross-origin opener, and cross-origin resource policy. The status
+endpoint reports fixed `gpt-5.6-terra`, OpenAI mode, no Intune writes, and no browser BYOK.
+
+One bounded live production question was submitted after deployment. The structured Terra response
+parsed, exact finding coverage and evidence references passed, typed claims matched deterministic
+evidence, generated prose remained quarantined, and the UI retained human-review language. The
+question, evidence input, prose, authorization data, and model output were not retained in this
+repository record and no second paid request was made.

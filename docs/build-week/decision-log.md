@@ -552,3 +552,28 @@ the prior subject.
 provenance, and federation trust must not be broken or silently broadened during a cosmetic rename.
 The prior hostname remains a rollback surface until the new custom domain, TLS, protected audit, and
 deployment are independently verified.
+
+**Verified outcome:** The repository was renamed without changing its immutable repository ID. The
+new environment-scoped Entra credential completed protected-main audit run `29780265224`; only then
+was the old repository-name credential deleted. Cloudflare attached the new custom domain without
+replacing the old rollback hostname, and protected deployment `29780852414` published only the
+exact scanned snapshot selected from that audit. The deployment window was restored to disabled.
+
+## 2026-07-20 — Canonicalize the one pinned upstream rule-ID variance
+
+**Decision:** Map the pinned upstream identifier
+`os_safari_prevent_cross-site_tracking_enable` only through the explicit catalog alias implemented
+in `2ca6073`, and require exact set equality between all Mission requirement rule IDs and the
+approved catalog profile before rendering a comparison.
+
+**Why:** The upstream profile's actual identifier uses a hyphen in `cross-site`, while Provifact's
+reviewed normalized baseline uses an underscore. Count-only validation let the comparison table
+render a false 99th reference-only row even though the overlap summary was correct. A narrow alias
+plus fail-closed set validation fixes the known source variance without broadly rewriting future
+identifiers or merging unrelated rules.
+
+The browser initially rejected an already-open page after deployment because its prior
+`force-cache` response contained the old catalog. The catalog URL is now version-bound to the
+expected fingerprint, and validation requires both that expected fingerprint and a recomputed
+canonical hash. New code therefore selects its matching immutable cache key while altered or stale
+catalog content continues to fail closed.

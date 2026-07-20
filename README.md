@@ -131,9 +131,10 @@ The public product is **Provifact™ by TMCO Consulting**. Phase 1 retains the e
 `evidenceops` Python import, `evidenceops` console command, schema/algorithm identifiers,
 `EVIDENCEOPS_*` environment variables, Worker resource name, OpenAI project/key labels, and artifact
 prefixes as compatibility identifiers. New operator documentation uses the `provifact` command.
-The public repository and hostname are migrating to `tmcoconsulting/provifact` and
-`provifact.tmcoconsulting.com` through a federation-safe cutover; the Worker name keeps its encrypted
-secrets and deployment history.
+The public repository and hostname are `tmcoconsulting/provifact` and
+`provifact.tmcoconsulting.com`. The cutover was proven through the renamed immutable GitHub OIDC
+subject before the old repository-name trust was retired. The internal Worker name keeps its
+encrypted secrets and deployment history.
 
 Copyright 2026 TMCO Consulting, LLC. Provifact™ is a trademark of TMCO Consulting, LLC. The
 software is licensed under the

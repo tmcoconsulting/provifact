@@ -100,6 +100,8 @@ or proprietary material from `intune-apple-gitops` or any other repository.
 | 2026-07-20 | Consolidated rebrand and live-readiness pull requests | `f3db2c7a38750d8b31938ec43c816cb435492e7d` |
 | 2026-07-20 | Full 98-rule implementation plan, cohesive docs shell, and judge path | `cde773cdd0f3820a46cd59205e8b883706f0ae58` |
 | 2026-07-20 | Judge-ready product experience squash merge through PR #16 | `48a67aea60e5759f54ed5aee1396f68274b57f3b` |
+| 2026-07-20 | Provifact Assistant, profile catalog, social metadata, and public cutover preparation | `9dae1363c0019022062c844a3725e0b537de658c` |
+| 2026-07-20 | Exact upstream rule-ID canonicalization and catalog/Mission set guard | `2ca6073` |
 
 Exact Phase 1 commands, results, limitations, and commit hashes are maintained in the
 [Phase 1 validation record](phase-1-validation.md).
@@ -173,3 +175,12 @@ TJ then authorized one further protected-main audit retry. Run `29703823180` pas
 collection, sanitization, scanning, and cleanup with artifact retention disabled. The earlier
 documentation-only final report is retained as a dated checkpoint; the current Mission
 package, roadmap, judge guide, and latest validation record supersede its mutable runtime counts.
+
+After the public repository rename, protected-main audit `29780265224` proved the new immutable
+`github-provifact-production` trust, completed GET-only collection, published only the scanned
+sanitized package, and removed ephemeral evidence. The old repository-name federated credential
+was deleted after this proof. Deployment `29780852414` validated and promoted exact snapshot
+`mission-c62d533f8d58f76cef9afb1a` to the new Cloudflare custom domain; the old hostname was retained
+as rollback and the deployment gate returned to `false`. A single bounded production Terra answer
+passed typed-claim/reference verification while its prose remained quarantined and was not stored
+in the repository.
