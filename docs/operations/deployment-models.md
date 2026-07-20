@@ -1,6 +1,6 @@
 # Deployment Models
 
-EvidenceOps currently combines a Python evidence engine, a credential-free synthetic build, a
+Provifact currently combines a Python evidence engine, a credential-free synthetic build, a
 protected read-only collection workflow, and a deployed Cloudflare Worker plus Static Assets
 runtime. The deployed evidence package is a reviewed sanitized live projection; the public
 assistant uses fixed-model OpenAI mode while local and preview builds remain fixture mode.
@@ -38,7 +38,7 @@ The same-origin API contract is:
 
 The current Worker/Static Assets stack is appropriate for the read-mostly Phase 1 application. A
 frontend migration by itself would not add missing policy-to-control semantics. A dedicated SPA and
-D1-backed API become justified when EvidenceOps introduces authenticated private policy names,
+D1-backed API become justified when Provifact introduces authenticated private policy names,
 long-term history, approvals, exceptions, multi-tenancy, or server-side matrix queries.
 
 ## 3. Protected private collection and sanitized publication

@@ -4,19 +4,19 @@ hide:
   - toc
 ---
 
-<h1 class="mission-visually-hidden">EvidenceOps Mission Control</h1>
+<h1 class="mission-visually-hidden">Provifact™ Mission Control</h1>
 
 <div class="mission-shell" data-mission-control aria-busy="true">
   <header class="mission-commandbar">
-    <a class="mission-brand" href="../" aria-label="EvidenceOps home">
-      <span class="mission-brand-mark">EO</span>
-      <span><strong>EvidenceOps</strong><small>Endpoint assurance</small></span>
+    <a class="mission-brand" href="../" aria-label="Provifact home">
+      <span class="mission-brand-mark">PV</span>
+      <span><strong>Provifact™</strong><small>by TMCO Consulting</small></span>
     </a>
     <div class="mission-command-status">
       <span class="mission-readonly">READ-ONLY</span>
-      <span>Git desired state</span><i aria-hidden="true"></i>
+      <span>Approved change</span><i aria-hidden="true"></i>
       <span>Graph evidence</span><i aria-hidden="true"></i>
-      <span>Deterministic findings</span>
+      <span>Audit-ready proof</span>
     </div>
     <div class="mission-command-actions">
       <a href="../settings-matrix/">Baseline matrix</a>
@@ -198,7 +198,7 @@ hide:
 
       <details class="mission-methodology">
         <summary>Authority boundary and methodology</summary>
-        <p>Git revert changes reviewed desired-state history; it does not revert Intune. EvidenceOps has no Intune write capability. Technical configuration may support an assessment objective but cannot establish organizational compliance. Human assessors retain final judgment.</p>
+        <p>Git revert changes reviewed desired-state history; it does not revert Intune. Provifact has no Intune write capability. Technical configuration may support an assessment objective but cannot establish organizational compliance. Human assessors retain final judgment.</p>
         <p><a href="../audit-methodology/">Deterministic audit methodology</a> · <a href="../data-handling/">Data handling</a> · <a href="../settings-matrix/">Complete baseline inventory</a></p>
       </details>
     </div>

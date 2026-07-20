@@ -7,8 +7,12 @@ from typing import cast
 
 import pytest
 
-from evidenceops.domain import JsonValue
-from evidenceops.evidence import load_public_mission_snapshot, validate_public_mission_snapshot
+from evidenceops.domain import JsonValue, fingerprint
+from evidenceops.evidence import (
+    MAX_PUBLIC_MISSION_BYTES,
+    load_public_mission_snapshot,
+    validate_public_mission_snapshot,
+)
 from evidenceops.evidence.mission import build_public_mission_snapshot
 from evidenceops.mission_demo import MISSION_PSEUDONYM_KEY, _collection, build_mission_demo
 from scripts.promote_live_mission import promote_live_mission
@@ -29,7 +33,7 @@ def _status(mission: dict[str, JsonValue]) -> dict[str, JsonValue]:
     collection = cast(dict[str, JsonValue], mission["collection"])
     return {
         "schema_version": "1.0.0",
-        "service": "EvidenceOps narrative boundary",
+        "service": "Provifact narrative boundary",
         "status": "ok",
         "narrative_mode": "fixture",
         "model": "gpt-5.6-terra",
@@ -47,11 +51,27 @@ def _status(mission: dict[str, JsonValue]) -> dict[str, JsonValue]:
     }
 
 
+def _resign_mission(mission: dict[str, JsonValue]) -> None:
+    unsigned = {
+        key: value
+        for key, value in mission.items()
+        if key not in {"snapshot_id", "content_fingerprint"}
+    }
+    digest = fingerprint(cast(JsonValue, unsigned))
+    mission["content_fingerprint"] = digest
+    mission["snapshot_id"] = f"mission-{digest[7:31]}"
+
+
 def test_live_mission_promotion_revalidates_and_writes_atomically(tmp_path: Path) -> None:
     mission = _live_mission()
+    baseline = cast(dict[str, JsonValue], mission["baseline"])
+    limitations = cast(list[JsonValue], baseline["limitations"])
+    limitations[0] = cast(str, limitations[0]) + " " + "A" * (160 * 1024)
+    _resign_mission(mission)
     source = tmp_path / "mission-control.json"
     destination = tmp_path / "published" / "mission-control.json"
     source.write_text(json.dumps(mission), encoding="utf-8")
+    assert 256 * 1024 < source.stat().st_size <= MAX_PUBLIC_MISSION_BYTES
 
     promote_live_mission(source, destination)
 
@@ -85,8 +105,8 @@ def test_live_mission_promotion_rejects_symlinks_and_oversized_inputs(tmp_path: 
         promote_live_mission(source_link, tmp_path / "out.json")
 
     oversized = tmp_path / "oversized.json"
-    oversized.write_bytes(b"{" + b" " * 2_000_000 + b"}")
-    with pytest.raises(ValueError, match="package limit"):
+    oversized.write_bytes(b"{" + b" " * MAX_PUBLIC_MISSION_BYTES + b"}")
+    with pytest.raises(ValueError, match="public Mission limit"):
         promote_live_mission(oversized, tmp_path / "out.json")
 
 
@@ -113,6 +133,11 @@ def test_previous_public_loader_rejects_private_synthetic_and_linked_inputs(
     link.symlink_to(live)
     with pytest.raises(ValueError, match="regular file"):
         load_public_mission_snapshot(link, require_live=True)
+
+    oversized = tmp_path / "oversized.json"
+    oversized.write_bytes(b"{" + b" " * MAX_PUBLIC_MISSION_BYTES + b"}")
+    with pytest.raises(ValueError, match="package limit"):
+        load_public_mission_snapshot(oversized, require_live=True)
 
 
 @pytest.mark.parametrize(

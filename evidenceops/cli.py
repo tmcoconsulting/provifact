@@ -84,7 +84,7 @@ APPLE_DELEGATED_SCOPES: Final = tuple(
 
 def build_parser() -> argparse.ArgumentParser:
     """Create the complete, intentionally small command surface."""
-    parser = argparse.ArgumentParser(prog="evidenceops")
+    parser = argparse.ArgumentParser(prog="provifact")
     subparsers = parser.add_subparsers(dest="command", required=True)
 
     demo = subparsers.add_parser("run-demo", help="run the credential-free synthetic flow")

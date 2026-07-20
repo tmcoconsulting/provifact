@@ -3,12 +3,12 @@
 <div class="synthetic-banner">
 DECLARED DATA MODE. Mission Control and <code>/api/status</code> are authoritative for the deployed
 package. Production currently serves a reviewed, fail-closed sanitized projection from read-only
-Microsoft Graph collection. Production Evidence Copilot uses fixed `gpt-5.6-terra`; local and
+Microsoft Graph collection. Production Provifact Copilot uses fixed `gpt-5.6-terra`; local and
 preview builds remain fixture mode and make no OpenAI request.
 The repository checkout and reproduction path below remain entirely synthetic.
 </div>
 
-The primary Build Week demonstration is the dynamic [EvidenceOps Mission Control](evidence-dashboard.md).
+The primary Build Week demonstration is the dynamic [Provifact Mission Control](evidence-dashboard.md).
 It renders entirely from the validated
 [Mission package](assets/data/mission-control.json), so dashboard metrics, findings, history,
 platform posture, gaps, and assistant references have one deterministic source.
@@ -68,9 +68,9 @@ that package.
 ## Reproduce it
 
 ```bash
-python -m evidenceops run-mission-demo --output-dir build/mission-demo
+python -m provifact run-mission-demo --output-dir build/mission-demo
 python scripts/check_public_artifacts.py build/mission-demo
-python -m evidenceops rebuild-static-demo
+python -m provifact rebuild-static-demo
 mkdocs build --strict
 python scripts/check_public_artifacts.py site
 ```

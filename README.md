@@ -1,17 +1,19 @@
-# EvidenceOps
+# Provifact™ by TMCO Consulting
+
+**From approved change to audit-ready proof.**
 
 [![CI](https://github.com/tmcoconsulting/evidenceops/actions/workflows/ci.yml/badge.svg)](https://github.com/tmcoconsulting/evidenceops/actions/workflows/ci.yml)
 [![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE)
 
-EvidenceOps is a continuous audit-evidence and configuration-lifecycle platform for regulated
-endpoint-management teams. Every reviewed configuration change should produce traceable evidence;
-teams should not have to reconstruct months of intent, observation, and approval history before an
-audit.
+Provifact™ is a continuous audit-evidence and configuration-lifecycle platform from TMCO Consulting
+for regulated endpoint-management teams. Every reviewed configuration change should produce
+traceable evidence; teams should not have to reconstruct months of intent, observation, and
+approval history before an audit.
 
 The Build Week Phase 1 vertical slice connects a Git-approved macOS baseline to Microsoft Intune
 through Microsoft Graph GET requests, normalizes only the evidence needed for deterministic drift,
 publishes a fail-closed sanitized package, and serves an operational dashboard with a constrained
-GPT-5.6 Evidence Copilot. The live application is
+GPT-5.6 Provifact Copilot. The current live application remains at the legacy transition hostname
 [evidenceops.tmcoconsulting.com](https://evidenceops.tmcoconsulting.com/).
 
 The verified production record is in
@@ -35,7 +37,7 @@ was performed.
 - Production deployment accepts only a reviewed sanitized artifact from a successful protected-main
   live audit and verifies its exact snapshot before and after deployment. Synthetic data has no
   production fallback path.
-- Evidence Copilot uses fixed `gpt-5.6-terra` in production, bounded sanitized context, strict
+- Provifact Copilot uses fixed `gpt-5.6-terra` in production, bounded sanitized context, strict
   structured output, `store: false`, no tools, rate limits, and deterministic claim/reference
   verification. Generated prose remains generated analysis subject to human review.
 
@@ -52,8 +54,8 @@ source .venv/bin/activate
 python -m pip install -r requirements-dev.txt
 python -m pip install --no-build-isolation --no-deps .
 npm ci --ignore-scripts --no-audit --no-fund
-python -m evidenceops run-mission-demo --output-dir build/mission-demo
-python -m evidenceops rebuild-static-demo
+python -m provifact run-mission-demo --output-dir build/mission-demo
+python -m provifact rebuild-static-demo
 mkdocs build --strict
 npm run validate:worker
 npm run dev
@@ -109,7 +111,7 @@ all Intune write capabilities remain deferred.
 
 ## Build Week provenance
 
-Before Build Week, EvidenceOps had repository safety foundations and a small synthetic schema proof.
+Before Build Week, Provifact had repository safety foundations and a small synthetic schema proof.
 During Build Week, TJ Olnhausen made the product, security, baseline-approval, and external-system
 decisions while Codex implemented and tested the provider contracts, live collection boundary,
 versioned evidence, deterministic drift, sanitizer, Cloudflare runtime, dashboard, Copilot, and
@@ -119,6 +121,17 @@ deployment controls. GPT-5.6 is a bounded runtime explainer, not the evidence en
 See [Getting Started](docs/getting-started.md), [Architecture](docs/architecture.md),
 [Security Model](docs/security-model.md), and the [Build Week demo package](docs/build-week/demo-package.md).
 
-Copyright 2026 TMCO Consulting, LLC. EvidenceOps is licensed under the
+## Brand and compatibility identifiers
+
+The public product is **Provifact™ by TMCO Consulting**. Phase 1 retains the existing
+`evidenceops` Python import, `evidenceops` console command, schema/algorithm identifiers,
+`EVIDENCEOPS_*` environment variables, GitHub repository slug, Worker resource name, and current
+hostname as compatibility identifiers. New operator documentation uses the `provifact` command.
+These identifiers will move only through a reviewed, rollback-safe migration because the GitHub
+repository name is part of the Entra OIDC trust and the Worker name owns encrypted secrets and
+deployment history.
+
+Copyright 2026 TMCO Consulting, LLC. Provifact™ is a trademark of TMCO Consulting, LLC. The
+software is licensed under the
 [Apache License 2.0](LICENSE). The pinned baseline is derived from the NIST macOS Security Compliance
 Project under its upstream terms; see [NOTICE](NOTICE) and the recorded source hashes for attribution.

@@ -22,7 +22,7 @@ const MAX_REQUIREMENTS = 128;
 const MAX_OUTPUT_TOKENS = 700;
 const VERIFIER_VERSION = "evidenceops-assistant-verifier-v1.0.0";
 const INSUFFICIENT =
-  "EvidenceOps does not have sufficient collected evidence to answer this question.";
+  "Provifact does not have sufficient collected evidence to answer this question.";
 const VERDICT =
   /\b(?:compliant|certified|certification|control\s+(?:is\s+)?satisfied|assessment\s+(?:is\s+)?complete|risk\s+accepted|meets?\s+(?:the\s+)?(?:standard|framework|compliance))\b/i;
 const REFERENCE = /\b(?:finding|req|gap|mission)-[0-9a-f]{24}\b/g;
@@ -855,7 +855,7 @@ function findingFact(finding: MissionFinding): JsonValue {
     observed_value: finding.observed_value,
     assignment_summary: finding.assignment_summary,
     read_only_review:
-      "Review the published setting and assignment evidence in Intune; EvidenceOps cannot make the change.",
+      "Review the published setting and assignment evidence in Intune; Provifact cannot make the change.",
   };
 }
 
@@ -1000,7 +1000,7 @@ function fixtureOutput(
         `The question is outside the bounded collected-evidence intents for the ${context.page} page.`,
       ],
       additional_evidence_required: [
-        "Ask about findings requiring attention, FileVault, changes, resolved drift, collected resources not evaluated, framework cross-references, provenance, evidence links, Intune review, or EvidenceOps limitations.",
+        "Ask about findings requiring attention, FileVault, changes, resolved drift, collected resources not evaluated, framework cross-references, provenance, evidence links, Intune review, or Provifact limitations.",
         "Human review or another classified evidence source is required for other conclusions.",
       ],
       suggested_human_review_questions: [
@@ -1059,7 +1059,7 @@ function fixtureDirectAnswer(context: AssistantContext): string {
     return `${resolved.length} finding(s) resolved since the previous sanitized collection. ${summarizeFindingFacts(resolved)}`;
   }
   if (context.intent === "collection_gaps" && Array.isArray(context.facts)) {
-    return `${context.facts.length} collection gap(s) are recorded. Each remains additional evidence required; EvidenceOps does not convert an unavailable endpoint into a missing tenant setting.`;
+    return `${context.facts.length} collection gap(s) are recorded. Each remains additional evidence required; Provifact does not convert an unavailable endpoint into a missing tenant setting.`;
   }
   if (context.intent === "unevaluated" && isRecord(context.facts)) {
     const groups = Array.isArray(context.facts.groups)
@@ -1081,11 +1081,11 @@ function fixtureDirectAnswer(context: AssistantContext): string {
     return `This package is labeled ${displayFact(context.facts.data_mode)}. It was collected at ${displayFact(context.facts.collected_at_utc)} through ${displayFact(context.facts.provider)} and published as ${displayFact(context.facts.snapshot_id)} against ${displayFact(context.facts.baseline_name)}.`;
   }
   if (context.intent === "limitations") {
-    return "EvidenceOps is limited to collected configuration evidence and deterministic drift. It does not provide organizational or assessor verdicts, accept risk, approve exceptions, or confirm a human change without a later collection. Human review is required.";
+    return "Provifact is limited to collected configuration evidence and deterministic drift. It does not provide organizational or assessor verdicts, accept risk, approve exceptions, or confirm a human change without a later collection. Human review is required.";
   }
   if (context.intent === "evidence" && isRecord(context.facts)) {
     if (typeof context.facts.evidence_missing === "string") {
-      return `${context.facts.evidence_missing} Open a finding or setting detail and choose Ask Evidence Copilot.`;
+      return `${context.facts.evidence_missing} Open a finding or setting detail and choose Ask Provifact Copilot.`;
     }
     return `The selected evidence chain is: ${summarizeFindingFacts([context.facts])} Open the linked finding or requirement for identifiers and fingerprints.`;
   }
@@ -1243,7 +1243,7 @@ function openAIRequest(
     max_output_tokens: MAX_OUTPUT_TOKENS,
     reasoning: { effort: "low" },
     instructions:
-      "Answer only from the supplied sanitized EvidenceOps facts. Copy every expected typed claim exactly. " +
+      "Answer only from the supplied sanitized Provifact facts. Copy every expected typed claim exactly. " +
       "Cite only allowed references. Do not infer identities, request identifiers, claim compliance, " +
       "certification, control satisfaction, assessment completion, exception, remediation, or risk acceptance. " +
       "If evidence is insufficient, use the exact supplied insufficient-evidence sentence. State limitations " +
@@ -1263,7 +1263,7 @@ function openAIRequest(
       verbosity: "low",
       format: {
         type: "json_schema",
-        name: "evidenceops_assistant_v1",
+        name: "provifact_assistant_v1",
         strict: true,
         schema: assistantSchema(),
       },

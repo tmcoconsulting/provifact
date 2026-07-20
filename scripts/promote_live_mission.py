@@ -8,20 +8,19 @@ import json
 from pathlib import Path
 from typing import Final
 
-from evidenceops.evidence import validate_public_mission_snapshot
+from evidenceops.evidence import MAX_PUBLIC_MISSION_BYTES, validate_public_mission_snapshot
 from evidenceops.sanitization import assert_public_safe
 
 REPOSITORY_ROOT: Final = Path(__file__).resolve().parents[1]
 DEFAULT_DESTINATION: Final = REPOSITORY_ROOT / "docs/assets/data/mission-control.json"
-MAX_PUBLIC_PACKAGE_BYTES: Final = 2_000_000
 
 
 def promote_live_mission(source: Path, destination: Path = DEFAULT_DESTINATION) -> None:
     """Validate and atomically stage a live public Mission package."""
     if source.is_symlink() or not source.is_file():
         raise ValueError("live Mission source must be one regular file")
-    if source.stat().st_size > MAX_PUBLIC_PACKAGE_BYTES:
-        raise ValueError("live Mission source exceeds the public package limit")
+    if source.stat().st_size > MAX_PUBLIC_MISSION_BYTES:
+        raise ValueError("live Mission source exceeds the public Mission limit")
     try:
         loaded = json.loads(source.read_text(encoding="utf-8"))
     except (OSError, UnicodeDecodeError, json.JSONDecodeError) as exc:

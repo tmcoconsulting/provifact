@@ -26,7 +26,7 @@ whatever newer reviewed production snapshot is actually reported.
 ## Narrated script — target 2:45
 
 **0:00–0:20 — problem and provenance.** Open Mission Control at the top. “Regulated endpoint teams
-should not reconstruct months of configuration history before every audit. EvidenceOps joins
+should not reconstruct months of configuration history before every audit. Provifact joins
 approved intent in Git to read-only Intune observation, deterministic drift, sanitized publication,
 and evidence-grounded explanation.” Point to the live-data badge, collection time, snapshot, and
 fixed-model availability.
@@ -39,26 +39,26 @@ read-only operator guidance.
 
 **0:55–1:20 — baseline and honest limits.** Open **Settings**. “The approved demo baseline contains
 98 pinned macOS Level 1 rules, but only four Microsoft Intune provider mappings are currently
-reviewed. EvidenceOps does not guess the rest.” Show the compact six-column matrix and one detail
+reviewed. Provifact does not guess the rest.” Show the compact six-column matrix and one detail
 dialog. Mention that framework identifiers are cross-references, not a score or assessment verdict.
 
 **1:20–1:45 — change history.** Return to **Changes**. If the current live package has a prior
 snapshot, show its exact new/resolved/unchanged result. If no manual Intune change was completed,
-say: “The workflow is ready for a later human change and second read-only collection; EvidenceOps
+say: “The workflow is ready for a later human change and second read-only collection; Provifact
 will not fabricate a resolved finding.” Explain that browser refresh checks only a newer published
 snapshot and never calls Microsoft Graph.
 
-**1:45–2:20 — actual GPT-5.6 answer.** Open Evidence Copilot and ask **What requires my attention?**
+**1:45–2:20 — actual GPT-5.6 answer.** Open Provifact Copilot and ask **What requires my attention?**
 Show the direct answer and click one evidence reference. “The Worker—not the browser—selects bounded
 sanitized facts for fixed `gpt-5.6-terra`. Typed claims and evidence references are checked against
 the deterministic package. Free prose remains generated analysis subject to human review.”
 
 **2:20–2:42 — security boundary.** “Microsoft Graph is GET-only through GitHub OIDC. Raw tenant
 responses and tokens are ephemeral. Production cannot fall back to synthetic evidence. The OpenAI
-key is server-side, requests use `store: false` and no tools, and EvidenceOps has no apply or Intune
+key is server-side, requests use `store: false` and no tools, and Provifact has no apply or Intune
 write command.”
 
-**2:42–2:50 — close.** “EvidenceOps does not decide organizational compliance. It makes approved
+**2:42–2:50 — close.** “Provifact does not decide organizational compliance. It makes approved
 intent, observed state, drift, limitations, and evidence references reviewable before the audit.”
 
 ## Exact click sequence
@@ -71,7 +71,7 @@ intent, observed state, drift, limitations, and evidence references reviewable b
 5. Choose **Review details** on a reviewed provider mapping; close the dialog.
 6. Return to Mission Control and select **Changes**.
 7. Choose **Check for newer published snapshot** and state that it does not collect from Intune.
-8. Open the lower-right **Evidence Copilot** launcher.
+8. Open the lower-right **Provifact Copilot** launcher.
 9. Choose **What requires my attention?**, submit once, then open one returned evidence link.
 10. Close with the visible human-review/no-write methodology boundary.
 

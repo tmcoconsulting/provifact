@@ -47,7 +47,7 @@ export default {
       return jsonResponse(
         {
           error: "internal_error",
-          message: "EvidenceOps could not complete the request",
+          message: "Provifact could not complete the request",
           human_review_required: true,
         },
         500,

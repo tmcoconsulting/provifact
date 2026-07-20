@@ -150,7 +150,7 @@
       default:
         return (
           finding.remediation_guidance ||
-          "Human review is required; EvidenceOps cannot change Intune."
+          "Human review is required; Provifact cannot change Intune."
         );
     }
   };
@@ -241,13 +241,13 @@
     const ask = create(
       "button",
       "md-button md-button--primary",
-      "Ask Evidence Copilot about this finding",
+      "Ask Provifact Copilot about this finding",
     );
     ask.type = "button";
     ask.addEventListener("click", () => {
       dialog.close();
       window.dispatchEvent(
-        new CustomEvent("evidenceops:select-evidence", {
+        new CustomEvent("provifact:select-evidence", {
           detail: {
             evidenceId: finding.finding_id,
             question:
@@ -534,7 +534,7 @@
           create(
             "p",
             "",
-            "EvidenceOps can reuse the same observations, but a real STIG evaluation requires a pinned authoritative STIG release, an approved desired-state profile, reviewed requirement-to-setting mappings, exact Intune definition mappings, and human acceptance of the new scope. The current view is only a technical cross-reference.",
+            "Provifact can reuse the same observations, but a real STIG evaluation requires a pinned authoritative STIG release, an approved desired-state profile, reviewed requirement-to-setting mappings, exact Intune definition mappings, and human acceptance of the new scope. The current view is only a technical cross-reference.",
           ),
           create(
             "p",
@@ -1024,7 +1024,7 @@
       const copilot = select("[data-open-copilot]");
       if (copilot instanceof HTMLButtonElement)
         copilot.addEventListener("click", () =>
-          window.EvidenceOpsCopilot?.open(),
+          window.ProvifactCopilot?.open(),
         );
       root.setAttribute("aria-busy", "false");
       const linked = mission.findings.find(

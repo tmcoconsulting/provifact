@@ -26,7 +26,7 @@ pagination separately, and records a visible gap if it is unavailable or changes
 not silently substitute another endpoint.
 
 The `configurationPolicies/{id}/settings` response can contain group collection instances whose
-configured settings are nested child instances. EvidenceOps traverses only Microsoft's documented
+configured settings are nested child instances. Provifact traverses only Microsoft's documented
 group, choice, and simple value containers, with depth and leaf-count bounds, and emits each scalar
 child under its exact `settingDefinitionId`. This is required for FileVault: Microsoft's public
 reference policy represents the FileVault payload as grouped settings, including the exact
@@ -65,7 +65,7 @@ All four permissions require administrator consent for the profiles used here.
 | `DeviceManagementApps.Read.All` | `4edf5f54-4666-44af-9de9-0144fb4b6e8c` | `7a6ee1e7-141e-4cec-ae74-d9db155731ff` | Managed apps, app policies, assignments, and Apps and Books health |
 | `DeviceManagementServiceConfig.Read.All` | `8696daa5-bce5-4b2e-83f9-51b6defc4e1e` | `06a5fe6d-c49d-46a7-b082-56b1b14103c7` | Enrollment, ADE, category, and APNs service metadata |
 
-EvidenceOps does not request write scopes, privileged device operations, `Directory.Read.All`,
+Provifact does not request write scopes, privileged device operations, `Directory.Read.All`,
 `Group.Read.All`, or `User.Read.All`. These four read scopes are broad tenant permissions even
 though the collector requests and publishes a much smaller field set; application ownership and
 admin consent remain meaningful security boundaries.
@@ -78,13 +78,13 @@ code enabled. Provide nonsecret IDs only to the current process:
 ```bash
 export AZURE_TENANT_ID='operator-supplied-value'
 export AZURE_CLIENT_ID='operator-supplied-value'
-python -m evidenceops live-collect-apple --auth device-code \
+python -m provifact live-collect-apple --auth device-code \
   --private-dir artifacts/private --retention-days 1
 ```
 
-MSAL uses an in-memory cache; EvidenceOps configures no persistent token storage. An already
+MSAL uses an in-memory cache; Provifact configures no persistent token storage. An already
 acquired short-lived token can instead be supplied as `EVIDENCEOPS_GRAPH_ACCESS_TOKEN` with
-`--auth environment-token`. EvidenceOps never writes the token.
+`--auth environment-token`. Provifact never writes the token.
 
 ## Publication
 
@@ -94,7 +94,7 @@ persisted. Publication requires a fresh runtime-only HMAC key:
 
 ```bash
 export EVIDENCEOPS_PSEUDONYM_KEY='operator-generated-random-value-at-least-32-bytes'
-python -m evidenceops publish-mission artifacts/private/private-apple-….json \
+python -m provifact publish-mission artifacts/private/private-apple-….json \
   --output build/live-public/mission-control.json
 unset EVIDENCEOPS_PSEUDONYM_KEY
 python scripts/check_public_artifacts.py build/live-public
@@ -168,7 +168,7 @@ device identity, assignment identity, raw Graph response, access token, or pseud
 in the repository or deployed package.
 
 The Entra application retains pre-existing delegated permissions that are not used by the
-application-permission workflow. EvidenceOps does not remove unrelated permissions automatically.
+application-permission workflow. Provifact does not remove unrelated permissions automatically.
 No client secret exists or is needed.
 
 After final deployment verification, TJ authorized one additional protected-main audit retry.

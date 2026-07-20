@@ -19,9 +19,9 @@ it.
 ## Three-minute synthetic demonstration
 
 ```bash
-python -m evidenceops run-mission-demo --output-dir build/mission-demo
+python -m provifact run-mission-demo --output-dir build/mission-demo
 python scripts/check_public_artifacts.py build/mission-demo
-python -m evidenceops rebuild-static-demo
+python -m provifact rebuild-static-demo
 mkdocs build --strict
 python scripts/check_public_artifacts.py site
 ```
@@ -30,7 +30,7 @@ Open `site/evidence-dashboard/index.html`. Mission Control shows the approved 98
 four reviewed macOS provider mappings, 25% technical alignment over the explicit four-rule
 denominator, FileVault/firewall/assignment/conflict drift, a Mac/iPhone/iPad posture, unevaluated
 resources, one collection gap, previous-versus-current changes, framework cross-references, and the
-site-wide Evidence Copilot.
+site-wide Provifact Copilot.
 Every value comes from the tracked synthetic package; fixture assistant answers make no model
 request.
 
@@ -39,7 +39,7 @@ To validate the same static artifact behind the local Cloudflare Worker boundary
 
 ```bash
 npm ci --ignore-scripts --no-audit --no-fund
-python -m evidenceops rebuild-static-demo
+python -m provifact rebuild-static-demo
 mkdocs build --strict
 npm run validate:worker
 npm run dev
@@ -74,14 +74,16 @@ Live collection requires a separately approved Entra app and explicit authentica
 `OPENAI_API_KEY` and pins `gpt-5.6-terra` for the bounded cost-conscious runtime.
 
 No successful paid model call is required or claimed by the static demo. Production has a dedicated
-EvidenceOps Project service-account key stored only as the encrypted Cloudflare Worker secret
-`OPENAI_API_KEY`; the value is absent from the repository and GitHub. Production uses fixed
+project-scoped service-account key dedicated to Provifact and stored only as the encrypted
+Cloudflare Worker secret. The current OpenAI Platform project retains its legacy `evidenceops` name
+until the coordinated infrastructure cutover. Its secret binding remains `OPENAI_API_KEY`; the value
+is absent from the repository and GitHub. Production uses fixed
 `gpt-5.6-terra` only after the same-origin request and sanitized evidence gates pass. It never
 silently falls back to a fixture response when an OpenAI request fails.
 Browser BYOK is rejected because it would create browser-storage, exfiltration, logging, and abuse
 risks without improving the server-side least-privilege boundary.
 
-EvidenceOps does not load `.env` files. Environment-variable names appear in `.env.example`, but
+Provifact does not load `.env` files. Environment-variable names appear in `.env.example`, but
 operators must use a local process environment or managed secret store. Never add a real value to
 the repository.
 

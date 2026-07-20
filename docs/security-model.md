@@ -1,6 +1,6 @@
 # Security Model
 
-EvidenceOps assumes endpoint configuration can identify an organization, people, and devices.
+Provifact assumes endpoint configuration can identify an organization, people, and devices.
 Collection is privileged even when it is read-only.
 
 ## Security invariants
@@ -9,7 +9,7 @@ Collection is privileged even when it is read-only.
 2. **No public private data.** Private packages cannot enter static builds, snapshots, fixtures,
    model requests, or logs.
 3. **Fail closed on change.** Unknown schema or publication fields stop processing.
-4. **No stored credentials.** EvidenceOps never writes Graph/OpenAI tokens or pseudonym keys.
+4. **No stored credentials.** Provifact never writes Graph/OpenAI tokens or pseudonym keys.
 5. **Deterministic findings remain authoritative.** GPT cannot select or alter finding status.
 6. **Human judgment remains visible.** Verification is not approval or certification.
 7. **Fork isolation.** Public CI receives no Graph, tenant, or OpenAI credential.
@@ -35,7 +35,7 @@ Catalog; its version and collection gap are explicit. See the
 Private packages contain normalized traceability metadata, not bulk raw Graph responses. They can
 exist only in a selected Git-ignored repository directory and are written without overwrite or
 symlink following. The expanded Apple command permits 1–30 day retention; operators remain responsible for secure
-deletion at expiry. EvidenceOps does not persist the pseudonymization key.
+deletion at expiry. Provifact does not persist the pseudonymization key.
 
 Publication applies `evidenceops-publication-v1.0.0`. Every field is allow, drop, or pseudonymize;
 unknown nested fields fail closed even under a dropped parent. A shared credential catalog is used
@@ -70,7 +70,7 @@ independently re-read. Protected-main OIDC collection and one separately reviewe
 publication completed successfully. No client secret exists.
 
 The public Worker runtime serves a reviewed live sanitized Mission package and fixed-model OpenAI
-Evidence Copilot; local and preview runtimes remain explicit fixture mode. It uses Worker-first
+Provifact Copilot; local and preview runtimes remain explicit fixture mode. It uses Worker-first
 routing only for `/api/*`, exact methods, same-origin checks,
 a 64 KiB request bound, compressed-body rejection, native client and global rate limiting, a
 20-second OpenAI timeout, bounded model context/output, a 256 KiB upstream-response bound, one

@@ -60,7 +60,7 @@ def verify_runtime_status(
         raise ValueError("runtime status has an unknown field or is incomplete")
     expected = {
         "schema_version": "1.0.0",
-        "service": "EvidenceOps narrative boundary",
+        "service": "Provifact narrative boundary",
         "status": "ok",
         "narrative_mode": expected_narrative_mode,
         "model": "gpt-5.6-terra",

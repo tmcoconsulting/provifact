@@ -1,8 +1,8 @@
 <div class="evidence-hero">
-  <div class="hero-kicker">Continuous endpoint evidence</div>
-  <h1>Connect approved intent to observed Intune state.</h1>
+  <div class="hero-kicker">Provifact™ by TMCO Consulting</div>
+  <h1>From approved change to audit-ready proof.</h1>
   <p>
-    EvidenceOps collects managed-Apple configuration read-only, evaluates mapped settings
+    Provifact collects managed-Apple configuration read-only, evaluates mapped settings
     deterministically, and publishes a sanitized evidence package that reviewers can trace without
     granting the product Intune write authority.
   </p>
@@ -12,9 +12,11 @@
   </div>
 </div>
 
+<p class="provifact-brand-note">Continuous, deterministic endpoint evidence—without granting the product Intune write authority.</p>
+
 <div class="synthetic-banner">
 Production serves a reviewed package labeled `LIVE SANITIZED TENANT DATA`. Tenant, device, user,
-group, assignment, and credential identities are not public. Production Evidence Copilot uses only
+group, assignment, and credential identities are not public. Production Provifact Copilot uses only
 fixed `gpt-5.6-terra` with bounded sanitized context; local and preview builds remain fixture mode.
 </div>
 
@@ -66,7 +68,7 @@ fixed `gpt-5.6-terra` with bounded sanitized context; local and preview builds r
 
 A mapped setting can support technical evidence for several framework identifiers. For example, a
 FileVault setting may be linked to CIS, STIG, NIST, and CMMC identifiers while sharing one observed
-Intune value. EvidenceOps reports whether that **setting-level evidence** matches the approved target.
+Intune value. Provifact reports whether that **setting-level evidence** matches the approved target.
 It does not convert that result into a framework-wide pass, certification, or assessor conclusion.
 
 The [settings matrix](settings-matrix.md) makes three distinctions visible:
@@ -74,7 +76,7 @@ The [settings matrix](settings-matrix.md) makes three distinctions visible:
 - **Mapped and aligned:** collected technical evidence matches the approved target.
 - **Mapped and drifting:** a deterministic value, assignment, conflict, or collection condition
   requires review, with an exact non-mutating change instruction.
-- **Not loaded or not mapped:** EvidenceOps says so directly rather than asking AI to fill the gap.
+- **Not loaded or not mapped:** Provifact says so directly rather than asking AI to fill the gap.
 
 ## Security and privacy boundaries
 
@@ -91,7 +93,7 @@ Read the [architecture](architecture.md), [audit methodology](audit-methodology.
 
 ## Current limitations and next priorities
 
-EvidenceOps is a technically complete Phase 1 vertical slice, not a finished enterprise compliance
+Provifact is a technically complete Phase 1 vertical slice, not a finished enterprise compliance
 platform. The highest-value next work is to preserve an approved parent-policy reference in the
 private model, load and review additional baselines such as CIS Level 2, expand provider mappings
 beyond four reviewed settings, expand evaluated evidence safely, and add authenticated sanitized
@@ -99,5 +101,5 @@ history only after retention and access-control design.
 
 The existing Cloudflare Worker plus Static Assets architecture is sufficient for the present
 read-mostly product. A dedicated application frontend and D1-backed history become justified when
-EvidenceOps adds authenticated users, private policy names, multi-tenant state, approvals, or
+Provifact adds authenticated users, private policy names, multi-tenant state, approvals, or
 long-running workflows—not merely because GitHub Pages was retired.

@@ -3,7 +3,7 @@
 ## Current state
 
 The production configuration at `https://evidenceops.tmcoconsulting.com/` requires a reviewed live
-sanitized Mission package and fixed `gpt-5.6-terra` Evidence Copilot. The credential-free preview
+sanitized Mission package and fixed `gpt-5.6-terra` Provifact Copilot. The credential-free preview
 configuration remains explicit fixture mode. The custom domain/TLS, Static Assets, dual native rate
 limiters, and encrypted `OPENAI_API_KEY` binding are active.
 
@@ -17,7 +17,7 @@ Node.js 22 or later and Python 3.12 or later are required.
 
 ```bash
 npm ci --ignore-scripts --no-audit --no-fund
-python -m evidenceops rebuild-static-demo
+python -m provifact rebuild-static-demo
 mkdocs build --strict
 python scripts/check_public_artifacts.py site
 npm run validate:worker
@@ -70,8 +70,9 @@ Wrangler plain-text variable, GitHub public-CI secret, browser value, repository
 argument, or log field. The Worker logs only event code, request ID, method, route, and status. It
 does not log client IPs, headers, packages, prompts, model responses, or error bodies.
 
-The production `OPENAI_API_KEY` binding now contains the only active key owned by the dedicated
-EvidenceOps project service account. The service account is assigned the custom
+The production `OPENAI_API_KEY` binding now contains the only active key owned by the project
+service account dedicated to Provifact. The OpenAI Platform project currently retains the
+legacy `evidenceops` identifier. The service account is assigned the custom
 `evidenceops-responses-runtime` role, which grants only Responses API model capability. The value is
 not in GitHub, the repository, documentation, or browser state.
 
@@ -79,7 +80,7 @@ The `global_fetch_strictly_public` compatibility flag forces the fixed OpenAI ho
 public route rather than treating it as an implicit Worker-to-Worker service binding. No arbitrary
 egress target is accepted from a request.
 
-Browser BYOK is deliberately unsupported. It would make EvidenceOps a credential processor and
+Browser BYOK is deliberately unsupported. It would make Provifact a credential processor and
 requires its own browser storage, transit, redaction, support, exfiltration, and abuse design.
 
 ## Production validation and remaining operations
@@ -142,7 +143,7 @@ The first route-isolated protected retry uploaded the reviewed bundle successful
 custom-domain curl received a Cloudflare Bot Fight Mode managed challenge because the caller was a
 cloud-hosted command-line runner; Cloudflare Security Analytics independently correlated the exact
 timestamp. The domain returned the correct snapshot and HTTPS/security headers from an independent
-network immediately afterward. EvidenceOps preserves Bot Fight Mode and instead attaches the
+network immediately afterward. Provifact preserves Bot Fight Mode and instead attaches the
 reviewed snapshot ID as a Worker-version message, then verifies through Wrangler that the exact
 version is the sole active deployment at 100% traffic. Public HTTP, browser rendering, and header
 validation remain a separate unauthenticated post-run operator check.

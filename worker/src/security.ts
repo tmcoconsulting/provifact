@@ -350,7 +350,7 @@ async function readBoundedStream(
     }
     total += result.value.byteLength;
     if (total > maximumBytes) {
-      await reader.cancel("EvidenceOps byte limit exceeded");
+      await reader.cancel("Provifact byte limit exceeded");
       throw new HttpError(error.status, error.code, error.message);
     }
     chunks.push(result.value);

@@ -1,4 +1,4 @@
-"""Vendor-neutral EvidenceOps domain types."""
+"""Vendor-neutral Provifact domain types."""
 
 from evidenceops.domain.models import ConfigurationObservation, DriftFinding, DriftStatus, JsonValue
 from evidenceops.domain.v1 import (

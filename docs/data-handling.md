@@ -30,7 +30,7 @@ are not requested or are rejected before public construction.
 | Correlation | Any value that can reasonably re-identify a tenant/person | Classify or reject |
 
 Deterministic pseudonyms are used only where correlation is necessary. They are HMAC-derived with
-runtime key material of at least 32 bytes. EvidenceOps never persists that key.
+runtime key material of at least 32 bytes. Provifact never persists that key.
 
 ## Lifecycle and retention
 
@@ -44,13 +44,13 @@ runtime key material of at least 32 bytes. EvidenceOps never persists that key.
 | Tokens/pseudonym key | Process environment/memory | Current operation only |
 | OpenAI project service-account key | Cloudflare Worker secret | Operator-managed rotation and immediate revocation on incident |
 
-Private packages are written without overwrite at mode `0600` where supported. EvidenceOps records
+Private packages are written without overwrite at mode `0600` where supported. Provifact records
 the deletion deadline but does not silently delete operator data; the operator must remove the
 package and backups securely at expiry.
 
 ## TMCO Consulting identity
 
-TMCO Consulting, LLC is the project sponsor and copyright holder for its original EvidenceOps work.
+TMCO Consulting, LLC is the project sponsor and copyright holder for its original Provifact work.
 Public company identity may appear in documentation. That authorization does not extend to TMCO Consulting
 tenant identifiers, directory/device data, credentials, or configuration exports. The tracked
 synthetic demo does not represent TMCO Consulting production state; the deployed live projection contains only

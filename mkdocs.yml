@@ -1,10 +1,10 @@
-site_name: EvidenceOps
-site_description: Continuous audit evidence for regulated endpoint-management teams
+site_name: Provifact™ by TMCO Consulting
+site_description: From approved change to audit-ready proof.
 site_url: https://evidenceops.tmcoconsulting.com/
 repo_url: https://github.com/tmcoconsulting/evidenceops
-repo_name: tmcoconsulting/evidenceops
+repo_name: Provifact source
 edit_uri: edit/main/docs/
-copyright: Copyright &copy; 2026 TMCO Consulting, LLC
+copyright: Copyright &copy; 2026 TMCO Consulting, LLC · Provifact™
 
 theme:
   name: material
@@ -88,15 +88,15 @@ markdown_extensions:
       alternate_style: true
 
 extra_css:
-  - assets/stylesheets/extra.css?v=20260720-noc1
+  - assets/stylesheets/extra.css?v=20260720-provifact1
   - assets/stylesheets/settings-matrix.css?v=20260720-final
   - assets/stylesheets/assistant-evidence-context.css?v=20260720-final
 
 extra_javascript:
-  - assets/javascripts/mission-control.js?v=20260720-noc1
-  - assets/javascripts/evidenceops-api.js?v=20260720-final
-  - assets/javascripts/settings-matrix.js?v=20260720-final
-  - assets/javascripts/assistant-evidence-context.js?v=20260720-noc1
+  - assets/javascripts/mission-control.js?v=20260720-provifact1
+  - assets/javascripts/provifact-api.js?v=20260720-provifact1
+  - assets/javascripts/settings-matrix.js?v=20260720-provifact1
+  - assets/javascripts/assistant-evidence-context.js?v=20260720-provifact1
 
 plugins:
   - search

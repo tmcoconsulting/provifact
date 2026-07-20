@@ -3,7 +3,7 @@
 
   const STATUS_URL = "/api/status";
   const MISSION_URL = "/assets/data/mission-control.json";
-  const HISTORY_KEY = "evidenceops-copilot-history-v1";
+  const HISTORY_KEY = "provifact-copilot-history-v1";
   const MAX_HISTORY = 12;
   const EVIDENCE_ID = /^(?:finding|req|gap|mission)-[0-9a-f]{24}$/;
   const operationalPaths = new Set([
@@ -20,7 +20,7 @@
     "What is not currently evaluated?",
     "What do the framework cross-references mean?",
     "Is this live tenant data?",
-    "What can EvidenceOps not conclude?",
+    "What can Provifact not conclude?",
   ];
 
   const create = (tagName, className = "", text = "") => {
@@ -52,7 +52,7 @@
     });
     const contentType = response.headers.get("Content-Type") || "";
     if (!contentType.includes("application/json")) {
-      throw new Error("EvidenceOps returned an unexpected response type");
+      throw new Error("Provifact returned an unexpected response type");
     }
     const payload = await response.json();
     return { payload, response };
@@ -163,7 +163,7 @@
       addFact("Snapshot", status.source_snapshot_id);
       addFact("Approved baseline", status.approved_baseline);
       addFact(
-        "Evidence Copilot",
+        "Provifact Copilot",
         status.model_call_available
           ? `${status.model} via OpenAI`
           : status.narrative_mode === "fixture"
@@ -184,7 +184,7 @@
       panel.dataset.state = "stale";
       statusLabel.textContent = "DEGRADED / STALE";
       detail.textContent =
-        "The Worker could not prove the current package. EvidenceOps did not substitute synthetic findings.";
+        "The Worker could not prove the current package. Provifact did not substitute synthetic findings.";
       refresh.disabled = true;
     }
 
@@ -273,7 +273,7 @@
     const launcher = create(
       "button",
       "evidence-copilot-launcher",
-      "Evidence Copilot",
+      "Provifact Copilot",
     );
     launcher.type = "button";
     launcher.setAttribute("aria-haspopup", "dialog");
@@ -291,7 +291,7 @@
       "evidence-copilot-eyebrow",
       "Bounded evidence assistant",
     );
-    const heading = create("h2", "", "Evidence Copilot");
+    const heading = create("h2", "", "Provifact Copilot");
     heading.id = "evidence-copilot-title";
     const runtime = create(
       "p",
@@ -301,7 +301,7 @@
     headingGroup.append(eyebrow, heading, runtime);
     const close = create("button", "evidence-copilot-close", "Close");
     close.type = "button";
-    close.setAttribute("aria-label", "Close Evidence Copilot");
+    close.setAttribute("aria-label", "Close Provifact Copilot");
     header.append(headingGroup, close);
 
     const selected = create("div", "evidence-copilot-selected");
@@ -313,7 +313,7 @@
 
     const transcript = create("div", "evidence-copilot-transcript");
     transcript.setAttribute("aria-live", "polite");
-    transcript.setAttribute("aria-label", "Evidence Copilot conversation");
+    transcript.setAttribute("aria-label", "Provifact Copilot conversation");
     const suggestionGroup = create("div", "evidence-copilot-suggestions");
     suggestionGroup.setAttribute("aria-label", "Suggested evidence questions");
 
@@ -326,7 +326,7 @@
     input.required = true;
     input.placeholder = "What requires my attention?";
     label.append(input);
-    const submit = create("button", "", "Ask Evidence Copilot");
+    const submit = create("button", "", "Ask Provifact Copilot");
     submit.type = "submit";
     submit.disabled = true;
     const formStatus = create("p", "evidence-copilot-form-status");
@@ -357,7 +357,7 @@
         `evidence-copilot-message evidence-copilot-${role}`,
       );
       article.append(
-        create("strong", "", role === "user" ? "You" : "Evidence Copilot"),
+        create("strong", "", role === "user" ? "You" : "Provifact Copilot"),
         create("p", "", text),
       );
       const links = references
@@ -431,14 +431,14 @@
       if (event.target === dialog) dialog.close();
     });
     clearSelected.addEventListener("click", () => setSelected(null));
-    window.addEventListener("evidenceops:select-evidence", (event) => {
+    window.addEventListener("provifact:select-evidence", (event) => {
       if (!(event instanceof CustomEvent) || !isRecord(event.detail)) return;
       openCopilot({
         selectedEvidenceId: event.detail.evidenceId,
         question: event.detail.question,
       });
     });
-    window.EvidenceOpsCopilot = { open: openCopilot };
+    window.ProvifactCopilot = { open: openCopilot };
 
     let status;
     try {
@@ -455,7 +455,7 @@
     } catch {
       runtime.textContent = "Worker runtime unavailable";
       formStatus.textContent =
-        "Evidence Copilot is unavailable. No synthetic or model fallback was selected.";
+        "Provifact Copilot is unavailable. No synthetic or model fallback was selected.";
       submit.disabled = true;
     }
 

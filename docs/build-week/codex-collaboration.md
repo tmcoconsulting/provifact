@@ -2,7 +2,7 @@
 
 ## Project record
 
-- **Project:** EvidenceOps
+- **Project:** Provifact
 - **Track:** Developer Tools
 - **Project start:** 2026-07-18
 - **Phase:** Phase 1 — narrow read-only Intune-to-verified-narrative proof
@@ -50,7 +50,7 @@ projection; deterministic evidence remains authoritative.
 ## Authorship and ownership
 
 Codex is an implementation tool, not the legal author or copyright owner. TMCO Consulting, LLC
-asserts copyright only in its original EvidenceOps work. The project does not claim ownership of
+asserts copyright only in its original Provifact work. The project does not claim ownership of
 Apple, Microsoft, NIST, CIS, CMMC, mSCP, or third-party repositories, standards, baselines, or
 documentation.
 

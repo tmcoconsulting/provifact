@@ -1,7 +1,7 @@
 (() => {
   "use strict";
 
-  const root = document.querySelector("[data-evidenceops-runtime]");
+  const root = document.querySelector("[data-provifact-runtime]");
   if (!(root instanceof HTMLElement)) {
     return;
   }
@@ -100,7 +100,7 @@
         runtimeMode === "fixture"
           ? "The Worker will return the tracked deterministic narrative without an API charge."
           : status.narrative_available === true
-            ? "The Worker may call the configured EvidenceOps model after all publication gates pass."
+            ? "The Worker may call the configured Provifact model after all publication gates pass."
             : "The Worker has no usable server-side model credential and will not fall back to fixture output.";
       setStatus(
         label,

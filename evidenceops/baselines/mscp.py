@@ -247,7 +247,7 @@ APPROVAL_RECORD: Final[dict[str, JsonValue]] = {
     "approver": "TMCO Consulting, LLC — Build Week Demo Authority",
     "approval_date": "2026-07-19",
     "approval_rationale": (
-        "Provide reproducible technical drift detection for the EvidenceOps Build Week demo."
+        "Provide reproducible technical drift detection for the Provifact Build Week demo."
     ),
     "scope": "macOS technical configuration evidence only",
     "supersedes": None,

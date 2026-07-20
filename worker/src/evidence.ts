@@ -75,7 +75,7 @@ export function assertJsonValue(
   depth = 0,
 ): asserts value is JsonValue {
   if (depth > 16) {
-    throw new Error("JSON nesting exceeds the EvidenceOps limit");
+    throw new Error("JSON nesting exceeds the Provifact limit");
   }
   if (
     value === null ||

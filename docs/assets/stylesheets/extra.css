@@ -1,8 +1,8 @@
 :root {
-  --evidenceops-ink: #10233d;
-  --evidenceops-blue: #2358d7;
-  --evidenceops-cyan: #00a7bd;
-  --evidenceops-mist: #eef4fb;
+  --provifact-ink: #10233d;
+  --provifact-blue: #2358d7;
+  --provifact-cyan: #00a7bd;
+  --provifact-mist: #eef4fb;
 }
 
 .md-header {
@@ -14,14 +14,14 @@
   margin: 0 0 2rem;
   border: 1px solid rgba(62, 112, 190, 0.28);
   border-radius: 1.25rem;
-  color: var(--evidenceops-ink);
+  color: var(--provifact-ink);
   background:
     radial-gradient(
       circle at 85% 16%,
       rgba(0, 167, 189, 0.22),
       transparent 30%
     ),
-    linear-gradient(135deg, #f8fbff 0%, var(--evidenceops-mist) 100%);
+    linear-gradient(135deg, #f8fbff 0%, var(--provifact-mist) 100%);
 }
 
 .evidence-hero h1 {
@@ -37,7 +37,7 @@
 }
 
 .hero-kicker {
-  color: var(--evidenceops-blue);
+  color: var(--provifact-blue);
   font-weight: 750;
   letter-spacing: 0.12em;
   text-transform: uppercase;
@@ -60,13 +60,21 @@
 
 .hero-actions .primary {
   color: white;
-  background: var(--evidenceops-blue);
+  background: var(--provifact-blue);
 }
 
 .hero-actions .secondary {
-  color: var(--evidenceops-ink);
+  color: var(--provifact-ink);
   border: 1px solid rgba(16, 35, 61, 0.24);
   background: white;
+}
+
+.provifact-brand-note {
+  margin: -0.4rem 0 1.8rem;
+  color: var(--md-default-fg-color--light);
+  font-size: 0.82rem;
+  letter-spacing: 0.03em;
+  text-align: center;
 }
 
 .evidence-grid {
@@ -104,7 +112,7 @@
 
 .synthetic-banner {
   padding: 0.9rem 1rem;
-  border-left: 0.3rem solid var(--evidenceops-cyan);
+  border-left: 0.3rem solid var(--provifact-cyan);
   border-radius: 0.35rem;
   background: rgba(0, 167, 189, 0.09);
   font-weight: 650;
@@ -140,7 +148,7 @@
   border: 0;
   border-radius: 0.55rem;
   color: #fff;
-  background: var(--evidenceops-blue);
+  background: var(--provifact-blue);
   font: inherit;
   font-weight: 700;
   cursor: pointer;
@@ -227,7 +235,7 @@
 }
 
 .mission-eyebrow {
-  color: var(--evidenceops-cyan);
+  color: var(--provifact-cyan);
   font-size: 0.72rem;
   font-weight: 850;
   letter-spacing: 0.12em;
@@ -239,7 +247,7 @@
   padding: 0.5rem 0.7rem;
   border-radius: 999px;
   color: #fff;
-  background: var(--evidenceops-ink);
+  background: var(--provifact-ink);
   font-size: 0.72rem;
   font-weight: 800;
   white-space: nowrap;
@@ -264,8 +272,8 @@
 
 .mission-nav a:hover,
 .mission-nav a:focus-visible {
-  color: var(--evidenceops-blue);
-  background: var(--evidenceops-mist);
+  color: var(--provifact-blue);
+  background: var(--provifact-mist);
 }
 
 .mission-metrics {
@@ -286,7 +294,7 @@
 .mission-metric {
   display: grid;
   gap: 0.32rem;
-  border-top: 0.22rem solid var(--evidenceops-blue);
+  border-top: 0.22rem solid var(--provifact-blue);
 }
 
 .mission-tone-good {
@@ -358,7 +366,7 @@
 .mission-attention-button {
   padding: 0;
   border: 0;
-  color: var(--evidenceops-blue);
+  color: var(--provifact-blue);
   background: transparent;
   font: inherit;
   font-weight: 800;
@@ -454,7 +462,7 @@
 .mission-assistant > button {
   width: fit-content;
   color: #fff;
-  background: var(--evidenceops-blue);
+  background: var(--provifact-blue);
 }
 
 .mission-assistant > button:disabled {
@@ -498,7 +506,7 @@
 .mission-finding-button {
   padding: 0;
   border: 0;
-  color: var(--evidenceops-blue);
+  color: var(--provifact-blue);
   background: transparent;
   font: inherit;
   font-weight: 750;
@@ -528,7 +536,7 @@
 .mission-callout {
   padding: 0.8rem 1rem;
   margin: 0.8rem 0;
-  border-left: 0.25rem solid var(--evidenceops-cyan);
+  border-left: 0.25rem solid var(--provifact-cyan);
   border-radius: 0.35rem;
   background: rgba(0, 167, 189, 0.08);
 }
@@ -621,8 +629,8 @@
 
 .mission-questions button[aria-pressed="true"] {
   color: #fff;
-  border-color: var(--evidenceops-blue);
-  background: var(--evidenceops-blue);
+  border-color: var(--provifact-blue);
+  background: var(--provifact-blue);
 }
 
 .mission-dialog {
@@ -631,7 +639,7 @@
   padding: 1.25rem;
   border: 1px solid var(--mission-border);
   border-radius: 0.9rem;
-  color: var(--evidenceops-ink);
+  color: var(--provifact-ink);
   background: #fff;
 }
 
@@ -681,8 +689,8 @@
 .mission-dialog-guidance {
   margin: 1rem 0;
   padding: 0.8rem;
-  border-left: 0.25rem solid var(--evidenceops-cyan);
-  background: var(--evidenceops-mist);
+  border-left: 0.25rem solid var(--provifact-cyan);
+  background: var(--provifact-mist);
 }
 
 .mission-trace-chain {

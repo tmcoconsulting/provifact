@@ -27,7 +27,7 @@ import type {
   RuntimeMode,
 } from "../worker/src/types";
 
-const ORIGIN = "https://evidenceops.example";
+const ORIGIN = "https://provifact.example";
 const FIXTURE_MODEL = "deterministic-offline-fixture-not-a-model-call";
 const TEST_API_KEY = `sk-test_${"A".repeat(32)}`;
 
@@ -197,7 +197,7 @@ describe("Worker routes", () => {
     );
     expect(health.status).toBe(200);
     await expect(health.json()).resolves.toMatchObject({
-      service: "EvidenceOps Worker",
+      service: "Provifact Worker",
       status: "ok",
     });
 
@@ -355,7 +355,7 @@ describe("Worker routes", () => {
     ["What do the framework cross-references mean?", "framework_meaning"],
     ["Is this live tenant data?", "provenance"],
     ["What should I review in Intune?", "intune_review"],
-    ["What can EvidenceOps not conclude?", "limitations"],
+    ["What can Provifact not conclude?", "limitations"],
   ])("answers bounded fixture question %s as %s", async (question, intent) => {
     const outboundFetch = vi.fn<typeof fetch>();
     const response = await handleRequest(
@@ -476,7 +476,7 @@ describe("Worker routes", () => {
       question_intent: "insufficient",
       answer: {
         direct_answer:
-          "EvidenceOps does not have sufficient collected evidence to answer this question.",
+          "Provifact does not have sufficient collected evidence to answer this question.",
         evidence_sufficiency: "insufficient",
       },
       verification: { status: "insufficient_evidence" },

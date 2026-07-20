@@ -31,7 +31,7 @@ export async function handleRequest(
     }
     return jsonResponse({
       schema_version: "1.0.0",
-      service: "EvidenceOps Worker",
+      service: "Provifact Worker",
       status: "ok",
     });
   }
@@ -50,7 +50,7 @@ export async function handleRequest(
     const mission = await readMissionStatus(request, env);
     return jsonResponse({
       schema_version: "1.0.0",
-      service: "EvidenceOps Worker",
+      service: "Provifact Worker",
       status: "ready",
       narrative_mode: mode,
       mission,
@@ -67,7 +67,7 @@ export async function handleRequest(
     const mission = await readMissionStatus(request, env);
     return jsonResponse({
       schema_version: "1.0.0",
-      service: "EvidenceOps narrative boundary",
+      service: "Provifact narrative boundary",
       status: "ok",
       narrative_mode: mode,
       model: env.OPENAI_MODEL,

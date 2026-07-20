@@ -1,4 +1,4 @@
-"""Run the Provifact operator interface."""
+"""Run the Provifact CLI while preserving the Phase 1 engine namespace."""
 
 from evidenceops.cli import main
 

@@ -2,6 +2,7 @@
 
 from evidenceops.evidence.drift import evaluate_drift
 from evidenceops.evidence.mission import (
+    MAX_PUBLIC_MISSION_BYTES,
     MISSION_ALGORITHM_VERSION,
     MISSION_SCHEMA_VERSION,
     DriftOutcome,
@@ -31,6 +32,7 @@ from evidenceops.evidence.versioned import (
 )
 
 __all__ = [
+    "MAX_PUBLIC_MISSION_BYTES",
     "MISSION_ALGORITHM_VERSION",
     "MISSION_SCHEMA_VERSION",
     "ALGORITHM_VERSION",

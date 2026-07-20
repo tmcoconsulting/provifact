@@ -4,13 +4,13 @@
 > below describe that checkpoint. Use the current Mission package, `/api/status`, roadmap, and final
 > video runbook for the Build Week final deployment.
 
-This record describes the technically complete EvidenceOps Build Week Phase 1 vertical slice as
+This record describes the technically complete Provifact Build Week Phase 1 vertical slice as
 verified on 2026-07-19. It does not claim regulatory compliance, assessor approval, or completion
 of the external DevPost submission.
 
 ## 1. Executive summary
 
-EvidenceOps now runs an end-to-end, read-only evidence flow: a Git-approved, hash-pinned macOS
+Provifact now runs an end-to-end, read-only evidence flow: a Git-approved, hash-pinned macOS
 baseline is compared deterministically with private Microsoft Intune observations; a fail-closed
 allowlist produces the only public package; Cloudflare serves the live sanitized Mission Control
 dashboard; and a bounded GPT-5.6 Terra path explains evidence without changing findings. The
@@ -72,7 +72,7 @@ permissions:
 - `DeviceManagementServiceConfig.Read.All`
 
 No Graph write, `Directory.Read.All`, `Group.Read.All`, `User.Read.All`, or user-impersonation scope
-is part of the EvidenceOps application workflow. Pre-existing delegated permissions are unrelated
+is part of the Provifact application workflow. Pre-existing delegated permissions are unrelated
 to the protected application flow and were left unchanged rather than removed automatically.
 
 ## 6. Graph resource families collected
@@ -127,7 +127,7 @@ production Mission package passed schema/fingerprint validation and the public-a
 
 The fixed runtime model is `gpt-5.6-terra`. OpenAI documents Terra as the GPT-5.6 tier balancing
 intelligence and cost, and its structured-output Responses API capability matches the bounded
-evidence-explanation workload. EvidenceOps uses no model router or fallback model.
+evidence-explanation workload. Provifact uses no model router or fallback model.
 
 One deliberately bounded synthetic request reached the project service-account path, returned HTTP
 success, parsed under the strict schema, accepted two deterministic typed claims, rejected none,
@@ -142,7 +142,8 @@ million input tokens, $0.25 per million cached-input tokens, $3.125 per million 
 and $15.00 per million output tokens. Prices can change; the authoritative source is the
 [OpenAI API pricing page](https://developers.openai.com/api/docs/pricing).
 
-The EvidenceOps project has a $5 monthly soft budget with alerts at 50%, 80%, and 100%, and a model
+The OpenAI Platform project retained under the legacy `evidenceops` identifier has a $5 monthly soft
+budget with alerts at 50%, 80%, and 100%, and a model
 limit of 5 RPM and 25,000 TPM. The budget is an alert threshold, not a hard cap. Application controls
 add fixed-model enforcement, no tools, `store: false`, bounded evidence and question schemas,
 strict input/output limits, timeout, one controlled endpoint, and Cloudflare rate limiting. The

@@ -148,7 +148,8 @@ and passed the public-artifact scan. No deployment was made for this continuatio
   coverage, HTTPS, CSP, HSTS, static assets, and API status returned success.
 - Verified same-origin, method, browser-key, authorization, media-type, compression, publication,
   fingerprint, verifier, and native-rate boundaries. A ten-request preview burst returned six 429s.
-- Created one key under the exact OpenAI Platform EvidenceOps project and transferred it directly to
+- Created one key under the OpenAI Platform project now retained under the legacy `evidenceops`
+  identifier and transferred it directly to
   the encrypted Worker secret `OPENAI_API_KEY`; no plaintext file remained.
 - Confirmed the project key lists all three GPT-5.6 model identifiers and kept the fixed runtime pin
   at `gpt-5.6-terra` for balanced cost and capability.

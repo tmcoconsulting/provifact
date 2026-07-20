@@ -1,6 +1,6 @@
 # Support
 
-EvidenceOps is an early open-source project.
+Provifact is an early open-source project.
 
 - Use GitHub Issues for reproducible bugs and scoped feature requests.
 - Use GitHub Discussions for design questions and community support.

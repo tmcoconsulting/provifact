@@ -2,7 +2,7 @@
 
 ## Supported versions
 
-EvidenceOps is pre-release Phase 1 software. Only the current `main` branch receives security fixes.
+Provifact is pre-release Phase 1 software. Only the current `main` branch receives security fixes.
 Dated Build Week validation records describe historical checkpoints and are not separate supported
 release lines.
 

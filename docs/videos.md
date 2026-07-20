@@ -1,6 +1,6 @@
 # Videos and Demonstration Media
 
-No public EvidenceOps video is linked from this repository yet. The live application and the
+No public Provifact video is linked from this repository yet. The live application and the
 [final video runbook](build-week/video-runbook.md) are ready; media production remains an operator
 submission task rather than a product capability.
 
@@ -16,7 +16,7 @@ submission task rather than a product capability.
 
 Recordings must distinguish live sanitized evidence from the tracked synthetic package and state
 whether the assistant is in fixture or OpenAI mode. Do not imply that a matrix row is a framework
-certification or that EvidenceOps changes Intune.
+certification or that Provifact changes Intune.
 
 Before publication, review every frame for notifications, account names, repository secrets, tenant
 identifiers, policy names, device data, browser history, terminal output, private submission

@@ -1,4 +1,4 @@
-# EvidenceOps agent guidance
+# Provifact agent guidance
 
 These rules apply to all work in this repository.
 

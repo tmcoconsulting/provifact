@@ -1,4 +1,4 @@
-# Contributing to EvidenceOps
+# Contributing to Provifact
 
 Thank you for helping make audit evidence safer and easier to operate.
 

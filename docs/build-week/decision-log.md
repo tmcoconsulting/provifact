@@ -9,7 +9,7 @@ or Apple GitOps repository.
 
 ## 2026-07-18 — Use Apache License 2.0
 
-**Decision:** License original EvidenceOps work under Apache License 2.0 and identify TMCO Consulting, LLC
+**Decision:** License original Provifact work under Apache License 2.0 and identify TMCO Consulting, LLC
 in `NOTICE`.
 
 **Why:** The license is OSI-approved, contribution-friendly, and includes an express patent grant.
@@ -24,10 +24,10 @@ tools are exact-pinned in `pyproject.toml`.
 **Why:** The evidence engine and sanitizer use the standard library, keeping the trusted computing
 base understandable. MkDocs and the Material theme are development/documentation dependencies only.
 MkDocs Material uses the [MIT license](https://github.com/squidfunk/mkdocs-material/blob/master/LICENSE),
-so its generated static output does not change EvidenceOps' Apache license.
+so its generated static output does not change Provifact' Apache license.
 
 **Known risk:** The pinned Material release prints an upstream warning about planned MkDocs 2.0
-incompatibility and licensing concerns. EvidenceOps remains on the pinned MkDocs 1.6.1 line in Phase
+incompatibility and licensing concerns. Provifact remains on the pinned MkDocs 1.6.1 line in Phase
 0 and will evaluate a documentation-stack change separately rather than silently upgrading.
 
 ## 2026-07-18 — Separate deterministic evidence from generated analysis
@@ -174,10 +174,11 @@ narratives remain readable but cannot verify without typed claims.
 
 ## 2026-07-18 — Defer production OpenAI key and BYOK to the Worker milestone
 
-**Decision:** The future production runtime should use a dedicated EvidenceOps Project
-service-account/project key stored only as a Cloudflare Worker secret. Fixture mode remains the
-default when credits or the key are unavailable. Browser BYOK is deferred pending a dedicated
-browser-key, logging, support, and abuse threat model.
+**Decision:** The future production runtime should use a dedicated OpenAI project service-account
+key stored only as a Cloudflare Worker secret. The current OpenAI project retains its legacy
+`evidenceops` identifier during the coordinated brand migration. Fixture mode remains the default
+when credits or the key are unavailable. Browser BYOK is deferred pending a dedicated browser-key,
+logging, support, and abuse threat model.
 
 **Why:** OpenAI recommends keeping API keys out of code and public repositories and supplying them
 through environment variables or a secret manager. Cloudflare provides encrypted Worker secret
@@ -214,8 +215,8 @@ and [structured outputs](https://developers.openai.com/api/docs/guides/structure
 ## 2026-07-18 — Deploy fixture-first and keep BYOK rejected
 
 **Decision:** Deploy `evidenceops` with Workers Static Assets, a Worker Custom Domain, dual native
-rate limiters, and a fixed `gpt-5.6-terra` model policy. Store the dedicated EvidenceOps Project key
-only as the Worker secret `OPENAI_API_KEY`. Keep production in explicit fixture mode after the
+rate limiters, and a fixed `gpt-5.6-terra` model policy. Store the dedicated OpenAI project key only
+as the Worker secret `OPENAI_API_KEY`. Keep production in explicit fixture mode after the
 single bounded live validation returned capacity unavailable. Do not accept browser-supplied keys.
 
 **Why:** Terra is the documented balanced GPT-5.6 cost/capability tier. The public fixture preserves
@@ -243,7 +244,7 @@ identity. Keeping execution post-merge preserves the protected-code boundary whi
 existing manual workflow to use a short-lived Graph token later.
 
 **Pre-existing state:** Eight consented delegated permissions remain on the application. They are
-not used by the EvidenceOps application-only workflow, were not added for this proof, and were not
+not used by the Provifact application-only workflow, were not added for this proof, and were not
 removed automatically because their ownership and unrelated consumers require human review.
 
 ## 2026-07-19 — Expand the Apple proof without adding mutation authority
@@ -302,7 +303,7 @@ public repository and adds data-flow analysis without giving untrusted pull-requ
 deployment identity, or build step.
 
 **Platform limitation:** GitHub's non-provider secret-pattern and secret-validity status remained
-`disabled` after a repository-API enable request, so EvidenceOps does not claim those controls are
+`disabled` after a repository-API enable request, so Provifact does not claim those controls are
 active. Provider secret scanning, push protection, the shared credential catalog, and fail-closed
 repository/public-artifact scans remain enabled requirements.
 
@@ -376,13 +377,13 @@ new drift without adding a database, retaining raw tenant evidence, or widening 
 
 ## 2026-07-20 — Use owner-approved TMCO Consulting brand assets locally
 
-**Decision:** Check the public TMCO Consulting favicon and social image into EvidenceOps rather than
+**Decision:** Check the public TMCO Consulting favicon and social image into Provifact rather than
 hotlinking them. Record source URLs and SHA-256 hashes beside the assets, use the full company name
 in user-facing copy, and retain `TMCO Consulting, LLC` for legal and approval contexts. Run a
 content check in CI that rejects standalone abbreviated company-name copy.
 
 **Why:** Local assets avoid a runtime dependency on the company site and preserve an auditable
-brand source. TJ owns and explicitly authorized the marks for EvidenceOps. The repository notice
+brand source. TJ owns and explicitly authorized the marks for Provifact. The repository notice
 clarifies that Apache-2.0 does not grant trademark rights.
 
 ## 2026-07-20 — Require exact reviewed provider IDs and keep unknown mappings honest
@@ -448,11 +449,28 @@ STIG score or compliance verdict.
 
 ## 2026-07-20 — Separate public Mission and model-response byte ceilings
 
-**Decision:** Keep OpenAI response reads capped at 256 KiB. Read the scanned public Mission through a
-separate 512 KiB ceiling before schema, fingerprint, and egress validation. Reject a public Mission
-above that dedicated cap with a fail-closed readiness error.
+**Decision:** Keep OpenAI response reads capped at 256 KiB. Apply one shared 512 KiB public-Mission
+ceiling at Python loading, production promotion, and Worker readiness before schema, fingerprint,
+and egress validation. Reject a public Mission above that dedicated cap before it can be accepted as
+publishable.
 
 **Why:** The first live package after nested FileVault normalization was 268,320 bytes because it
 retains the complete 98-rule review inventory. Reusing the smaller untrusted-model response cap made
-`/api/status` return 502 even though the static package was valid. Increasing the shared limit would
-have unnecessarily weakened the OpenAI boundary; a distinct bounded path keeps both purposes clear.
+`/api/status` return 502 even though the static package was valid. Increasing the model-response
+limit would have unnecessarily weakened the OpenAI boundary; a distinct public-Mission cap keeps
+the handoff and runtime consistent while preserving the smaller model boundary.
+
+## 2026-07-20 — Rebrand the product as Provifact™ by TMCO Consulting
+
+**Decision:** Adopt **Provifact™ by TMCO Consulting** as the public product name and **From approved
+change to audit-ready proof.** as the product tagline. Update public UI, documentation, runtime
+labels, package metadata, and the preferred CLI. Preserve the existing Python import namespace,
+schema and algorithm identifiers, environment-variable prefix, GitHub repository slug, Cloudflare
+Worker name, OpenAI project identifier, and transition hostname as explicitly documented legacy
+technical identifiers until a coordinated external cutover.
+
+**Why:** The prior product name conflicts with an existing name. A blind global rename would break
+the Entra federated credential subject bound to the GitHub repository, detach deployment history and
+encrypted Worker secrets, invalidate stable fingerprints/schema contracts, and complicate rollback.
+Brand presentation can change immediately while infrastructure identifiers migrate through a
+separately reviewed cutover.
