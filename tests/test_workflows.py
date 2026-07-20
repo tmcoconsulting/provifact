@@ -71,7 +71,7 @@ def test_privileged_workflows_are_main_only_and_environment_protected() -> None:
     assert "store_private" not in audit
     assert "python -m pytest -o addopts=''" in audit
     assert "if: inputs.prepare_publication" in audit
-    assert "actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f" in audit
+    assert "actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a" in audit
     assert "path: build/live-public/mission-control.json" in audit
     assert "retention-days: 1" in audit
     assert "path: artifacts/private" not in audit
@@ -92,7 +92,7 @@ def test_privileged_workflows_are_main_only_and_environment_protected() -> None:
     assert "npm run deploy:production" in deploy
     assert "ref: ${{ github.sha }}" in deploy
     assert "actions: read" in deploy
-    assert "actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131" in deploy
+    assert "actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c" in deploy
     assert "run-id: ${{ inputs.sanitized_audit_run_id }}" in deploy
     assert "expected_source_snapshot_id:" in deploy
     assert "EXPECTED_SOURCE_SNAPSHOT_ID: ${{ inputs.expected_source_snapshot_id }}" in deploy
@@ -179,7 +179,7 @@ def test_prior_live_publication_is_validated_and_never_private() -> None:
     assert "prior_sanitized_audit_run_id:" in audit
     assert "PRIOR_SANITIZED_AUDIT_RUN_ID: ${{ inputs.prior_sanitized_audit_run_id }}" in audit
     assert 'if [[ ! "$PRIOR_SANITIZED_AUDIT_RUN_ID" =~ ^[0-9]{1,20}$ ]]' in audit
-    assert "actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131" in audit
+    assert "actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c" in audit
     assert "evidenceops-sanitized-mission-${{ inputs.prior_sanitized_audit_run_id }}" in audit
     assert "run-id: ${{ inputs.prior_sanitized_audit_run_id }}" in audit
     assert "path: build/previous-public" in audit

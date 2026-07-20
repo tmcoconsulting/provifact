@@ -102,6 +102,8 @@ or proprietary material from `intune-apple-gitops` or any other repository.
 | 2026-07-20 | Judge-ready product experience squash merge through PR #16 | `48a67aea60e5759f54ed5aee1396f68274b57f3b` |
 | 2026-07-20 | Provifact Assistant, profile catalog, social metadata, and public cutover preparation | `9dae1363c0019022062c844a3725e0b537de658c` |
 | 2026-07-20 | Exact upstream rule-ID canonicalization and catalog/Mission set guard | `2ca6073` |
+| 2026-07-20 | Exact-mapping and cutover-record squash merge through PR #25 | `ffbdd0352e78e8c288cf3f79865552a83def79db` |
+| 2026-07-20 | Version-bound catalog cache and final product squash merge through PR #26 | `0dd12dcac2511bdfeed51471baedc2f304741659` |
 
 Exact Phase 1 commands, results, limitations, and commit hashes are maintained in the
 [Phase 1 validation record](phase-1-validation.md).

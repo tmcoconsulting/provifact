@@ -2,9 +2,9 @@
 
 **Date:** 2026-07-20
 
-**Protected-main merge:** `9dae1363c0019022062c844a3725e0b537de658c`
+**Protected-main product merge:** `0dd12dcac2511bdfeed51471baedc2f304741659`
 
-**Validated product commit:** `2ca6073`
+**Validated product commit:** `0dd12dcac2511bdfeed51471baedc2f304741659`
 
 **Human review:** required
 
@@ -214,3 +214,14 @@ parsed, exact finding coverage and evidence references passed, typed claims matc
 evidence, generated prose remained quarantined, and the UI retained human-review language. The
 question, evidence input, prose, authorization data, and model output were not retained in this
 repository record and no second paid request was made.
+
+The first browser session retained a stale `force-cache` catalog after the exact rule-ID fix. The
+page failed closed instead of presenting an inconsistent matrix. The catalog URL is now bound to
+its expected fingerprint, the browser requires the recomputed fingerprint and exact Mission/
+TMCO Consulting rule-set equality, and protected deployment
+[`29782874960`](https://github.com/tmcoconsulting/provifact/actions/runs/29782874960) published the
+final product commit above. Post-deployment browser verification showed all 98 TMCO Consulting
+requirements in CIS Level 1 and, as a separate planning comparison, 73 company-profile overlaps
+plus 142
+reference-only candidates for the 215-rule CMMC Level 2 profile. Those figures describe catalog
+membership and planning scope, not compliance.

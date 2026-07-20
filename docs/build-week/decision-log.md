@@ -577,3 +577,17 @@ The browser initially rejected an already-open page after deployment because its
 expected fingerprint, and validation requires both that expected fingerprint and a recomputed
 canonical hash. New code therefore selects its matching immutable cache key while altered or stale
 catalog content continues to fail closed.
+
+## 2026-07-20 — Refresh pinned CI runtime and artifact dependencies together
+
+**Decision:** Consolidate the independently green Dependabot proposals for `filelock` 3.31.1,
+`actions/checkout` 7.0.1, `actions/setup-python` 7.0.0, and `actions/setup-node` 7.0.0 with the
+`actions/upload-artifact` 7.0.1 and `actions/download-artifact` 8.0.1 upgrades. Keep every action
+reference pinned to the exact Dependabot-supplied commit SHA and update the workflow-security tests
+to require those new immutable pins.
+
+**Why:** The action-major updates move the workflows off the deprecated Node 20 action runtime.
+The two artifact PRs failed only because the security tests correctly required the previous SHAs;
+changing the workflow and its exact-pin assertions in one trusted-source change preserves that
+fail-closed control. No workflow permission, trigger, environment boundary, artifact path, or
+retention rule changes.
