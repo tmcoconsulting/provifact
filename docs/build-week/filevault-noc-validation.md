@@ -2,9 +2,12 @@
 
 Date: 2026-07-20
 
-Branch: `codex/intune-filevault-noc-dashboard`
+Historical implementation branch: `codex/intune-filevault-noc-dashboard`
 
-Review state: pending human review
+Review state: merged through PR #13 as `3206d58b9f565107e8b8d79fe9e7aea73b5ca8d1`
+
+> This page is a dated defect and validation record. Current counts come from Mission Control and
+> the current Mission package, not from this checkpoint narrative.
 
 ## Problem reproduced
 

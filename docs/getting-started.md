@@ -29,8 +29,8 @@ python scripts/check_public_artifacts.py site
 Open `site/evidence-dashboard/index.html`. Mission Control shows the approved 98-rule inventory,
 four reviewed macOS provider mappings, 25% technical alignment over the explicit four-rule
 denominator, FileVault/firewall/assignment/conflict drift, a Mac/iPhone/iPad posture, unevaluated
-resources, one collection gap, previous-versus-current changes, framework cross-references, and the
-site-wide Provifact Copilot.
+resources, a 94-rule implementation backlog grouped by baseline section, one collection gap,
+previous-versus-current changes, framework cross-references, and the site-wide Provifact Assistant.
 Every value comes from the tracked synthetic package; fixture assistant answers make no model
 request.
 
@@ -46,7 +46,7 @@ npm run dev
 ```
 
 `npm run dev` starts fixture mode and explicitly disables Wrangler `.env`/`.dev.vars` loading. The
-Copilot enables `/api/ask` only after `/api/status` confirms a supported Worker mode. Fixture mode
+Assistant enables `/api/ask` only after `/api/status` confirms a supported Worker mode. Fixture mode
 makes no OpenAI request. Stop the local process when the review is complete.
 
 ## Command boundary

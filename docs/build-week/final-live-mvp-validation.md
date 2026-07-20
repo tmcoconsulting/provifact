@@ -22,7 +22,7 @@
 - Mission schema `2.1.0`, public-safe parent references, and current/prior live snapshot comparison
 - Live-artifact-only production workflow with exact audit-run and snapshot provenance
 - Action-first Mission Control, compact Settings detail, global provenance, and snapshot refresh
-- Site-wide bounded Provifact Copilot with production `gpt-5.6-terra` and local/preview fixture mode
+- Site-wide bounded Provifact Assistant with production `gpt-5.6-terra` and local/preview fixture mode
 - Official owner-approved TMCO Consulting assets and standalone-company-name content gate
 - Preserved GET-only Graph provider, fail-closed publication, deterministic authority, and no BYOK
 
@@ -143,7 +143,7 @@ frame-denial headers. HEAD is rejected by the method allowlist.
 
 Authenticated browser checks verified global provenance, action-first Mission Control, the compact
 settings matrix, exact FileVault mapping detail, the published-snapshot refresh control, the
-site-wide Copilot drawer, accessible controls, and a 390-by-844 responsive drawer without
+site-wide Assistant drawer, accessible controls, and a 390-by-844 responsive drawer without
 page overflow. Browser logs contained no warnings or errors. No private identifier or synthetic
 tenant posture was visible.
 

@@ -3,7 +3,7 @@
 <div class="synthetic-banner">
 DECLARED DATA MODE. Mission Control and <code>/api/status</code> are authoritative for the deployed
 package. Production currently serves a reviewed, fail-closed sanitized projection from read-only
-Microsoft Graph collection. Production Provifact Copilot uses fixed `gpt-5.6-terra`; local and
+Microsoft Graph collection. Production Provifact Assistant uses fixed `gpt-5.6-terra`; local and
 preview builds remain fixture mode and make no OpenAI request.
 The repository checkout and reproduction path below remain entirely synthetic.
 </div>
@@ -28,9 +28,8 @@ platform posture, gaps, and assistant references have one deterministic source.
 
 The tracked fixture alignment score is intentionally 25%: one aligned rule divided by four
 explicitly mapped and evaluable rules. Production derives its current score from the sanitized
-Mission package instead. In both modes, the other 94 baseline rules remain visible as mapping not
-reviewed
-and do not inflate or deflate the denominator.
+Mission package instead. In both modes, the other 94 baseline rules remain visible as an
+implementation backlog, grouped by baseline section, and do not inflate or deflate the denominator.
 
 ## Representative fixture states
 

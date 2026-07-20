@@ -16,6 +16,7 @@ from evidenceops.baselines.intune import (
 )
 from evidenceops.baselines.mscp import (
     APPROVAL_RECORD,
+    BASELINE_RULE_TITLES,
     BASELINE_RULES,
     DEMO_RULE_MAPPINGS,
     EXTRACTED_INVENTORY_SHA256,
@@ -26,6 +27,7 @@ __all__ = [
     "APPROVAL_RECORD",
     "AssignmentRequirement",
     "BASELINE_RULES",
+    "BASELINE_RULE_TITLES",
     "DEMO_RULE_MAPPINGS",
     "EXTRACTED_INVENTORY_SHA256",
     "INTUNE_PROVIDER_MAPPINGS",

@@ -18,7 +18,7 @@ requirements from their authoritative source before submission.
 
 - [x] Every demo surface clearly declares whether its evidence is synthetic or sanitized live data
 - [x] Production reports the exact reviewed live snapshot and fixed `gpt-5.6-terra` mode; one
-      bounded Copilot answer passes deterministic verification
+      bounded Assistant answer passes deterministic verification
 - [x] No live tenant, person, device, group, or credential data is committed
 - [x] Sanitizer fails closed on unknown fields
 - [x] Generated site passes prohibited-pattern scanning

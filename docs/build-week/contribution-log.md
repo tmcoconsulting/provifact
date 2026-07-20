@@ -97,6 +97,8 @@ or proprietary material from `intune-apple-gitops` or any other repository.
 | 2026-07-19 | Reviewed deployment-isolation squash merge | `3e4954dfe50ddaaa06e5f38114abe26591fe10ea` |
 | 2026-07-19 | Bot-Fight-safe active Worker version proof | `18b94c3` |
 | 2026-07-19 | Reviewed active-version proof squash merge | `f1dd37be822c07677621907168fc372c6ccc0ae0` |
+| 2026-07-20 | Consolidated rebrand and live-readiness pull requests | `f3db2c7a38750d8b31938ec43c816cb435492e7d` |
+| 2026-07-20 | Full 98-rule implementation plan, cohesive docs shell, and judge path | `cde773cdd0f3820a46cd59205e8b883706f0ae58` |
 
 Exact Phase 1 commands, results, limitations, and commit hashes are maintained in the
 [Phase 1 validation record](phase-1-validation.md).
@@ -104,7 +106,7 @@ Exact Phase 1 commands, results, limitations, and commit hashes are maintained i
 The July 20 finalization remained owned by the primary Codex task and used three bounded supporting
 agents in the same shared checkout: one implemented exact provider mappings and sanitized snapshot
 history; one hardened protected audit/deployment workflows; and one implemented Mission Control and
-Provifact Copilot. The primary agent read the governing instructions, integrated and reviewed every
+Provifact Assistant. The primary agent read the governing instructions, integrated and reviewed every
 shared change, added TMCO Consulting branding and documentation, ran the complete validation gate,
 and retained sole responsibility for Git, PR, merge, live audit, deployment, and production checks.
 Implementation commit: `143f694f7183f1a2ce117a3a0867aad316f7a1ae`.
@@ -159,5 +161,6 @@ follow-up preserves the edge control and proves the snapshot-bound Worker versio
 that proof. Protected deployment `29703512007` passed validation, exact public-package selection,
 upload, and control-plane proof; independent production checks matched the live sanitized snapshot.
 TJ then authorized one further protected-main audit retry. Run `29703823180` passed OIDC, GET-only
-collection, sanitization, scanning, and cleanup with artifact retention disabled. The
-documentation-only final report remains pending TJ review.
+collection, sanitization, scanning, and cleanup with artifact retention disabled. The earlier
+documentation-only final report is retained as a dated checkpoint; the current Mission
+package, roadmap, judge guide, and latest validation record supersede its mutable runtime counts.

@@ -70,7 +70,7 @@ independently re-read. Protected-main OIDC collection and one separately reviewe
 publication completed successfully. No client secret exists.
 
 The public Worker runtime serves a reviewed live sanitized Mission package and fixed-model OpenAI
-Provifact Copilot; local and preview runtimes remain explicit fixture mode. It uses Worker-first
+Provifact Assistant; local and preview runtimes remain explicit fixture mode. It uses Worker-first
 routing only for `/api/*`, exact methods, same-origin checks,
 a 64 KiB request bound, compressed-body rejection, native client and global rate limiting, a
 20-second OpenAI timeout, bounded model context/output, a 256 KiB upstream-response bound, one

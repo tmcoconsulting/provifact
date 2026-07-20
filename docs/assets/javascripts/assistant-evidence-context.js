@@ -3,7 +3,7 @@
 
   const STATUS_URL = "/api/status";
   const MISSION_URL = "/assets/data/mission-control.json";
-  const HISTORY_KEY = "provifact-copilot-history-v1";
+  const HISTORY_KEY = "provifact-assistant-history-v1";
   const MAX_HISTORY = 12;
   const EVIDENCE_ID = /^(?:finding|req|gap|mission)-[0-9a-f]{24}$/;
   const operationalPaths = new Set([
@@ -88,6 +88,7 @@
   let currentStatus = null;
 
   const freshnessState = (status) => {
+    if (status.data_mode.startsWith("SYNTHETIC")) return "fixed fixture";
     const collected = Date.parse(status.evidence_timestamp);
     const maximum = Number(status.evidence_maximum_age_seconds);
     if (
@@ -143,14 +144,13 @@
       currentStatus = status;
       facts.replaceChildren();
       const freshness = freshnessState(status);
-      const state =
-        freshness === "stale"
+      const state = status.data_mode.startsWith("SYNTHETIC")
+        ? "fixture"
+        : freshness === "stale"
           ? "stale"
           : status.data_mode.startsWith("LIVE")
             ? "live"
-            : status.data_mode.startsWith("SYNTHETIC")
-              ? "fixture"
-              : "stale";
+            : "stale";
       panel.dataset.state = state;
       statusLabel.textContent =
         state === "stale" ? "DEGRADED / STALE" : status.data_mode;
@@ -163,7 +163,7 @@
       addFact("Snapshot", status.source_snapshot_id);
       addFact("Approved baseline", status.approved_baseline);
       addFact(
-        "Provifact Copilot",
+        "Provifact Assistant",
         status.model_call_available
           ? `${status.model} via OpenAI`
           : status.narrative_mode === "fixture"
@@ -269,55 +269,55 @@
     return null;
   };
 
-  const renderCopilot = async () => {
+  const renderAssistant = async () => {
     const launcher = create(
       "button",
-      "evidence-copilot-launcher",
-      "Provifact Copilot",
+      "provifact-assistant-launcher",
+      "Provifact Assistant",
     );
     launcher.type = "button";
     launcher.setAttribute("aria-haspopup", "dialog");
     launcher.setAttribute("aria-expanded", "false");
 
-    const dialog = create("dialog", "evidence-copilot");
-    dialog.id = "evidence-copilot";
-    dialog.setAttribute("aria-labelledby", "evidence-copilot-title");
+    const dialog = create("dialog", "provifact-assistant");
+    dialog.id = "provifact-assistant";
+    dialog.setAttribute("aria-labelledby", "provifact-assistant-title");
     launcher.setAttribute("aria-controls", dialog.id);
 
-    const header = create("header", "evidence-copilot-header");
+    const header = create("header", "provifact-assistant-header");
     const headingGroup = create("div");
     const eyebrow = create(
       "span",
-      "evidence-copilot-eyebrow",
+      "provifact-assistant-eyebrow",
       "Bounded evidence assistant",
     );
-    const heading = create("h2", "", "Provifact Copilot");
-    heading.id = "evidence-copilot-title";
+    const heading = create("h2", "", "Provifact Assistant");
+    heading.id = "provifact-assistant-title";
     const runtime = create(
       "p",
-      "evidence-copilot-runtime",
+      "provifact-assistant-runtime",
       "Checking runtime…",
     );
     headingGroup.append(eyebrow, heading, runtime);
-    const close = create("button", "evidence-copilot-close", "Close");
+    const close = create("button", "provifact-assistant-close", "Close");
     close.type = "button";
-    close.setAttribute("aria-label", "Close Provifact Copilot");
+    close.setAttribute("aria-label", "Close Provifact Assistant");
     header.append(headingGroup, close);
 
-    const selected = create("div", "evidence-copilot-selected");
+    const selected = create("div", "provifact-assistant-selected");
     selected.hidden = true;
     const selectedText = create("span");
     const clearSelected = create("button", "", "Clear selected evidence");
     clearSelected.type = "button";
     selected.append(selectedText, clearSelected);
 
-    const transcript = create("div", "evidence-copilot-transcript");
+    const transcript = create("div", "provifact-assistant-transcript");
     transcript.setAttribute("aria-live", "polite");
-    transcript.setAttribute("aria-label", "Provifact Copilot conversation");
-    const suggestionGroup = create("div", "evidence-copilot-suggestions");
+    transcript.setAttribute("aria-label", "Provifact Assistant conversation");
+    const suggestionGroup = create("div", "provifact-assistant-suggestions");
     suggestionGroup.setAttribute("aria-label", "Suggested evidence questions");
 
-    const form = create("form", "evidence-copilot-form");
+    const form = create("form", "provifact-assistant-form");
     const label = create("label", "", "Ask about the published evidence");
     const input = create("textarea");
     input.name = "question";
@@ -326,16 +326,16 @@
     input.required = true;
     input.placeholder = "What requires my attention?";
     label.append(input);
-    const submit = create("button", "", "Ask Provifact Copilot");
+    const submit = create("button", "", "Ask Provifact Assistant");
     submit.type = "submit";
     submit.disabled = true;
-    const formStatus = create("p", "evidence-copilot-form-status");
+    const formStatus = create("p", "provifact-assistant-form-status");
     formStatus.setAttribute("role", "status");
     form.append(label, submit, formStatus);
 
     const boundary = create(
       "p",
-      "evidence-copilot-boundary",
+      "provifact-assistant-boundary",
       "Only the question, page enum, snapshot ID, and optional selected evidence ID are sent. No DOM, tenant identities, or browser API key is sent. Answers remain subject to human review.",
     );
     dialog.append(
@@ -354,10 +354,10 @@
     const appendMessage = (role, text, references = []) => {
       const article = create(
         "article",
-        `evidence-copilot-message evidence-copilot-${role}`,
+        `provifact-assistant-message provifact-assistant-${role}`,
       );
       article.append(
-        create("strong", "", role === "user" ? "You" : "Provifact Copilot"),
+        create("strong", "", role === "user" ? "You" : "Provifact Assistant"),
         create("p", "", text),
       );
       const links = references
@@ -368,7 +368,7 @@
         .map((reference) => ({ reference, href: evidenceHref(reference) }))
         .filter((item) => item.href !== null);
       if (links.length) {
-        const nav = create("nav", "evidence-copilot-links");
+        const nav = create("nav", "provifact-assistant-links");
         nav.setAttribute("aria-label", "Evidence references");
         for (const { reference, href } of links) {
           const link = create("a", "", reference);
@@ -403,7 +403,7 @@
         evidenceId === null ? "" : `Selected evidence: ${evidenceId}`;
     };
 
-    const openCopilot = (options = {}) => {
+    const openAssistant = (options = {}) => {
       if (
         typeof options.selectedEvidenceId === "string" &&
         EVIDENCE_ID.test(options.selectedEvidenceId)
@@ -421,7 +421,7 @@
       input.focus();
     };
 
-    launcher.addEventListener("click", () => openCopilot());
+    launcher.addEventListener("click", () => openAssistant());
     close.addEventListener("click", () => dialog.close());
     dialog.addEventListener("close", () => {
       launcher.setAttribute("aria-expanded", "false");
@@ -433,12 +433,12 @@
     clearSelected.addEventListener("click", () => setSelected(null));
     window.addEventListener("provifact:select-evidence", (event) => {
       if (!(event instanceof CustomEvent) || !isRecord(event.detail)) return;
-      openCopilot({
+      openAssistant({
         selectedEvidenceId: event.detail.evidenceId,
         question: event.detail.question,
       });
     });
-    window.ProvifactCopilot = { open: openCopilot };
+    window.ProvifactAssistant = { open: openAssistant };
 
     let status;
     try {
@@ -455,7 +455,7 @@
     } catch {
       runtime.textContent = "Worker runtime unavailable";
       formStatus.textContent =
-        "Provifact Copilot is unavailable. No synthetic or model fallback was selected.";
+        "Provifact Assistant is unavailable. No synthetic or model fallback was selected.";
       submit.disabled = true;
     }
 
@@ -549,5 +549,5 @@
   };
 
   void renderProvenance();
-  void renderCopilot();
+  void renderAssistant();
 })();

@@ -10,8 +10,8 @@ theme:
   name: material
   language: en
   font: false
-  logo: assets/images/tmco-favicon.svg
-  favicon: assets/images/tmco-favicon.svg
+  logo: assets/images/provifact-mark.svg
+  favicon: assets/images/provifact-mark.svg
   features:
     - navigation.footer
     - navigation.indexes
@@ -22,28 +22,16 @@ theme:
     - search.suggest
     - content.code.copy
   palette:
-    - media: "(prefers-color-scheme: light)"
-      scheme: default
-      primary: indigo
-      accent: cyan
-      toggle:
-        icon: material/weather-night
-        name: Switch to dark mode
-    - media: "(prefers-color-scheme: dark)"
-      scheme: slate
-      primary: indigo
-      accent: cyan
-      toggle:
-        icon: material/weather-sunny
-        name: Switch to light mode
+    scheme: slate
+    primary: indigo
+    accent: cyan
 
 nav:
   - Start Here: index.md
-  - Product:
-      - Mission Control: evidence-dashboard.md
-      - Settings & Baselines: settings-matrix.md
-      - Runtime Demo: live-demo.md
-  - How It Works:
+  - Mission Control: evidence-dashboard.md
+  - Baseline Plan: settings-matrix.md
+  - Judge Guide: judge-guide.md
+  - Trust & Design:
       - Architecture: architecture.md
       - Audit Methodology: audit-methodology.md
       - Security Model: security-model.md
@@ -51,25 +39,22 @@ nav:
       - Threat Model: threat-model.md
   - Operate:
       - Getting Started: getting-started.md
+      - Runtime Status: live-demo.md
       - Local Demo: operations/demo-mode.md
       - Live Read-Only Collection: operations/live-collection.md
       - Cloudflare Worker: operations/cloudflare-worker.md
       - Deployment Models: operations/deployment-models.md
       - Incident Response: operations/incident-response.md
-  - Project:
+  - Project Evidence:
       - Roadmap: roadmap.md
       - Videos: videos.md
       - Build Week:
-          - Codex Collaboration: build-week/codex-collaboration.md
+          - Demo Package: build-week/demo-package.md
+          - Current Judge-Readiness Validation: build-week/judge-readiness-validation.md
+          - FileVault & NOC Validation: build-week/filevault-noc-validation.md
           - Decision Log: build-week/decision-log.md
           - Contribution Log: build-week/contribution-log.md
-          - Phase 1 Validation: build-week/phase-1-validation.md
-          - Worker Validation: build-week/cloudflare-worker-validation.md
-          - Build Week Slice Validation: build-week/build-week-slice-validation.md
-          - Final Live MVP Validation: build-week/final-live-mvp-validation.md
-          - FileVault & NOC Validation: build-week/filevault-noc-validation.md
-          - Final Implementation Report: build-week/final-implementation-report.md
-          - Demo Package: build-week/demo-package.md
+          - Codex Collaboration: build-week/codex-collaboration.md
           - Final Video Runbook: build-week/video-runbook.md
           - Submission Checklist: build-week/submission-checklist.md
 
@@ -88,15 +73,15 @@ markdown_extensions:
       alternate_style: true
 
 extra_css:
-  - assets/stylesheets/extra.css?v=20260720-provifact1
-  - assets/stylesheets/settings-matrix.css?v=20260720-final
-  - assets/stylesheets/assistant-evidence-context.css?v=20260720-final
+  - assets/stylesheets/extra.css?v=20260720-judge2
+  - assets/stylesheets/settings-matrix.css?v=20260720-judge2
+  - assets/stylesheets/assistant-evidence-context.css?v=20260720-judge2
 
 extra_javascript:
-  - assets/javascripts/mission-control.js?v=20260720-provifact1
-  - assets/javascripts/provifact-api.js?v=20260720-provifact1
-  - assets/javascripts/settings-matrix.js?v=20260720-provifact1
-  - assets/javascripts/assistant-evidence-context.js?v=20260720-provifact1
+  - assets/javascripts/mission-control.js?v=20260720-judge2
+  - assets/javascripts/provifact-api.js?v=20260720-judge2
+  - assets/javascripts/settings-matrix.js?v=20260720-judge2
+  - assets/javascripts/assistant-evidence-context.js?v=20260720-judge2
 
 plugins:
   - search

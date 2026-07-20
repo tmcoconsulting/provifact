@@ -5,6 +5,85 @@
   --provifact-mist: #eef4fb;
 }
 
+/* The documentation shell uses the same operations-console visual language as
+   Mission Control, while retaining MkDocs' accessible navigation and search. */
+[data-md-color-scheme="slate"] {
+  --md-default-bg-color: #07111f;
+  --md-default-bg-color--light: #0b1727;
+  --md-default-bg-color--lighter: #0f1d2f;
+  --md-default-bg-color--lightest: #13243a;
+  --md-default-fg-color: #d9e6f3;
+  --md-default-fg-color--light: #8299af;
+  --md-default-fg-color--lighter: #607b96;
+  --md-primary-fg-color: #10243a;
+  --md-accent-fg-color: #2dd4bf;
+  --md-typeset-a-color: #55a7ff;
+  --md-code-bg-color: #0b1727;
+}
+
+body:not(:has(.mission-shell)) .md-container,
+body:not(:has(.mission-shell)) .md-main {
+  background:
+    radial-gradient(circle at 78% -12%, rgb(33 111 182 / 17%), transparent 36rem),
+    #07111f;
+}
+
+body:not(:has(.mission-shell)) .md-header,
+body:not(:has(.mission-shell)) .md-tabs {
+  border-bottom: 1px solid rgb(118 159 201 / 20%);
+  background: rgb(7 17 31 / 94%);
+  box-shadow: 0 0.7rem 1.8rem rgb(0 0 0 / 18%);
+  backdrop-filter: blur(1rem);
+}
+
+body:not(:has(.mission-shell)) .md-main__inner {
+  max-width: 92rem;
+}
+
+body:not(:has(.mission-shell)) .md-content__inner {
+  padding-bottom: 3rem;
+}
+
+body:not(:has(.mission-shell)) .md-typeset > h1 {
+  padding-bottom: 0.7rem;
+  border-bottom: 1px solid rgb(118 159 201 / 22%);
+  color: #f3f8fd;
+  font-weight: 820;
+  letter-spacing: -0.035em;
+}
+
+body:not(:has(.mission-shell)) .md-typeset h2,
+body:not(:has(.mission-shell)) .md-typeset h3 {
+  color: #f3f8fd;
+}
+
+body:not(:has(.mission-shell)) .md-nav__link--active,
+body:not(:has(.mission-shell)) .md-nav__link:focus,
+body:not(:has(.mission-shell)) .md-nav__link:hover {
+  color: #2dd4bf;
+}
+
+body:not(:has(.mission-shell)) .md-typeset table:not([class]) {
+  border: 1px solid rgb(118 159 201 / 22%);
+  background: rgb(11 23 39 / 72%);
+}
+
+body:not(:has(.mission-shell)) .md-typeset table:not([class]) th {
+  color: #f3f8fd;
+  background: #10243a;
+}
+
+body:not(:has(.mission-shell)) .md-typeset .admonition,
+body:not(:has(.mission-shell)) .md-typeset details {
+  border-color: rgb(118 159 201 / 26%);
+  background: rgb(11 23 39 / 74%);
+}
+
+body:not(:has(.mission-shell)) .md-footer {
+  border-top: 1px solid rgb(118 159 201 / 20%);
+  background: #06101c;
+}
+
 .md-header {
   background: linear-gradient(110deg, #172a57 0%, #234fbd 58%, #007e99 100%);
 }
@@ -37,6 +116,9 @@
 }
 
 .hero-kicker {
+  display: flex;
+  gap: 0.7rem;
+  align-items: center;
   color: var(--provifact-blue);
   font-weight: 750;
   letter-spacing: 0.12em;
@@ -173,6 +255,28 @@
 [data-md-color-scheme="slate"] .runtime-panel {
   color: #edf5ff;
   background: rgba(27, 45, 72, 0.84);
+}
+
+[data-md-color-scheme="slate"] .evidence-hero h1 {
+  color: #f3f8fd;
+}
+
+body:not(:has(.mission-shell)) .md-typeset .md-button {
+  color: #d9e6f3;
+  border-color: rgb(118 159 201 / 34%);
+  background: #0b1727;
+}
+
+body:not(:has(.mission-shell)) .md-typeset .md-button--primary {
+  color: #06121f;
+  border-color: transparent;
+  background: linear-gradient(120deg, #2dd4bf, #55a7ff);
+}
+
+body:not(:has(.mission-shell)) .md-typeset .md-button:hover,
+body:not(:has(.mission-shell)) .md-typeset .md-button:focus-visible {
+  color: #f3f8fd;
+  border-color: #55a7ff;
 }
 
 [data-md-color-scheme="slate"] .hero-actions .secondary {
@@ -887,18 +991,10 @@ body:has(.mission-shell) .md-content__inner::before {
 }
 
 .mission-brand-mark {
-  display: grid;
   width: 2.5rem;
   height: 2.5rem;
-  place-items: center;
-  border: 1px solid rgb(45 212 191 / 55%);
   border-radius: 0.65rem;
-  color: #07111f;
-  background: linear-gradient(135deg, #2dd4bf, #55a7ff);
   box-shadow: 0 0 1.5rem rgb(45 212 191 / 18%);
-  font-size: 0.76rem;
-  font-weight: 900;
-  letter-spacing: 0.08em;
 }
 
 .mission-brand strong,
@@ -1266,6 +1362,10 @@ body:has(.mission-shell) .md-content__inner::before {
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
+.mission-panel-wide {
+  grid-column: 1 / -1;
+}
+
 .mission-panel-priority,
 .mission-panel-pipeline {
   min-height: 20rem;
@@ -1363,7 +1463,15 @@ body:has(.mission-shell) .md-content__inner::before {
 }
 
 .mission-posture-table-wrap {
+  max-height: 42rem;
   margin-top: 0.8rem;
+  overflow: auto;
+}
+
+.mission-posture-table-wrap .mission-table th {
+  position: sticky;
+  top: 0;
+  z-index: 2;
 }
 
 .mission-baseline-next {
@@ -1420,6 +1528,14 @@ body:has(.mission-shell) .md-content__inner::before {
 .mission-state-assignment-drift,
 .mission-state-conflicting-policy {
   color: var(--mission-red);
+}
+
+.mission-state-implementation-planning-required {
+  color: var(--mission-amber);
+}
+
+.mission-state-provider-mapping-review-required {
+  color: var(--mission-blue);
 }
 
 .mission-row-action {
@@ -1485,6 +1601,25 @@ body:has(.mission-shell) .md-content__inner::before {
 .mission-resource-group summary {
   color: var(--mission-text);
   font-size: 0.66rem;
+}
+
+.mission-planning-list {
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+
+.mission-plan-scope {
+  color: var(--mission-muted);
+  font-size: 0.61rem;
+}
+
+.mission-plan-link {
+  color: var(--mission-text) !important;
+  text-decoration: none;
+}
+
+.mission-plan-link:hover,
+.mission-plan-link:focus-visible {
+  color: var(--mission-blue) !important;
 }
 
 .mission-callout,
@@ -1591,7 +1726,8 @@ body:has(.mission-shell) .md-content__inner::before {
   }
 
   .mission-baseline-readout,
-  .mission-grid-coverage {
+  .mission-grid-coverage,
+  .mission-planning-list {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
@@ -1656,7 +1792,8 @@ body:has(.mission-shell) .md-content__inner::before {
 
   .mission-metrics,
   .mission-baseline-readout,
-  .mission-grid-coverage {
+  .mission-grid-coverage,
+  .mission-planning-list {
     grid-template-columns: 1fr;
   }
 

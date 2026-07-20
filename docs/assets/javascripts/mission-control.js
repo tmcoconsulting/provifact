@@ -21,6 +21,24 @@
     if (typeof value === "boolean") return value ? "Enabled" : "Disabled";
     return String(value);
   };
+  const implementationState = (requirement) => {
+    if (requirement.evaluation_included === true) return requirement.outcome;
+    if (
+      requirement.mapping_review_status === "not reviewed" &&
+      requirement.setting_key &&
+      requirement.setting_key !== "not mapped"
+    )
+      return "Provider mapping review required";
+    return "Implementation planning required";
+  };
+  const implementationTarget = (requirement) =>
+    requirement.setting_key && requirement.setting_key !== "not mapped"
+      ? formatValue(requirement.expected_value)
+      : "Target pending approved mapping";
+  const implementationObserved = (requirement) =>
+    requirement.evaluation_included === true
+      ? formatValue(requirement.observed_value)
+      : "Not deterministically collected";
   const shortHash = (value) =>
     typeof value === "string" && value.length > 22
       ? `${value.slice(0, 20)}…`
@@ -241,7 +259,7 @@
     const ask = create(
       "button",
       "md-button md-button--primary",
-      "Ask Provifact Copilot about this finding",
+      "Ask Provifact Assistant about this finding",
     );
     ask.type = "button";
     ask.addEventListener("click", () => {
@@ -262,37 +280,40 @@
 
   const renderOverview = () => {
     const metrics = mission.metrics;
+    const planningCount = mission.requirements.filter(
+      (requirement) => requirement.evaluation_included !== true,
+    ).length;
     const container = select("[data-mission-metrics]");
     if (container instanceof HTMLElement) {
       container.replaceChildren(
         metricCard(
-          "Findings requiring review",
+          "Approved Level 1 rules",
+          mission.baseline.rule_count,
+          "Complete pinned inventory",
+          "good",
+        ),
+        metricCard(
+          "Exact Intune joins",
+          metrics.alignment_denominator,
+          `${metrics.aligned_requirements} match desired state`,
+        ),
+        metricCard(
+          "Deterministic drift",
           metrics.drifted_requirements,
           `${metrics.high_severity_drift} high severity`,
           metrics.drifted_requirements ? "danger" : "good",
         ),
         metricCard(
-          "New drift",
-          mission.changes.new_drift.length,
-          "Since the previous sanitized collection",
-          mission.changes.new_drift.length ? "warning" : "good",
-        ),
-        metricCard(
-          "Resolved",
-          mission.changes.resolved_drift.length,
-          "Requires later collected evidence",
-          "good",
+          "Implementation backlog",
+          planningCount,
+          "Rules still needing an approved path",
+          planningCount ? "warning" : "good",
         ),
         metricCard(
           "Collection gaps",
           metrics.collection_gaps,
           "Additional evidence required",
           metrics.collection_gaps ? "warning" : "good",
-        ),
-        metricCard(
-          "Evaluated settings",
-          metrics.alignment_denominator,
-          `${metrics.aligned_requirements} currently aligned`,
         ),
       );
     }
@@ -306,7 +327,10 @@
       `Collected ${mission.collection.collected_at_utc} · ${mission.collection.provider} ${mission.collection.provider_version}`,
     );
     text("[data-mission-mode]", mission.data_mode);
-    text("[data-priority-count]", `${mission.findings.length} open`);
+    text(
+      "[data-priority-count]",
+      `${mission.findings.length} drift · ${planningCount} to plan`,
+    );
 
     const list = select("[data-attention-list]");
     if (list instanceof HTMLElement) {
@@ -373,7 +397,10 @@
       case "Missing from tenant":
         return "Confirm absence, then use the approved human change process.";
       case "Provider mapping not reviewed":
-        return "Review an exact provider definition before evaluation.";
+        return requirement.setting_key &&
+          requirement.setting_key !== "not mapped"
+          ? "Review an exact Intune definition before evaluation."
+          : "Classify the Intune, custom-profile, script/agent, or alternate-evidence path.";
       case "Unsupported value shape":
         return "Review the provider shape; do not infer a value.";
       default:
@@ -384,13 +411,15 @@
   const renderPostureRows = (lens) => {
     const body = select("[data-posture-rows]");
     if (!(body instanceof HTMLElement)) return;
-    const requirements = mission.requirements.filter(
-      (requirement) =>
+    const requirements = mission.requirements.filter((requirement) => {
+      if (lens === "active") return true;
+      if (lens === "evaluated") return requirement.evaluation_included === true;
+      return (
         requirement.evaluation_included === true &&
-        (lens !== "stig" ||
-          (Array.isArray(requirement.mappings?.stig) &&
-            requirement.mappings.stig.length > 0)),
-    );
+        Array.isArray(requirement.mappings?.stig) &&
+        requirement.mappings.stig.length > 0
+      );
+    });
     body.replaceChildren();
     for (const requirement of requirements) {
       const row = document.createElement("tr");
@@ -405,12 +434,13 @@
             : requirement.setting_key,
         ),
       );
+      const renderedState = implementationState(requirement);
       const state = create(
         "span",
-        `mission-state mission-state-${String(requirement.outcome)
+        `mission-state mission-state-${String(renderedState)
           .toLowerCase()
           .replaceAll(" ", "-")}`,
-        requirement.outcome,
+        renderedState,
       );
       const evidenceCount = Array.isArray(requirement.source_evidence_ids)
         ? requirement.source_evidence_ids.length
@@ -445,12 +475,12 @@
         create(
           "td",
           "mission-observed-target",
-          formatValue(requirement.expected_value),
+          implementationTarget(requirement),
         ),
         create(
           "td",
           "mission-observed-target",
-          formatValue(requirement.observed_value),
+          implementationObserved(requirement),
         ),
         stateCell,
         evidence,
@@ -483,6 +513,7 @@
       return;
     const render = () => {
       const stig = selector.value === "stig";
+      const evaluatedOnly = selector.value === "evaluated";
       const framework = mission.framework_coverage.STIG || {
         identifiers: [],
         technical_evidence_identifier_count: 0,
@@ -495,36 +526,66 @@
           Array.isArray(requirement.mappings?.stig) &&
           requirement.mappings.stig.length,
       );
-      const aligned = (stig ? stigEvaluated : evaluated).filter(
+      const scoped = stig
+        ? stigEvaluated
+        : evaluatedOnly
+          ? evaluated
+          : mission.requirements;
+      const evaluatedScoped = scoped.filter(
+        (requirement) => requirement.evaluation_included === true,
+      );
+      const aligned = evaluatedScoped.filter(
         (requirement) => requirement.outcome === "Aligned",
       ).length;
-      const scoped = stig ? stigEvaluated : evaluated;
+      const planning = scoped.length - evaluatedScoped.length;
       readout.replaceChildren(
         metricCard(
-          stig ? "STIG-linked evaluated settings" : "Pinned baseline inventory",
-          stig ? stigEvaluated.length : mission.baseline.rule_count,
+          stig
+            ? "STIG-linked evaluated settings"
+            : evaluatedOnly
+              ? "Exact reviewed joins"
+              : "Pinned baseline inventory",
+          scoped.length,
           stig
             ? `${framework.technical_evidence_identifier_count} technical identifier(s)`
-            : mission.baseline.benchmark_version,
+            : evaluatedOnly
+              ? "Deterministic denominator only"
+              : mission.baseline.benchmark_version,
         ),
         metricCard(
           "Deterministically evaluated",
-          scoped.length,
+          evaluatedScoped.length,
           stig ? "Cross-reference lens only" : "Exact reviewed Intune mappings",
         ),
         metricCard(
-          "Matches desired state",
-          aligned,
-          `${scoped.length - aligned} differ, are missing, or need evidence`,
-          aligned === scoped.length ? "good" : "warning",
+          evaluatedOnly || stig
+            ? "Matches desired state"
+            : "Implementation backlog",
+          evaluatedOnly || stig ? aligned : planning,
+          evaluatedOnly || stig
+            ? `${evaluatedScoped.length - aligned} deterministic finding(s)`
+            : "Requires approved management and evidence paths",
+          planning || evaluatedScoped.length - aligned ? "warning" : "good",
         ),
         metricCard(
-          stig ? "STIG baseline status" : "Authority",
-          stig ? "NOT LOADED" : "APPROVED",
+          stig
+            ? "STIG baseline status"
+            : evaluatedOnly
+              ? "Deterministic findings"
+              : "Authority",
+          stig
+            ? "NOT LOADED"
+            : evaluatedOnly
+              ? evaluatedScoped.length - aligned
+              : "APPROVED",
           stig
             ? "No STIG assessment or score is produced"
-            : mission.baseline.approval_status,
-          stig ? "warning" : "good",
+            : evaluatedOnly
+              ? "Technical evidence states only"
+              : mission.baseline.approval_status,
+          stig || (evaluatedOnly && evaluatedScoped.length - aligned)
+            ? "warning"
+            : "good",
         ),
       );
       next.replaceChildren();
@@ -544,11 +605,19 @@
         );
       } else {
         next.append(
-          create("strong", "", mission.baseline.benchmark),
+          create(
+            "strong",
+            "",
+            evaluatedOnly
+              ? "Deterministic evidence scope"
+              : mission.baseline.benchmark,
+          ),
           create(
             "p",
             "",
-            `${mission.baseline.rule_count} rules are inventoried; ${mission.metrics.alignment_denominator} currently have reviewed exact provider mappings and sufficient support for deterministic comparison. Open the baseline matrix to see every not-yet-evaluated rule.`,
+            evaluatedOnly
+              ? `${mission.metrics.alignment_denominator} rules currently have reviewed exact provider mappings. Their states come from evidence, not GPT.`
+              : `${mission.baseline.rule_count} rules are inventoried; ${mission.metrics.alignment_denominator} have reviewed exact provider mappings and ${mission.baseline.rule_count - mission.metrics.alignment_denominator} remain visible as implementation planning work.`,
           ),
         );
       }
@@ -821,6 +890,49 @@
   };
 
   const renderCoverage = () => {
+    const planningGroups = new Map();
+    for (const requirement of mission.requirements.filter(
+      (item) => item.evaluation_included !== true,
+    )) {
+      const items = planningGroups.get(requirement.section) || [];
+      items.push(requirement);
+      planningGroups.set(requirement.section, items);
+    }
+    const planningContainer = select("[data-planning-groups]");
+    if (planningContainer instanceof HTMLElement) {
+      planningContainer.replaceChildren();
+      for (const [sectionName, requirements] of planningGroups) {
+        const detail = create("details", "mission-resource-group");
+        const providerReview = requirements.filter(
+          (item) => item.setting_key && item.setting_key !== "not mapped",
+        ).length;
+        detail.append(
+          create(
+            "summary",
+            "",
+            `${sectionName} · ${requirements.length} implementation item(s)`,
+          ),
+        );
+        const scope = create(
+          "p",
+          "mission-plan-scope",
+          providerReview
+            ? `${providerReview} exact provider mapping review; ${requirements.length - providerReview} management paths to classify.`
+            : `${requirements.length} management and evidence paths to classify.`,
+        );
+        detail.append(scope);
+        for (const requirement of requirements) {
+          const row = create("a", "mission-resource mission-plan-link");
+          row.href = `../settings-matrix/?selected=${encodeURIComponent(requirement.requirement_id)}#settings-matrix`;
+          row.append(
+            create("strong", "", requirement.title),
+            create("span", "", implementationState(requirement)),
+          );
+          detail.append(row);
+        }
+        planningContainer.append(detail);
+      }
+    }
     const resourcesByRef = new Map(
       mission.resources
         .filter(
@@ -997,15 +1109,19 @@
       const collected = Date.parse(mission.collection.collected_at_utc);
       const maximum =
         Number(mission.collection.freshness?.maximum_age_seconds || 0) * 1000;
+      const synthetic = mission.data_mode.startsWith("SYNTHETIC");
       const stale =
-        !Number.isFinite(collected) ||
-        maximum <= 0 ||
-        Date.now() - collected > maximum;
+        !synthetic &&
+        (!Number.isFinite(collected) ||
+          maximum <= 0 ||
+          Date.now() - collected > maximum);
       const banner = select("[data-mission-banner]");
       if (banner instanceof HTMLElement) {
         banner.textContent = stale
           ? `DEGRADED / STALE · ${mission.data_mode} package exceeds its declared freshness window`
-          : `${mission.data_mode} · fingerprint and publication gates passed · ${mission.snapshot_id}`;
+          : synthetic
+            ? `${mission.data_mode} · reproducible fixed-time fixture · fingerprint passed · ${mission.snapshot_id}`
+            : `${mission.data_mode} · fingerprint and publication gates passed · ${mission.snapshot_id}`;
         banner.dataset.state = stale
           ? "stale"
           : mission.data_mode.startsWith("LIVE")
@@ -1020,11 +1136,14 @@
       renderPosture();
       renderCoverage();
       renderEvidence();
-      text("[data-rail-state]", stale ? "DEGRADED" : "VERIFIED");
-      const copilot = select("[data-open-copilot]");
-      if (copilot instanceof HTMLButtonElement)
-        copilot.addEventListener("click", () =>
-          window.ProvifactCopilot?.open(),
+      text(
+        "[data-rail-state]",
+        stale ? "DEGRADED" : synthetic ? "FIXTURE" : "VERIFIED",
+      );
+      const assistant = select("[data-open-assistant]");
+      if (assistant instanceof HTMLButtonElement)
+        assistant.addEventListener("click", () =>
+          window.ProvifactAssistant?.open(),
         );
       root.setAttribute("aria-busy", "false");
       const linked = mission.findings.find(

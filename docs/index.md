@@ -1,5 +1,5 @@
 <div class="evidence-hero">
-  <div class="hero-kicker">Provifact™ by TMCO Consulting</div>
+  <div class="hero-kicker"><img src="assets/images/provifact-mark.svg" alt="" width="42" height="42"> Provifact™ by TMCO Consulting</div>
   <h1>From approved change to audit-ready proof.</h1>
   <p>
     Provifact collects managed-Apple configuration read-only, evaluates mapped settings
@@ -16,7 +16,7 @@
 
 <div class="synthetic-banner">
 Production serves a reviewed package labeled `LIVE SANITIZED TENANT DATA`. Tenant, device, user,
-group, assignment, and credential identities are not public. Production Provifact Copilot uses only
+group, assignment, and credential identities are not public. Production Provifact Assistant uses only
 fixed `gpt-5.6-terra` with bounded sanitized context; local and preview builds remain fixture mode.
 </div>
 
@@ -29,8 +29,8 @@ fixed `gpt-5.6-terra` with bounded sanitized context; local and preview builds r
     <p><a href="evidence-dashboard/">Open the dashboard →</a></p>
   </div>
   <div class="evidence-card">
-    <h3>Settings &amp; Baselines</h3>
-    <p>Compare each mapped Intune setting with CIS, STIG, NIST, and CMMC identifiers and see the required technical change.</p>
+    <h3>Baseline Implementation Plan</h3>
+    <p>See all 98 approved Level 1 rules, the four exact Intune joins, deterministic drift, and every management path still to plan.</p>
     <p><a href="settings-matrix/">Open the matrix →</a></p>
   </div>
   <div class="evidence-card">
@@ -57,9 +57,9 @@ fixed `gpt-5.6-terra` with bounded sanitized context; local and preview builds r
 
 | Capability | Current state | Important limit |
 | --- | --- | --- |
-| macOS baseline inventory | 98 pinned CIS Level 1 rules | Four settings have reviewed exact provider mappings; one desired mapping remains explicitly unreviewed |
+| macOS baseline inventory | 98 pinned CIS Level 1 rules with authoritative mSCP titles | Four settings have reviewed exact provider mappings; 94 remain visible implementation work |
 | Intune collection | Comprehensive GET-only managed-Apple resource families | No create, update, assign, remediate, or rollback method exists |
-| Settings matrix | Observed value, target, state, framework IDs, and required change | CIS Level 2 is not loaded and is never inferred |
+| Baseline implementation plan | All 98 rules by default, plus observed value, target, state, evidence, and required action | Planning work is not mislabeled as drift or a failed control |
 | Public dashboard | Live sanitized aggregate package on Cloudflare | Tenant policy display names and object identities are intentionally excluded |
 | Assistant | Site-wide bounded `/api/ask`, exact typed-claim verification, prose quarantine | Production is fixed-model OpenAI mode; local/preview are fixture mode; neither can decide compliance |
 | History | Current/prior sanitized snapshot delta | No persistent D1/KV/R2 history store yet |
@@ -71,12 +71,14 @@ FileVault setting may be linked to CIS, STIG, NIST, and CMMC identifiers while s
 Intune value. Provifact reports whether that **setting-level evidence** matches the approved target.
 It does not convert that result into a framework-wide pass, certification, or assessor conclusion.
 
-The [settings matrix](settings-matrix.md) makes three distinctions visible:
+The [baseline implementation plan](settings-matrix.md) makes four distinctions visible:
 
 - **Mapped and aligned:** collected technical evidence matches the approved target.
 - **Mapped and drifting:** a deterministic value, assignment, conflict, or collection condition
   requires review, with an exact non-mutating change instruction.
 - **Not loaded or not mapped:** Provifact says so directly rather than asking AI to fill the gap.
+- **Implementation planning required:** the rule is approved inventory, but the team must still
+  choose and approve a Settings Catalog, custom-profile, script/agent, or alternate-evidence path.
 
 ## Security and privacy boundaries
 
@@ -94,10 +96,10 @@ Read the [architecture](architecture.md), [audit methodology](audit-methodology.
 ## Current limitations and next priorities
 
 Provifact is a technically complete Phase 1 vertical slice, not a finished enterprise compliance
-platform. The highest-value next work is to preserve an approved parent-policy reference in the
-private model, load and review additional baselines such as CIS Level 2, expand provider mappings
-beyond four reviewed settings, expand evaluated evidence safely, and add authenticated sanitized
-history only after retention and access-control design.
+platform. The highest-value next work is to work down the now-visible 94-rule implementation
+backlog, preserve an approved parent-policy reference in the private model, load and review
+additional baselines such as CIS Level 2, expand evaluated evidence safely, and add authenticated
+sanitized history only after retention and access-control design.
 
 The existing Cloudflare Worker plus Static Assets architecture is sufficient for the present
 read-mostly product. A dedicated application frontend and D1-backed history become justified when

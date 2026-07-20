@@ -40,13 +40,18 @@ Public CI never performs live collection.
       deployment can show the actual Intune policy that supplied each setting
 - [ ] Define the data-classification, authorization, and retention rules for friendly tenant policy names
 - [ ] Load and independently review a CIS Level 2 baseline before displaying Level 2 technical alignment
-- [ ] Expand exact reviewed provider mappings beyond the current four macOS settings
+- [ ] Work through the visible 94-rule backlog and expand exact reviewed provider mappings only when
+      provider identifiers, typed targets, collection completeness, and ownership are verified
 - [x] Add matrix/evidence tests for aligned, value-drift, assignment, conflict, missing, collection-gap,
       unsupported, and baseline-not-loaded states
 - [x] Flatten documented nested Settings Catalog groups so FileVault child settings join by exact
       provider ID without treating non-Apple policies as Apple collection gaps
 - [x] Present desired, observed, missing/evidence-gap, and technical STIG cross-reference views in a
       full-width NOC-style Mission Control while keeping STIG explicitly not loaded
+- [x] Show all 98 approved Level 1 rules by default with authoritative pinned-source titles and
+      separate the 94-rule implementation backlog from the deterministic four-rule denominator
+- [x] Group implementation work by baseline section and distinguish exact provider-mapping review
+      from management/evidence-path planning
 - [x] Add a bounded site-wide assistant contract with exact typed claims, selected evidence, and
       deterministic context selection; free prose remains quarantined
 

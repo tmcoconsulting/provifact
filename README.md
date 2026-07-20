@@ -13,7 +13,7 @@ approval history before an audit.
 The Build Week Phase 1 vertical slice connects a Git-approved macOS baseline to Microsoft Intune
 through Microsoft Graph GET requests, normalizes only the evidence needed for deterministic drift,
 publishes a fail-closed sanitized package, and serves an operational dashboard with a constrained
-GPT-5.6 Provifact Copilot. The current live application remains at the legacy transition hostname
+GPT-5.6 Provifact Assistant. The current live application remains at the legacy transition hostname
 [evidenceops.tmcoconsulting.com](https://evidenceops.tmcoconsulting.com/).
 
 The verified production record is in
@@ -29,6 +29,9 @@ was performed.
   certification or an organizational compliance verdict.
 - Four macOS settings have reviewed, exact Microsoft Intune provider-definition mappings. A fifth
   desired setting remains visibly **Provider mapping not reviewed** instead of being guessed.
+- Every approved Level 1 rule is visible by default in the implementation plan. The 94 rules
+  outside the deterministic denominator are grouped as provider-mapping or implementation-planning
+  work rather than hidden or falsely reported as failed controls.
 - Exact provider IDs—not policy display names or substrings—join observed settings to desired state.
 - A setting is called missing only when its mapping is reviewed and collection evidence is complete.
   Unsupported values, parser gaps, unreviewed mappings, and unevaluated resources remain distinct.
@@ -37,7 +40,7 @@ was performed.
 - Production deployment accepts only a reviewed sanitized artifact from a successful protected-main
   live audit and verifies its exact snapshot before and after deployment. Synthetic data has no
   production fallback path.
-- Provifact Copilot uses fixed `gpt-5.6-terra` in production, bounded sanitized context, strict
+- Provifact Assistant uses fixed `gpt-5.6-terra` in production, bounded sanitized context, strict
   structured output, `store: false`, no tools, rate limits, and deterministic claim/reference
   verification. Generated prose remains generated analysis subject to human review.
 
@@ -103,18 +106,19 @@ permission.
 ## Scope and limitations
 
 The slice begins with Microsoft Intune and managed Apple platforms while keeping the provider and
-evidence contracts vendor-neutral. The macOS inventory contains 98 pinned Level 1 rules, but only
-four exact provider mappings are currently reviewed. iOS and iPadOS appear only as sanitized
+evidence contracts vendor-neutral. The macOS inventory contains 98 pinned Level 1 rules with titles
+from the recorded mSCP revision; four exact provider mappings are currently reviewed. The remaining
+94 are a visible onboarding and implementation backlog. iOS and iPadOS appear only as sanitized
 aggregate posture and are not scored against the macOS baseline. Long-term history, multi-tenancy,
-private policy-name presentation, CIS Level 2, broad rule mapping, Apple release intelligence, and
-all Intune write capabilities remain deferred.
+private policy-name presentation, CIS Level 2, broad exact provider mapping, Apple release
+intelligence, and all Intune write capabilities remain deferred.
 
 ## Build Week provenance
 
 Before Build Week, Provifact had repository safety foundations and a small synthetic schema proof.
 During Build Week, TJ Olnhausen made the product, security, baseline-approval, and external-system
 decisions while Codex implemented and tested the provider contracts, live collection boundary,
-versioned evidence, deterministic drift, sanitizer, Cloudflare runtime, dashboard, Copilot, and
+versioned evidence, deterministic drift, sanitizer, Cloudflare runtime, dashboard, Assistant, and
 deployment controls. GPT-5.6 is a bounded runtime explainer, not the evidence engine. The private
 `/feedback` Session ID belongs only in submission metadata and must never be committed.
 

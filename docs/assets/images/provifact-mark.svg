@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-labelledby="title desc">
+  <title id="title">Provifact</title>
+  <desc id="desc">A linked evidence path ending in a verified proof mark.</desc>
+  <defs>
+    <linearGradient id="proof" x1="10" y1="10" x2="54" y2="54" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#2DD4BF"/>
+      <stop offset="1" stop-color="#55A7FF"/>
+    </linearGradient>
+  </defs>
+  <rect width="64" height="64" rx="14" fill="#07111F"/>
+  <path d="M32 7 53 19v24L32 57 11 43V19L32 7Z" fill="#0C1E33" stroke="url(#proof)" stroke-width="2.5"/>
+  <path d="M20 23h13c6.1 0 10 3.4 10 8.5S39.1 40 33 40h-5v7h-8V23Zm8 6v5h4.4c1.8 0 2.8-.8 2.8-2.5S34.2 29 32.4 29H28Z" fill="#EAF4FF"/>
+  <circle cx="18" cy="21" r="2.5" fill="#2DD4BF"/>
+  <circle cx="18" cy="32" r="2.5" fill="#55A7FF"/>
+  <path d="m35.5 45.5 4 4 8-9" fill="none" stroke="#2DD4BF" stroke-linecap="round" stroke-linejoin="round" stroke-width="3.4"/>
+</svg>

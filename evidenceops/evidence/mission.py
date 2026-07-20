@@ -15,6 +15,7 @@ from typing import Final, cast
 
 from evidenceops.baselines import (
     APPROVAL_RECORD,
+    BASELINE_RULE_TITLES,
     BASELINE_RULES,
     DEMO_RULE_MAPPINGS,
     INTUNE_PROVIDER_MAPPINGS,
@@ -306,7 +307,7 @@ def _evaluate_requirements(
                 ordinal=ordinal,
                 section=section,
                 rule_id=rule_id,
-                title=rule_id.replace("_", " ").title(),
+                title=BASELINE_RULE_TITLES[rule_id],
                 expected=(
                     desired_mapping["expected_value"]
                     if desired_mapping is not None
@@ -757,8 +758,8 @@ def _metrics(
         "alignment_percent": alignment,
         "alignment_denominator": len(evaluated),
         "alignment_denominator_explanation": (
-            "Mapped macOS baseline requirements with sufficient provider support; iOS/iPadOS "
-            "and unsupported macOS rules are excluded."
+            "Only reviewed exact macOS provider joins enter this denominator. The other approved "
+            "rules remain visible as implementation work; iOS/iPadOS are outside the macOS scope."
         ),
         "aligned_requirements": aligned,
         "drifted_requirements": len(evaluated) - aligned,

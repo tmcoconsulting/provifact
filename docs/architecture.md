@@ -42,11 +42,12 @@ Jamf or Workspace ONE adapter can produce the same evidence model.
 
 The pinned baseline inventory comes from mSCP revision
 `11b5896e4f12f43410686024f543792742562c91`. Its source artifact and extracted inventory hashes are
-verified at test time. The repository contains a machine-readable internal TMCO Consulting demo approval for
-the complete 98-rule macOS inventory. Four settings currently have exact reviewed provider
-mappings; a fifth desired mapping remains explicitly unreviewed. Only reviewed mappings can drive
-deterministic findings. Unsupported rules stay visible and do not enter the alignment denominator. iOS and
-iPadOS posture is visible but is not scored against the macOS baseline.
+verified at test time. The repository contains a machine-readable internal TMCO Consulting demo
+approval for the complete 98-rule macOS inventory, with human-readable titles copied from that same
+pinned revision. Four settings currently have exact reviewed provider mappings; a fifth desired
+mapping remains explicitly unreviewed. Only reviewed mappings can drive deterministic findings. The
+other 94 rules stay visible as implementation-planning work and do not enter the alignment
+denominator. iOS and iPadOS posture is visible but is not scored against the macOS baseline.
 
 The engine compares only explicitly mapped normalized values and assignment evidence. Every
 finding links the baseline requirement, source evidence IDs, Git SHA, algorithm version, and

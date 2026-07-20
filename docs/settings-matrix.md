@@ -1,13 +1,13 @@
-# Settings and Baseline Matrix
+# CIS Level 1 Implementation Plan
 
 <div class="matrix-intro">
   <div>
     <p class="matrix-kicker">Setting-level technical evidence</p>
-    <h2>See what Intune expresses, which framework identifiers it supports, and what must change.</h2>
+    <h2>Start with all 98 approved rules, then separate proven drift from work still to plan.</h2>
     <p>
-      This view joins the current sanitized evidence package to the reviewed baseline mappings.
-      It reports technical alignment for each mapped macOS setting; it does not issue a framework,
-      certification, or organizational-compliance verdict.
+      This view begins with the complete pinned CIS Level 1 inventory. Exact reviewed Intune joins
+      produce deterministic technical states; every other rule remains visible as implementation or
+      provider-mapping work. It does not issue a certification or organizational-compliance verdict.
     </p>
   </div>
   <div class="matrix-intro-actions">
@@ -28,6 +28,7 @@
   </div>
 
   <div class="matrix-summary" data-matrix-summary aria-live="polite"></div>
+  <div class="matrix-plan" data-matrix-plan aria-label="Implementation backlog by baseline section"></div>
 
   <form class="matrix-controls" data-matrix-controls>
     <label>
@@ -38,6 +39,12 @@
       <span>Technical state</span>
       <select data-matrix-outcome>
         <option value="">All states</option>
+      </select>
+    </label>
+    <label>
+      <span>Baseline section</span>
+      <select data-matrix-section>
+        <option value="">All sections</option>
       </select>
     </label>
     <label>
@@ -53,8 +60,8 @@
       </select>
     </label>
     <label class="matrix-checkbox">
-      <input type="checkbox" data-matrix-mapped-only checked>
-      <span>Show reviewed provider mappings only</span>
+      <input type="checkbox" data-matrix-mapped-only>
+      <span>Limit to deterministically evaluated rules</span>
     </label>
     <button type="button" class="md-button" data-matrix-reset>Reset filters</button>
   </form>
@@ -83,10 +90,10 @@
 
 ## How to read the matrix
 
-The default table stays compact: setting, observed-to-target value, state, assignment, framework
-summary, and action. Select **Review details** for the exact provider definition ID, public-safe
-parent policy reference, cross-reference identifiers, evidence IDs and fingerprints, deterministic
-operator guidance, and limitations.
+The default table shows every approved Level 1 rule. Select **Review details** for the exact
+provider definition ID when one is approved, public-safe policy references, evidence IDs,
+fingerprints, deterministic guidance, and limitations. Use **Limit to deterministically evaluated
+rules** to reduce the view to the four exact Intune joins.
 
 A green technical-evidence state means the collected setting matched the approved target and had
 normalized assignment evidence. It does **not** prove the organization satisfies the mapped control.
@@ -106,9 +113,13 @@ next data-model priority; the public matrix never guesses it from a display name
 
 ## Coverage limits
 
-- The complete 98-rule CIS Level 1 inventory remains visible when **Show reviewed provider mappings
-  only** is cleared, but only explicitly reviewed provider mappings enter the technical-alignment
-  denominator.
+- The complete 98-rule CIS Level 1 inventory is visible by default. Only explicitly reviewed exact
+  provider mappings enter the technical-alignment denominator.
+- **Implementation planning required** means the rule belongs to the approved inventory but its
+  Intune Settings Catalog, custom-profile, script/agent, or alternate-evidence path has not been
+  approved. It is a backlog state—not a failed control.
+- **Provider mapping review required** means desired metadata exists but an exact Intune definition
+  ID has not yet passed review.
 - CIS Level 2 is not loaded in the current repository and is never inferred.
 - STIG, NIST, and CMMC cells are cross-reference identifiers associated with the setting. They are
   supporting technical evidence, not independent baseline scores.

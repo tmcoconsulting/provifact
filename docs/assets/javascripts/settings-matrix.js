@@ -9,6 +9,7 @@
   const table = root.querySelector("[data-matrix-table]");
   const search = root.querySelector("[data-matrix-search]");
   const outcome = root.querySelector("[data-matrix-outcome]");
+  const section = root.querySelector("[data-matrix-section]");
   const framework = root.querySelector("[data-matrix-framework]");
   const mappedOnly = root.querySelector("[data-matrix-mapped-only]");
   const reset = root.querySelector("[data-matrix-reset]");
@@ -16,6 +17,7 @@
   const empty = root.querySelector("[data-matrix-empty]");
   const dialog = root.querySelector("[data-matrix-dialog]");
   const detail = root.querySelector("[data-matrix-detail]");
+  const plan = root.querySelector("[data-matrix-plan]");
 
   if (
     !(banner instanceof HTMLElement) ||
@@ -23,13 +25,15 @@
     !(table instanceof HTMLTableElement) ||
     !(search instanceof HTMLInputElement) ||
     !(outcome instanceof HTMLSelectElement) ||
+    !(section instanceof HTMLSelectElement) ||
     !(framework instanceof HTMLSelectElement) ||
     !(mappedOnly instanceof HTMLInputElement) ||
     !(reset instanceof HTMLButtonElement) ||
     !(count instanceof HTMLElement) ||
     !(empty instanceof HTMLElement) ||
     !(dialog instanceof HTMLDialogElement) ||
-    !(detail instanceof HTMLElement)
+    !(detail instanceof HTMLElement) ||
+    !(plan instanceof HTMLElement)
   )
     return;
 
@@ -69,6 +73,24 @@
     requirement.mapping_review_status === "reviewed" &&
     Array.isArray(requirement.provider_definition_ids) &&
     requirement.provider_definition_ids.length > 0;
+  const implementationState = (requirement) => {
+    if (requirement.evaluation_included === true) return requirement.outcome;
+    if (
+      requirement.mapping_review_status === "not reviewed" &&
+      requirement.setting_key &&
+      requirement.setting_key !== "not mapped"
+    )
+      return "Provider mapping review required";
+    return "Implementation planning required";
+  };
+  const implementationTarget = (requirement) =>
+    requirement.setting_key && requirement.setting_key !== "not mapped"
+      ? formatValue(requirement.expected_value)
+      : "Target pending approved mapping";
+  const implementationObserved = (requirement) =>
+    requirement.evaluation_included === true
+      ? formatValue(requirement.observed_value)
+      : "Not deterministically collected";
   const stateClass = (value) => {
     if (value === "Aligned") return "matrix-state-aligned";
     if (value === "Conflicting policy") return "matrix-state-conflict";
@@ -78,6 +100,8 @@
       value === "Human review required" ||
       value === "Collection gap" ||
       value === "Provider mapping not reviewed" ||
+      value === "Provider mapping review required" ||
+      value === "Implementation planning required" ||
       value === "Unsupported value shape"
     )
       return "matrix-state-review";
@@ -109,8 +133,12 @@
       case "Unsupported value shape":
         return "Review the collected value shape and add a deterministic parser before evaluating it.";
       case "Provider mapping not reviewed":
+        return requirement.setting_key &&
+          requirement.setting_key !== "not mapped"
+          ? "Review and approve the exact Intune setting definition ID before this rule enters deterministic evaluation."
+          : "Classify the approved implementation path: Intune Settings Catalog, custom profile, script or agent, or alternate evidence. Then approve a typed target and exact collector mapping.";
       case "Unsupported by provider":
-        return "Review and approve an exact provider definition mapping before this rule enters technical alignment.";
+        return "Document an approved alternate implementation or evidence path; do not infer provider support.";
       default:
         return "Human review is required; Provifact has no Intune write capability.";
     }
@@ -135,9 +163,11 @@
     const label = create(
       "p",
       "matrix-dialog-status",
-      `${requirement.outcome} · ${requirement.severity} severity`,
+      `${implementationState(requirement)} · ${requirement.severity} severity`,
     );
     const list = create("dl", "matrix-detail-list");
+    addDetail(list, "Planning state", implementationState(requirement));
+    addDetail(list, "Raw deterministic state", requirement.outcome);
     addDetail(
       list,
       "Requirement",
@@ -218,7 +248,7 @@
     const ask = create(
       "button",
       "md-button md-button--primary",
-      "Ask Provifact Copilot about this setting",
+      "Ask Provifact Assistant about this setting",
     );
     ask.type = "button";
     ask.addEventListener("click", () => {
@@ -308,11 +338,20 @@
         }));
 
       for (const value of [
-        ...new Set(rows.map(({ requirement }) => requirement.outcome)),
+        ...new Set(
+          rows.map(({ requirement }) => implementationState(requirement)),
+        ),
       ].sort()) {
         const option = create("option", "", value);
         option.value = value;
         outcome.append(option);
+      }
+      for (const value of [
+        ...new Set(rows.map(({ requirement }) => requirement.section)),
+      ].sort()) {
+        const option = create("option", "", value);
+        option.value = value;
+        section.append(option);
       }
       const mapped = rows.filter(({ requirement }) =>
         hasReviewedProviderMapping(requirement),
@@ -323,12 +362,19 @@
       const aligned = evaluated.filter(
         ({ requirement }) => requirement.outcome === "Aligned",
       ).length;
+      const planning = rows.filter(
+        ({ requirement }) => requirement.evaluation_included !== true,
+      );
+      const providerReview = planning.filter(
+        ({ requirement }) =>
+          requirement.setting_key && requirement.setting_key !== "not mapped",
+      ).length;
       const summaryValues = [
-        [rows.length, "Baseline rules"],
-        [mapped.length, "Reviewed mappings"],
-        [evaluated.length, "Evaluated settings"],
-        [aligned, "Aligned"],
-        [evaluated.length - aligned, "Require review"],
+        [rows.length, "Approved Level 1 rules"],
+        [mapped.length, "Exact Intune joins"],
+        [planning.length, "Implementation backlog"],
+        [evaluated.length - aligned, "Deterministic drift"],
+        [aligned, "Matches desired state"],
       ];
       summary.replaceChildren();
       for (const [value, label] of summaryValues) {
@@ -336,6 +382,31 @@
         card.append(create("strong", "", value), create("span", "", label));
         summary.append(card);
       }
+      plan.replaceChildren();
+      const sectionGroups = new Map();
+      for (const row of rows) {
+        const values = sectionGroups.get(row.requirement.section) || [];
+        values.push(row.requirement);
+        sectionGroups.set(row.requirement.section, values);
+      }
+      for (const [sectionName, requirements] of sectionGroups) {
+        const evaluatedCount = requirements.filter(
+          (requirement) => requirement.evaluation_included === true,
+        ).length;
+        const card = create("article", "matrix-plan-card");
+        card.append(
+          create("strong", "", sectionName),
+          create(
+            "span",
+            "",
+            `${requirements.length - evaluatedCount} to plan · ${evaluatedCount} evaluated`,
+          ),
+        );
+        plan.append(card);
+      }
+      const planNote = create("p", "matrix-plan-note");
+      planNote.textContent = `${providerReview} rule has an approved desired value but still needs an exact Intune definition review; ${planning.length - providerReview} rules need an approved management and evidence path.`;
+      plan.append(planNote);
       banner.textContent = `${mission.data_mode} · ${mission.baseline.name} · collected ${new Date(mission.collection.collected_at_utc).toLocaleString()} · public-safe evidence only`;
       banner.dataset.state = mission.data_mode.startsWith("LIVE")
         ? "live"
@@ -344,15 +415,22 @@
       const render = () => {
         const query = search.value.trim().toLowerCase();
         const selectedOutcome = outcome.value;
+        const selectedSection = section.value;
         const selectedFramework = framework.value;
         const filtered = rows.filter(({ requirement, resources: evidence }) => {
           if (mappedOnly.checked && !hasReviewedProviderMapping(requirement))
             return false;
-          if (selectedOutcome && requirement.outcome !== selectedOutcome)
+          if (
+            selectedOutcome &&
+            implementationState(requirement) !== selectedOutcome
+          )
+            return false;
+          if (selectedSection && requirement.section !== selectedSection)
             return false;
           if (selectedFramework === "cis_lvl2") return false;
           if (
             selectedFramework &&
+            selectedFramework !== "cis_benchmark" &&
             !frameworkIds(requirement, selectedFramework).length
           )
             return false;
@@ -362,6 +440,7 @@
             requirement.rule_id,
             requirement.setting_key,
             requirement.outcome,
+            implementationState(requirement),
             formatValue(requirement.observed_value),
             formatValue(requirement.expected_value),
             buildAction(requirement),
@@ -419,18 +498,20 @@
           );
           const observedTarget = create("td", "matrix-observed-target");
           observedTarget.append(
-            create("code", "", formatValue(requirement.observed_value)),
+            create("code", "", implementationObserved(requirement)),
             create("span", "", "→"),
-            create("code", "", formatValue(requirement.expected_value)),
+            create("code", "", implementationTarget(requirement)),
           );
           const stateCell = create("td");
-          stateCell.append(state(requirement.outcome));
+          stateCell.append(state(implementationState(requirement)));
           const frameworks = create("td", "matrix-framework-chips");
           for (const { key, label } of frameworkColumns) {
             const ids = frameworkIds(requirement, key);
             if (ids.length)
               frameworks.append(create("span", "", `${label} ${ids.length}`));
           }
+          if (!frameworkIds(requirement, "cis_benchmark").length)
+            frameworks.prepend(create("span", "", "CIS L1 inventory"));
           if (!frameworks.childElementCount)
             frameworks.append(
               create("span", "matrix-muted", "No reviewed cross-reference"),
@@ -462,15 +543,16 @@
               : "No settings match the selected filters.";
       };
 
-      for (const control of [search, outcome, framework, mappedOnly]) {
+      for (const control of [search, outcome, section, framework, mappedOnly]) {
         control.addEventListener("input", render);
         control.addEventListener("change", render);
       }
       reset.addEventListener("click", () => {
         search.value = "";
         outcome.value = "";
+        section.value = "";
         framework.value = "";
-        mappedOnly.checked = true;
+        mappedOnly.checked = false;
         render();
       });
       render();

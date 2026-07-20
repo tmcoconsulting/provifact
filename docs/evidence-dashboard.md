@@ -9,7 +9,7 @@ hide:
 <div class="mission-shell" data-mission-control aria-busy="true">
   <header class="mission-commandbar">
     <a class="mission-brand" href="../" aria-label="Provifact home">
-      <span class="mission-brand-mark">PV</span>
+      <img class="mission-brand-mark" src="../assets/images/provifact-mark.svg" alt="" width="40" height="40">
       <span><strong>Provifact™</strong><small>by TMCO Consulting</small></span>
     </a>
     <div class="mission-command-status">
@@ -20,7 +20,7 @@ hide:
     </div>
     <div class="mission-command-actions">
       <a href="../settings-matrix/">Baseline matrix</a>
-      <button type="button" data-open-copilot>Ask Copilot</button>
+      <button type="button" data-open-assistant>Ask Provifact Assistant</button>
     </div>
   </header>
 
@@ -98,12 +98,13 @@ hide:
           <div>
             <span class="mission-eyebrow">Desired state versus observed state</span>
             <h2 id="posture-title">Baseline posture</h2>
-            <p>Only reviewed exact provider mappings enter the technical-alignment denominator.</p>
+            <p>All 98 approved rules stay visible. Only reviewed exact provider mappings enter the deterministic denominator.</p>
           </div>
           <label class="mission-baseline-selector">
             <span>Comparison lens</span>
             <select data-baseline-view>
-              <option value="active">CIS Level 1 · active desired state</option>
+              <option value="active">CIS Level 1 · full implementation plan</option>
+              <option value="evaluated">CIS Level 1 · evaluated rules only</option>
               <option value="stig">STIG · technical cross-reference only</option>
             </select>
           </label>
@@ -163,9 +164,16 @@ hide:
       </section>
 
       <section id="coverage" class="mission-grid mission-grid-coverage" aria-labelledby="coverage-title">
+        <article class="mission-panel mission-panel-wide">
+          <div class="mission-section-heading">
+            <div><span class="mission-eyebrow">Approved inventory versus implementation</span><h2 id="coverage-title">Baseline implementation backlog</h2></div>
+          </div>
+          <p>These are planning gaps, not failed controls. Each rule needs an approved Intune, custom-profile, script/agent, or alternate-evidence path before deterministic evaluation.</p>
+          <div class="mission-resource-list mission-planning-list" data-planning-groups></div>
+        </article>
         <article class="mission-panel">
           <div class="mission-section-heading">
-            <div><span class="mission-eyebrow">Parser and mapping debt</span><h2 id="coverage-title">Coverage and blind spots</h2></div>
+            <div><span class="mission-eyebrow">Collected resources versus parser</span><h2>Collection coverage and blind spots</h2></div>
           </div>
           <p>Inventory-only records are visible but do not change alignment. Parser or exact-mapping gaps require engineering review.</p>
           <div class="mission-resource-list" data-unevaluated-groups></div>
