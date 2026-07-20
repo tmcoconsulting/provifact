@@ -291,8 +291,33 @@ def test_mission_control_bounds_grid_content_on_narrow_viewports() -> None:
     assert "min-width: 0;" in stylesheet
     assert ".mission-table-wrap {\n  overflow-x: auto;" in stylesheet
     mkdocs = (REPOSITORY_ROOT / "mkdocs.yml").read_text(encoding="utf-8")
-    assert "assets/stylesheets/extra.css?v=20260720-final" in mkdocs
-    assert "assets/javascripts/assistant-evidence-context.js?v=20260720-final" in mkdocs
+    assert "assets/stylesheets/extra.css?v=20260720-noc1" in mkdocs
+    assert "assets/javascripts/mission-control.js?v=20260720-noc1" in mkdocs
+    assert "assets/javascripts/assistant-evidence-context.js?v=20260720-noc1" in mkdocs
+
+
+def test_mission_control_is_an_operational_dashboard_with_honest_stig_lens() -> None:
+    dashboard = (REPOSITORY_ROOT / "docs" / "evidence-dashboard.md").read_text(encoding="utf-8")
+    script = (REPOSITORY_ROOT / "docs" / "assets" / "javascripts" / "mission-control.js").read_text(
+        encoding="utf-8"
+    )
+    stylesheet = (REPOSITORY_ROOT / "docs" / "assets" / "stylesheets" / "extra.css").read_text(
+        encoding="utf-8"
+    )
+    for required in (
+        "data-baseline-view",
+        "STIG · technical cross-reference only",
+        "data-collection-pipeline",
+        "data-posture-rows",
+        "No Intune writes",
+    ):
+        assert required in dashboard
+    assert 'stig ? "NOT LOADED" : "APPROVED"' in script
+    assert "No STIG assessment or score is produced" in script
+    assert "exact provider mappings" in script
+    assert "body:has(.mission-shell) .md-header" in stylesheet
+    assert ".mission-commandbar" in stylesheet
+    assert ".mission-rail" in stylesheet
 
 
 def test_operational_frontend_is_compact_and_keyboard_accessible() -> None:

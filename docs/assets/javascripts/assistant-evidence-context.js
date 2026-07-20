@@ -104,6 +104,7 @@
     if (!operationalPaths.has(path)) return;
     const content = document.querySelector(".md-content__inner");
     if (!(content instanceof HTMLElement)) return;
+    const missionSlot = document.querySelector("[data-provenance-slot]");
 
     const panel = create("section", "evidence-provenance");
     panel.setAttribute("aria-label", "Current evidence provenance");
@@ -131,7 +132,8 @@
       "Checks published evidence only; it never triggers Microsoft Graph collection.",
     );
     panel.append(statusLabel, facts, detail, refresh, refreshNote);
-    content.prepend(panel);
+    if (missionSlot instanceof HTMLElement) missionSlot.append(panel);
+    else content.prepend(panel);
 
     const addFact = (label, value) => {
       facts.append(create("dt", "", label), create("dd", "", value));
