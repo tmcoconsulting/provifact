@@ -447,6 +447,19 @@ decision surface. A visual framework change does not alter the authority boundar
 desired state and deterministic evidence remain authoritative, and cross-references never become a
 STIG score or compliance verdict.
 
+## 2026-07-20 — Separate public Mission and model-response byte ceilings
+
+**Decision:** Keep OpenAI response reads capped at 256 KiB. Apply one shared 512 KiB public-Mission
+ceiling at Python loading, production promotion, and Worker readiness before schema, fingerprint,
+and egress validation. Reject a public Mission above that dedicated cap before it can be accepted as
+publishable.
+
+**Why:** The first live package after nested FileVault normalization was 268,320 bytes because it
+retains the complete 98-rule review inventory. Reusing the smaller untrusted-model response cap made
+`/api/status` return 502 even though the static package was valid. Increasing the model-response
+limit would have unnecessarily weakened the OpenAI boundary; a distinct public-Mission cap keeps
+the handoff and runtime consistent while preserving the smaller model boundary.
+
 ## 2026-07-20 — Rebrand the product as Provifact™ by TMCO Consulting
 
 **Decision:** Adopt **Provifact™ by TMCO Consulting** as the public product name and **From approved

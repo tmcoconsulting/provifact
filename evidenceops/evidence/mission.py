@@ -36,7 +36,7 @@ MISSION_SCHEMA_VERSION: Final = "2.1.0"
 MISSION_ALGORITHM_VERSION: Final = "evidenceops-mission-drift-v2.1.0"
 PUBLICATION_POLICY_VERSION: Final = "evidenceops-mission-public-v1.0.0"
 FRESHNESS_SECONDS: Final = 86_400
-MAX_PUBLIC_MISSION_BYTES: Final = 2_000_000
+MAX_PUBLIC_MISSION_BYTES: Final = 512 * 1024
 
 
 class DriftOutcome(StrEnum):
@@ -150,7 +150,7 @@ def build_public_mission_snapshot(
         "approver": APPROVAL_RECORD["approver"],
         "approval_date": APPROVAL_RECORD["approval_date"],
         "scope": APPROVAL_RECORD["scope"],
-        "limitations": APPROVAL_RECORD["limitations"],
+        "limitations": list(cast(list[JsonValue], APPROVAL_RECORD["limitations"])),
         "rule_count": APPROVAL_RECORD["rule_count"],
     }
     unsigned: dict[str, JsonValue] = {

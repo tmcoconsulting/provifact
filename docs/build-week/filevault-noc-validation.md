@@ -77,10 +77,27 @@ navigation, and generated sections rendered without browser console warnings or 
 ## Deferred live verification
 
 No Microsoft Graph request, Intune write, OpenAI request, Cloudflare deployment, or production
-mutation was made from this feature branch. After human review and protected merge, one manual
-read-only audit must confirm that the nested FileVault setting joins by exact provider definition ID
-and that the false Settings Catalog completeness gap is absent. Only sanitized counts and status may
-be retained.
+mutation was made from the feature branch.
+
+After TJ merged PR #13 as `3206d58b9f565107e8b8d79fe9e7aea73b5ca8d1`, protected-main audit
+run `29763776286` passed. The scanned public package confirmed:
+
+- provider version `2.1.0`;
+- Settings Catalog collected 4 policy records and 28 scalar setting records;
+- FileVault joined by exact `com.apple.mcx.filevault2_enable` definition;
+- FileVault observed `true`, included one normalized assignment, and evaluated `Aligned`; and
+- no Settings Catalog collection-completeness gap remained.
+
+Three unrelated fail-closed parser gaps remain visible: one Automated Device Enrollment token shape
+and two compliance scheduled-action shapes. They are not permission failures and were not hidden by
+this correction.
+
+Production deployment run `29763988793` promoted the exact scanned snapshot. The first readiness
+check then identified a distinct bounded-read defect: the 268,320-byte live public Mission exceeded
+the shared 256 KiB OpenAI-response cap. The runtime now preserves that 256 KiB model-response limit
+and uses a separate 512 KiB ceiling only for the already-sanitized, fingerprint-verified public
+Mission asset. Regression tests accept the valid intermediate size and reject Missions above the
+new dedicated ceiling.
 
 ## Authoritative sources
 

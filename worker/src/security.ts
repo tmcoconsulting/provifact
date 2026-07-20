@@ -6,6 +6,7 @@ import { isRecord, sha256 } from "./evidence";
 
 export const MAX_REQUEST_BYTES = 64 * 1024;
 export const MAX_UPSTREAM_BYTES = 256 * 1024;
+export const MAX_PUBLIC_MISSION_BYTES = 512 * 1024;
 export const OPENAI_TIMEOUT_MS = 20_000;
 
 interface CompiledPattern {
@@ -279,28 +280,58 @@ export async function readBoundedJson(request: Request): Promise<unknown> {
 export async function readBoundedResponse(
   response: Response,
 ): Promise<unknown> {
-  if (response.body === null) {
-    throw new HttpError(
-      502,
-      "upstream_response_invalid",
-      "upstream response body was missing",
-    );
-  }
-  const bytes = await readBoundedStream(response.body, MAX_UPSTREAM_BYTES, {
-    code: "upstream_response_too_large",
-    message: "upstream response exceeded the byte limit",
+  return readBoundedJsonResponse(response, MAX_UPSTREAM_BYTES, {
+    missingCode: "upstream_response_invalid",
+    missingMessage: "upstream response body was missing",
+    oversizeCode: "upstream_response_too_large",
+    oversizeMessage: "upstream response exceeded the byte limit",
+    invalidCode: "upstream_response_invalid",
+    invalidMessage: "upstream response was not valid JSON",
     status: 502,
+  });
+}
+
+export async function readBoundedPublicMissionResponse(
+  response: Response,
+): Promise<unknown> {
+  return readBoundedJsonResponse(response, MAX_PUBLIC_MISSION_BYTES, {
+    missingCode: "mission_unavailable",
+    missingMessage: "mission evidence response body was missing",
+    oversizeCode: "mission_evidence_too_large",
+    oversizeMessage: "mission evidence exceeded the byte limit",
+    invalidCode: "mission_schema_rejected",
+    invalidMessage: "mission evidence was not valid JSON",
+    status: 503,
+  });
+}
+
+async function readBoundedJsonResponse(
+  response: Response,
+  maximumBytes: number,
+  error: {
+    missingCode: string;
+    missingMessage: string;
+    oversizeCode: string;
+    oversizeMessage: string;
+    invalidCode: string;
+    invalidMessage: string;
+    status: number;
+  },
+): Promise<unknown> {
+  if (response.body === null) {
+    throw new HttpError(error.status, error.missingCode, error.missingMessage);
+  }
+  const bytes = await readBoundedStream(response.body, maximumBytes, {
+    code: error.oversizeCode,
+    message: error.oversizeMessage,
+    status: error.status,
   });
   try {
     return JSON.parse(
       new TextDecoder("utf-8", { fatal: true, ignoreBOM: false }).decode(bytes),
     );
   } catch {
-    throw new HttpError(
-      502,
-      "upstream_response_invalid",
-      "upstream response was not valid JSON",
-    );
+    throw new HttpError(error.status, error.invalidCode, error.invalidMessage);
   }
 }
 

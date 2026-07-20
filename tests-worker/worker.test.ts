@@ -17,6 +17,8 @@ import {
   assertMissionEgressSafe,
   assertPublicSafe,
   HttpError,
+  MAX_PUBLIC_MISSION_BYTES,
+  MAX_UPSTREAM_BYTES,
 } from "../worker/src/security";
 import type {
   JsonValue,
@@ -229,6 +231,44 @@ describe("Worker routes", () => {
     expect(missingLiveKey.status).toBe(503);
     await expect(missingLiveKey.json()).resolves.toMatchObject({
       error: "runtime_not_ready",
+    });
+  });
+
+  it("loads a validated public Mission larger than the model-response cap", async () => {
+    const largeMission = structuredClone(missionFixture);
+    largeMission.baseline.limitations[0] = "A".repeat(160 * 1024);
+    const signed = await signMission(largeMission);
+    const size = new TextEncoder().encode(JSON.stringify(signed)).byteLength;
+    expect(size).toBeGreaterThan(MAX_UPSTREAM_BYTES);
+    expect(size).toBeLessThan(MAX_PUBLIC_MISSION_BYTES);
+
+    const response = await worker.fetch(
+      new Request(`${ORIGIN}/api/status`),
+      environment("fixture", { mission: signed }),
+    );
+    expect(response.status).toBe(200);
+    await expect(response.json()).resolves.toMatchObject({
+      source_snapshot_id: signed.snapshot_id,
+      status: "ok",
+    });
+  });
+
+  it("fails closed when a public Mission exceeds its dedicated cap", async () => {
+    const oversizedMission = structuredClone(missionFixture);
+    oversizedMission.baseline.limitations[0] = "A".repeat(520 * 1024);
+    const signed = await signMission(oversizedMission);
+    expect(
+      new TextEncoder().encode(JSON.stringify(signed)).byteLength,
+    ).toBeGreaterThan(MAX_PUBLIC_MISSION_BYTES);
+
+    const response = await worker.fetch(
+      new Request(`${ORIGIN}/api/status`),
+      environment("fixture", { mission: signed }),
+    );
+    expect(response.status).toBe(503);
+    await expect(response.json()).resolves.toMatchObject({
+      error: "mission_evidence_too_large",
+      human_review_required: true,
     });
   });
 

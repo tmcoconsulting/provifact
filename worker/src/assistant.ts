@@ -10,6 +10,7 @@ import {
   hasUsableOpenAIKey,
   HttpError,
   OPENAI_TIMEOUT_MS,
+  readBoundedPublicMissionResponse,
   readBoundedResponse,
 } from "./security";
 import type { JsonValue, RuntimeMode } from "./types";
@@ -312,7 +313,7 @@ async function loadMission(
       "mission evidence is unavailable",
     );
   }
-  const value = await readBoundedResponse(response);
+  const value = await readBoundedPublicMissionResponse(response);
   const mission = validateMission(value);
   await verifyMissionIdentity(mission);
   assertMissionEgressSafe(mission);
