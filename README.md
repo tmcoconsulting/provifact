@@ -14,6 +14,12 @@ publishes a fail-closed sanitized package, and serves an operational dashboard w
 GPT-5.6 Evidence Copilot. The live application is
 [evidenceops.tmcoconsulting.com](https://evidenceops.tmcoconsulting.com/).
 
+The verified production record is in
+[Final Live MVP Validation](docs/build-week/final-live-mvp-validation.md). Production currently
+serves a scanned live package with an immediately prior live snapshot; one bounded
+`gpt-5.6-terra` request passed typed-claim and evidence-reference verification. No Intune mutation
+was performed.
+
 ## What the slice proves
 
 - The approved baseline is **TMCO Consulting macOS CIS Level 1 Demo Baseline**, pinned to a reviewed

@@ -6,6 +6,12 @@ only; TJ does not need to appear on camera.
 
 ## Pre-recording gate
 
+The verified production package at the end of finalization is
+`mission-2626272a6ea65343eee5302c`, collected `2026-07-20T16:24:36Z`, with prior live snapshot
+`mission-283e1b9be457b76d104a0e8a`. It contains a real unchanged comparison and no resolved finding
+because no manual Intune change occurred. Recheck these values immediately before recording and use
+whatever newer reviewed production snapshot is actually reported.
+
 1. Open `https://evidenceops.tmcoconsulting.com/api/status` in a clean browser profile. Confirm
    `data_mode` is `LIVE SANITIZED TENANT DATA`, `narrative_mode` is `openai`, `model` is
    `gpt-5.6-terra`, and `model_call_available` is `true`.

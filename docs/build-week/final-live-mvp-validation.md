@@ -1,4 +1,4 @@
-# Final Live MVP Pre-Merge Validation
+# Final Live MVP Validation and Production Record
 
 **Date:** 2026-07-20
 
@@ -6,9 +6,15 @@
 
 **Implementation commit:** `143f694f7183f1a2ce117a3a0867aad316f7a1ae`
 
-**Human review:** required before merge
+**Primary merge:** PR
+[#10](https://github.com/tmcoconsulting/evidenceops/pull/10),
+`d71da96b6b3770e96b3b7e715a51ca5b602ef852`
 
-**External state:** no live collection or deployment was performed from this feature branch
+**Promotion-safety fix:** PR
+[#11](https://github.com/tmcoconsulting/evidenceops/pull/11),
+`1662cd1b631bfa3051eac071f442f70a48ca9b68`
+
+**Human review:** final submission review remains TJ Olnhausen's responsibility
 
 ## Validated scope
 
@@ -83,9 +89,74 @@ run only after reviewed code reaches `main`; feature-branch execution is intenti
 - The tracked Mission package remains explicitly synthetic; production must replace it in-memory in
   the trusted workflow with one reviewed live sanitized artifact before building.
 
-## Post-merge gates
+## Post-merge operational verification
 
-The final external result requires a protected-main Intune audit with publication enabled, review of
-the single sanitized artifact, exact-snapshot Cloudflare deployment, `/api/status` and Mission
-identity verification, one bounded live Copilot request, and desktop/mobile browser checks. Those
-run and deployment identifiers belong in the final operator report after direct verification.
+The protected-main GET-only audit and Cloudflare deployment were completed only after the primary
+PR passed CI and CodeQL and was squash-merged. The first production attempt, run `29757719909`,
+stopped before Cloudflare when a Worker test proved dependent on the generated synthetic JSON
+module's inferred scalar types. The deployment enable variable was restored to `false`. PR #11
+made those assertions promotion-safe; its CI and CodeQL checks passed before merge.
+
+### Live collection and publication
+
+- Audit run [`29757456114`](https://github.com/tmcoconsulting/evidenceops/actions/runs/29757456114)
+  passed GitHub OIDC authentication, GET-only collection, fail-closed sanitization, public scanning,
+  one-file artifact upload, and ephemeral cleanup.
+- Deployment run
+  [`29758740795`](https://github.com/tmcoconsulting/evidenceops/actions/runs/29758740795)
+  deployed its exact reviewed snapshot `mission-283e1b9be457b76d104a0e8a`.
+- One bounded production request reached fixed `gpt-5.6-terra` for that sanitized snapshot. It
+  returned HTTP 200; the deterministic verifier accepted four typed claims, rejected none, kept
+  generated prose quarantined, and required human review. No retry was made and no narrative prose
+  was retained in this record.
+- Audit run [`29759424410`](https://github.com/tmcoconsulting/evidenceops/actions/runs/29759424410)
+  then revalidated run `29757456114` as its prior public snapshot before OIDC authentication. It
+  passed collection, sanitization, comparison, scanning, artifact upload, and cleanup.
+- Deployment run
+  [`29759572945`](https://github.com/tmcoconsulting/evidenceops/actions/runs/29759572945)
+  deployed the exact comparison snapshot `mission-2626272a6ea65343eee5302c`, collected
+  `2026-07-20T16:24:36Z`. The snapshot-tagged Cloudflare version serves 100% of production traffic;
+  its UUID is retained in the private operator report rather than the public site.
+
+The final package is `LIVE SANITIZED TENANT DATA`, records
+`mission-283e1b9be457b76d104a0e8a` as its prior snapshot, and reports zero changed, new, or resolved
+findings because no Intune setting was changed between collections. The reviewed denominator is
+four settings; all four remain honest collection gaps. Thirteen policies were evaluated, five
+collection gaps were recorded overall, and no raw or private evidence was retained. Unknown
+provider settings were not described as missing.
+
+### Production checks
+
+The following public URLs returned HTTP 200 with successful TLS verification:
+
+- `https://evidenceops.tmcoconsulting.com/`
+- `https://evidenceops.tmcoconsulting.com/evidence-dashboard/`
+- `https://evidenceops.tmcoconsulting.com/settings-matrix/`
+- `https://evidenceops.tmcoconsulting.com/api/status`
+- `https://evidenceops.tmcoconsulting.com/api/ready`
+- `https://evidenceops.tmcoconsulting.com/assets/data/mission-control.json`
+
+The final `/api/status` reports `openai`, `gpt-5.6-terra`, model-call availability, live sanitized
+data, and exact snapshot `mission-2626272a6ea65343eee5302c`. API GET responses use `no-store` and
+include HSTS, a deny-by-default CSP, same-origin isolation, no-sniff, referrer, permissions, and
+frame-denial headers. HEAD is rejected by the method allowlist.
+
+Authenticated browser checks verified global provenance, action-first Mission Control, the compact
+settings matrix, exact FileVault mapping detail, the published-snapshot refresh control, the
+site-wide Copilot drawer, accessible controls, and a 390-by-844 responsive drawer without
+page overflow. Browser logs contained no warnings or errors. No private identifier or synthetic
+tenant posture was visible.
+
+The production deployment gate was independently re-read as `false` after each deployment. The
+Cloudflare secret list exposes only the name `OPENAI_API_KEY` with type `secret_text`; its value was
+never retrieved. The provider remains GET-only and no Intune object was changed.
+
+## Remaining manual demonstration step
+
+The live current/prior comparison is operational, and automated tests prove new and resolved drift
+representation. A visible resolved live finding still requires TJ to make the separately authorized
+manual Intune change. The lowest-risk reviewed path is a dedicated test-Mac Settings Catalog policy
+for exact provider ID `com.apple.screensaver.user_idleTime`: collect an assigned value greater than
+the approved 900-second maximum as snapshot A, manually set it to 900 seconds or lower, then run
+audit B with A's sanitized audit run ID as `prior_sanitized_audit_run_id`. EvidenceOps must remain
+read-only throughout and may call the result resolved only after audit B observes it.
