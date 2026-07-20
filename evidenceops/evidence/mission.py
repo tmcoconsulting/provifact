@@ -150,7 +150,7 @@ def build_public_mission_snapshot(
         "approver": APPROVAL_RECORD["approver"],
         "approval_date": APPROVAL_RECORD["approval_date"],
         "scope": APPROVAL_RECORD["scope"],
-        "limitations": APPROVAL_RECORD["limitations"],
+        "limitations": list(cast(list[JsonValue], APPROVAL_RECORD["limitations"])),
         "rule_count": APPROVAL_RECORD["rule_count"],
     }
     unsigned: dict[str, JsonValue] = {
