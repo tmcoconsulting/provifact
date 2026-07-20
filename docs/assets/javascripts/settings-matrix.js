@@ -4,7 +4,10 @@
   const root = document.querySelector("[data-settings-matrix]");
   if (!(root instanceof HTMLElement)) return;
 
-  const CATALOG_URL = "/assets/data/baseline-catalog.json";
+  const CATALOG_FINGERPRINT =
+    "sha256:2c30e3996b6070dc8a748aa84701689a3d813933682a66222b4afd1960b14e47";
+  const CATALOG_URL =
+    "/assets/data/baseline-catalog.json?v=2c30e3996b6070dc8a748aa84701689a3d813933682a66222b4afd1960b14e47";
   const banner = root.querySelector("[data-matrix-banner]");
   const summary = root.querySelector("[data-matrix-summary]");
   const table = root.querySelector("[data-matrix-table]");
@@ -338,6 +341,7 @@
         "catalog_fingerprint,comparison_boundary,metadata_fallback_rule_ids,profiles,rules,schema_version,source" ||
       value.schema_version !== "1.0.0" ||
       !/^sha256:[0-9a-f]{64}$/.test(value.catalog_fingerprint) ||
+      value.catalog_fingerprint !== CATALOG_FINGERPRINT ||
       !isRecord(value.source) ||
       Object.keys(value.source).sort().join(",") !==
         "attribution,license,platform,repository,revision" ||
@@ -388,10 +392,17 @@
     if (profiles.length !== value.profiles.length)
       throw new Error("Baseline catalog contains an invalid profile");
     const tmco = profiles.find((item) => item.profile_id === "tmco_approved");
+    const missionRuleIds = new Set(
+      mission.requirements
+        .filter((item) => isRecord(item) && typeof item.rule_id === "string")
+        .map((item) => item.rule_id),
+    );
     if (
       !tmco ||
       tmco.rule_count !== mission.baseline.rule_count ||
-      tmco.source_sha256 !== mission.baseline.extracted_baseline_sha256
+      tmco.source_sha256 !== mission.baseline.extracted_baseline_sha256 ||
+      missionRuleIds.size !== tmco.rule_ids.length ||
+      !tmco.rule_ids.every((ruleId) => missionRuleIds.has(ruleId))
     )
       throw new Error("Baseline catalog does not match the approved baseline");
     return { ...value, profiles };

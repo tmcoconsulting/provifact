@@ -64,6 +64,20 @@ PROFILE_SPECS: Final[tuple[tuple[str, str, str, str], ...]] = (
     ("nllmap_plus", "NLLMAP Plus", "NLLMAP", "nlmapgov_plus_macos_26.0.yaml"),
 )
 
+# The pinned upstream profile uses a hyphen in this one rule identifier while
+# the approved Provifact baseline and deterministic Mission schema use the
+# normalized underscore form. Keep the conversion explicit rather than
+# applying a broad punctuation rewrite that could merge unrelated future IDs.
+UPSTREAM_RULE_ID_ALIASES: Final[dict[str, str]] = {
+    "os_safari_prevent_cross-site_tracking_enable": (
+        "os_safari_prevent_cross_site_tracking_enable"
+    ),
+}
+
+
+def _canonical_rule_id(rule_id: str) -> str:
+    return UPSTREAM_RULE_ID_ALIASES.get(rule_id, rule_id)
+
 
 def _validate_archive(archive: tarfile.TarFile) -> None:
     expected_root = f"macos_security-{MSCP_SOURCE_REVISION}/"
@@ -107,7 +121,7 @@ def _parse_profile(raw: bytes) -> tuple[list[str], dict[str, int]]:
             continue
         rule_match = re.fullmatch(r"      - ([a-z0-9_+-]+)", line)
         if rule_match:
-            rule_id = rule_match.group(1)
+            rule_id = _canonical_rule_id(rule_match.group(1))
             if rule_id in rule_ids:
                 raise ValueError(f"duplicate rule {rule_id!r} in pinned profile")
             rule_ids.append(rule_id)
@@ -137,6 +151,9 @@ def _rule_metadata(archive: tarfile.TarFile) -> dict[str, dict[str, str]]:
             if rule_id and title:
                 break
         if rule_id:
+            rule_id = _canonical_rule_id(rule_id)
+            if rule_id in metadata:
+                raise ValueError(f"duplicate canonical rule metadata {rule_id!r}")
             metadata[rule_id] = {
                 "title": title or rule_id.replace("_", " ").title(),
                 "section": match.group(1),
