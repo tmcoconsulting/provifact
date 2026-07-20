@@ -178,8 +178,9 @@ describe("Worker routes", () => {
       response_source: "deterministic_fixture",
       byok_supported: false,
       intune_write_capability: false,
-      data_mode: "SYNTHETIC DEMO DATA",
-      live_intune_collection_performed: false,
+      data_mode: missionFixture.data_mode,
+      live_intune_collection_performed:
+        missionFixture.data_mode.startsWith("LIVE "),
       source_snapshot_id: missionFixture.snapshot_id,
       provider: missionFixture.collection.provider,
       approved_baseline: missionFixture.baseline.name,
@@ -207,7 +208,7 @@ describe("Worker routes", () => {
       narrative_mode: "fixture",
       status: "ready",
       mission: {
-        data_mode: "SYNTHETIC DEMO DATA",
+        data_mode: missionFixture.data_mode,
         snapshot_id: missionFixture.snapshot_id,
       },
     });
@@ -396,8 +397,12 @@ describe("Worker routes", () => {
     const requirement = aligned.requirements.find((item) =>
       item.rule_id.includes("filevault"),
     )!;
-    requirement.outcome = "Aligned";
-    requirement.observed_value = requirement.expected_value;
+    // Production promotion replaces the imported JSON asset, so its inferred
+    // scalar types must not make this fixture mutation artifact-dependent.
+    Object.assign(requirement, {
+      outcome: "Aligned",
+      observed_value: requirement.expected_value,
+    });
     aligned.findings = aligned.findings.filter(
       (item) => !item.rule_id.includes("filevault"),
     );
