@@ -99,9 +99,18 @@ or proprietary material from `intune-apple-gitops` or any other repository.
 | 2026-07-19 | Reviewed active-version proof squash merge | `f1dd37be822c07677621907168fc372c6ccc0ae0` |
 | 2026-07-20 | Consolidated rebrand and live-readiness pull requests | `f3db2c7a38750d8b31938ec43c816cb435492e7d` |
 | 2026-07-20 | Full 98-rule implementation plan, cohesive docs shell, and judge path | `cde773cdd0f3820a46cd59205e8b883706f0ae58` |
+| 2026-07-20 | Judge-ready product experience squash merge through PR #16 | `48a67aea60e5759f54ed5aee1396f68274b57f3b` |
 
 Exact Phase 1 commands, results, limitations, and commit hashes are maintained in the
 [Phase 1 validation record](phase-1-validation.md).
+
+After PR #16 passed CI and both CodeQL languages, protected-main audit run `29772311614` completed
+OIDC authentication, GET-only collection, current-versus-prior comparison, sanitization, public
+scanning, artifact upload, and ephemeral cleanup. Deployment run `29772466732` selected only that
+run's exact reviewed snapshot, reran every public gate, deployed the Cloudflare Worker/static
+artifact, and proved the active version through the authenticated control plane. Independent HTTPS
+and browser checks matched the reviewed snapshot; the production deployment gate was restored to
+false.
 
 The July 20 finalization remained owned by the primary Codex task and used three bounded supporting
 agents in the same shared checkout: one implemented exact provider mappings and sanitized snapshot

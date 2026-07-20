@@ -2,17 +2,19 @@
 
 **Date:** 2026-07-20
 
-**Branch:** `codex/cis-planning-judge-ready`
+**Protected-main merge:** `48a67aea60e5759f54ed5aee1396f68274b57f3b`
 
 **Validated product commit:** `cde773cdd0f3820a46cd59205e8b883706f0ae58`
 
 **Human review:** required
 
-**Data used locally:** synthetic only
+**Data used locally:** synthetic only; production verification used only the scanned sanitized
+public package and public-safe aggregates
 
-This is the current pre-merge validation record for the complete CIS Level 1 planning view,
-site-wide operational design, original Provifact mark, Provifact Assistant naming, and judge path.
-It supersedes mutable counts in earlier checkpoint reports without deleting their audit history.
+This is the current validation record for the complete CIS Level 1 planning view, site-wide
+operational design, original Provifact mark, Provifact Assistant naming, protected-main collection,
+Cloudflare deployment, and judge path. It supersedes mutable counts in earlier checkpoint reports
+without deleting their audit history.
 
 ## Product evidence
 
@@ -108,9 +110,52 @@ The locally built Worker/static artifact was inspected in a real browser. Verifi
   analysis subject to human review; and
 - the global documentation shell uses the same operational visual system as Mission Control.
 
-## Remaining production gate
+## Protected-main and production validation
 
-This record does not claim the change is deployed. After review and protected merge, run the
-protected-main GET-only Intune audit, publish only its scanned sanitized package, deploy that exact
-snapshot through the protected Cloudflare workflow, and perform HTTPS/browser verification. Record
-the resulting run IDs and public-safe aggregate counts here or in a follow-up validation commit.
+PR #16 passed the required public CI job and both CodeQL language analyses, had no review threads,
+and was squash-merged to protected `main` as
+`48a67aea60e5759f54ed5aee1396f68274b57f3b`. Local `main` was then fast-forwarded to the same
+commit.
+
+Protected audit run
+[`29772311614`](https://github.com/tmcoconsulting/evidenceops/actions/runs/29772311614)
+completed in 43 seconds. It verified the prior sanitized-package provenance, authenticated through
+the production-environment GitHub OIDC trust, ran the approved GET-only collector, sanitized and
+scanned the publication, uploaded the one-day public artifact, and passed the unconditional
+ephemeral-evidence cleanup. No private response was downloaded or inspected during this validation.
+
+The independently re-scanned public package had snapshot ID
+`mission-7b5fad138c9b5bb3a643a781` and reported only these public-safe aggregates:
+
+- 98 approved rules;
+- four deterministically evaluated rules;
+- one aligned rule and three missing-from-tenant findings;
+- three collection gaps;
+- 13 policies evaluated; and
+- 82 collected but unmapped objects.
+
+Protected deployment run
+[`29772466732`](https://github.com/tmcoconsulting/evidenceops/actions/runs/29772466732)
+completed in 1 minute 42 seconds. It reran the complete public validation, selected only audit run
+`29772311614`, required the exact snapshot ID above, rebuilt and scanned the static artifact,
+rechecked the snapshot immediately before upload, deployed the Worker, and verified the active
+Cloudflare version through the authenticated control plane. The temporary production window was
+then reset and independently verified as `CLOUDFLARE_DEPLOY_ENABLED=false`.
+
+Independent production verification confirmed:
+
+- `https://evidenceops.tmcoconsulting.com/`, Mission Control, the baseline plan, judge guide,
+  logo, `/api/status`, and `/api/ready` return HTTP 200 with successful TLS verification;
+- every one of the 32 URLs in the production sitemap returns HTTP 200;
+- HSTS, CSP, frame denial, no-sniff, referrer, permissions, cross-origin opener, and cross-origin
+  resource headers are present;
+- `/api/status` reports `gpt-5.6-terra`, OpenAI Responses mode, current live sanitized evidence,
+  the exact snapshot ID, `intune_write_capability=false`, and `byok_supported=false`;
+- Mission Control renders 98 posture rows and five implementation-plan sections; and
+- the baseline plan shows `98 of 98 baseline requirements shown` by default with its evaluated-only
+  filter disabled.
+
+No new paid model request was made for this presentation and documentation change. The existing
+bounded live Terra validation remains recorded in the historical live validation evidence. Final
+human review still covers product copy, the original mark, and submission materials; it is not an
+unmet automated security or deployment gate.
