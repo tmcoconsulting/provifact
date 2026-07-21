@@ -171,7 +171,9 @@ temporary Python virtual environment on Python 3.14.6 (the project supports Pyth
 
 The skipped live-tenant test, production refresh/deployment, paid model call, video upload, and
 Devpost submission require protected-main or human-controlled external actions and were not run by
-this non-deploying readiness branch. Branch CI remains pending until this branch is pushed.
+this non-deploying readiness branch. On pushed implementation head
+`c3a15c97a4606a327102892252e4bd4fedb85ad2`, required CI run `29867933390` and CodeQL run
+`29867933414` passed. This audit-only record commit must receive the same final checks.
 
 ## Readiness checklist
 
@@ -184,7 +186,7 @@ this non-deploying readiness branch. Branch CI remains pending until this branch
 - [x] Approved-baseline and protected-refresh runbooks exist.
 - [x] Final recording, YouTube, Devpost, site-audit, and public-safe changelog materials exist.
 - [x] Final local validation passes after all branch edits.
-- [ ] Branch CI passes after push.
+- [x] Required CI and both CodeQL language analyses passed on the pushed implementation head.
 - [ ] TJ reviews and merges the branch.
 
 ### Production / human
@@ -226,7 +228,7 @@ require TJ review and must not carry a `Human-Reviewed` trailer until that revie
 | Gate | Evidence | Status | Blocking? | Exact owner action |
 | --- | --- | --- | --- | --- |
 | Repository clean and reviewed | Branch starts at current `origin/main`; public-safe diff and validation complete | NEEDS HUMAN | Yes | Review this pull request, approve, and merge after green checks |
-| CI and CodeQL | Protected-main CI/CodeQL green at the starting revision; branch CI awaits push | PASS WITH LIMIT | Yes | Require green branch CI and retain green CodeQL before merge |
+| CI and CodeQL | Protected-main checks were green; required CI and both CodeQL analyses passed on pushed implementation head `c3a15c9` | PASS WITH LIMIT | Yes | Require the final audit-only head checks to remain green before merge |
 | Dependency and security scans | Ruff, Mypy, Pytest, Bandit, pip-audit, npm audit, Worker security tests pass | PASS | No | None |
 | Deterministic build | Two isolated Mission runs are byte-identical; tracked demo rebuild has no unexplained delta | PASS | No | None |
 | Public-artifact and privacy scan | Repository, two demo outputs, and final `site/` scans pass | PASS | No | None |
