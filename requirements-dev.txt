@@ -59,7 +59,7 @@ pyparsing==3.3.2
 pytest==9.1.1
 pytest-cov==7.1.0
 python-dateutil==2.9.0.post0
-python-discovery==1.4.4
+python-discovery==1.5.0
 PyYAML==6.0.3
 pyyaml_env_tag==1.1
 requests==2.34.2
