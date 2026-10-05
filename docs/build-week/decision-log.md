@@ -591,3 +591,13 @@ The two artifact PRs failed only because the security tests correctly required t
 changing the workflow and its exact-pin assertions in one trusted-source change preserves that
 fail-closed control. No workflow permission, trigger, environment boundary, artifact path, or
 retention rule changes.
+
+## 2026-10-05 — Keep virtualenv's discovery dependency compatible
+
+**Decision:** Pin `python-discovery` to 1.6.1 alongside the Dependabot update to `virtualenv`
+21.7.13. Preserve the exact direct dependency pins in `pyproject.toml`.
+
+**Why:** The previous `python-discovery` 1.4.4 pin conflicts with virtualenv 21.7.13's requirement
+for `python-discovery>=1.6`, causing the locked CI installation to stop before validation. This
+scoped transitive update restores a resolvable development environment without changing runtime
+application behavior, workflow permissions, deployment, or provider integrations.
