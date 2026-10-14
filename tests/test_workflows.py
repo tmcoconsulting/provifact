@@ -71,7 +71,7 @@ def test_privileged_workflows_are_main_only_and_environment_protected() -> None:
     assert "store_private" not in audit
     assert "python -m pytest -o addopts=''" in audit
     assert "if: inputs.prepare_publication" in audit
-    assert "actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a" in audit
+    assert "actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9" in audit
     assert "path: build/live-public/mission-control.json" in audit
     assert "retention-days: 1" in audit
     assert "path: artifacts/private" not in audit
