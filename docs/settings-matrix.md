@@ -1,5 +1,10 @@
 # Baseline Comparison & Implementation Plan
 
+Rows come from the canonical public matrix projection bound to the displayed Mission snapshot.
+Every approved row preserves its baseline profile and benchmark version. Private policy names and
+stable private policy lineage remain excluded; see the
+[lineage and authorization contract](operations/private-policy-lineage.md).
+
 <div class="matrix-intro">
   <div>
     <p class="matrix-kicker">Setting-level technical evidence</p>
@@ -127,9 +132,9 @@ and assignment identities are excluded or pseudonymized before publication. The 
 shows public-safe setting/evidence references rather than claiming to expose the tenant's actual
 Intune display names.
 
-A private, access-controlled deployment can preserve a reviewed parent-policy reference and friendly
-name after a separate data-classification and authorization review. That parent-policy join is the
-next data-model priority; the public matrix never guesses it from a display name.
+The private collector preserves a stable parent-policy reference and friendly name under the
+documented classification and retention boundary. Authenticated name presentation still requires
+a separately reviewed deployment. The public matrix never guesses lineage from a display name.
 
 ## Coverage limits
 

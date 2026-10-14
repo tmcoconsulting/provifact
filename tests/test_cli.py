@@ -13,6 +13,7 @@ from evidenceops.evidence import (
     private_collection_document,
     validate_public_mission_snapshot,
 )
+from evidenceops.evidence.matrix import validate_public_matrix
 from evidenceops.mission_demo import MISSION_PSEUDONYM_KEY, _collection, build_mission_demo
 from scripts.check_public_artifacts import scan as scan_public
 
@@ -26,6 +27,9 @@ def test_run_demo_reproduces_complete_public_flow(tmp_path: Path) -> None:
         loaded = json.loads(path.read_text(encoding="utf-8"))
         if path.name == "mission-control.json":
             validate_public_mission_snapshot(loaded)
+        elif path.name == "settings-matrix.json":
+            mission = json.loads((output / "mission-control.json").read_text(encoding="utf-8"))
+            validate_public_matrix(loaded, mission)
         else:
             validate_evidence_object(loaded)
 

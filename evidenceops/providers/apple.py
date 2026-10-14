@@ -18,11 +18,19 @@ from typing import Final, Protocol, cast
 from evidenceops.domain import JsonValue, fingerprint
 from evidenceops.providers.intune import GraphErrorCategory, GraphProviderError
 
-APPLE_PROVIDER_VERSION: Final = "2.1.0"
+APPLE_PROVIDER_VERSION: Final = "2.2.0"
 APPLE_COLLECTION_SCHEMA_VERSION: Final = "2.0.0"
 MAX_CONCURRENCY: Final = 4
 MAX_SETTING_DEPTH: Final = 8
 MAX_SETTINGS_PER_RESPONSE_ITEM: Final = 512
+_POLICY_RESOURCE_FAMILIES: Final = frozenset(
+    {
+        "settings_catalog",
+        "configuration_profiles",
+        "compliance_policies",
+        "app_configuration_policies",
+    }
+)
 
 
 class _OutOfScopeRecordError(ValueError):
@@ -339,6 +347,8 @@ def _normalize_item(
         elif isinstance(raw_value, list):
             properties[target] = len(raw_value)
     display_name = _optional_string(item, "displayName")
+    if spec.resource_family == "settings_catalog":
+        display_name = _optional_string(item, "name") or display_name
     if display_name is not None:
         properties["private_display_name"] = display_name
     bundle_id = _optional_string(item, "bundleId")
@@ -392,6 +402,9 @@ def _record(
     collected_at: str,
     properties: dict[str, JsonValue],
 ) -> dict[str, JsonValue]:
+    properties = {**properties, "private_source_endpoint": spec.path}
+    if spec.resource_family in _POLICY_RESOURCE_FAMILIES:
+        properties["private_policy_ref"] = private_policy_reference(spec.resource_family, source_id)
     unsigned: dict[str, JsonValue] = {
         "schema_version": APPLE_COLLECTION_SCHEMA_VERSION,
         "resource_family": spec.resource_family,
@@ -407,6 +420,20 @@ def _record(
         "evidence_id": f"apple-{fingerprint(unsigned)[7:31]}",
         "content_fingerprint": fingerprint(unsigned),
     }
+
+
+def private_policy_reference(resource_family: str, source_id: str) -> str:
+    """Stable private join key; never publish this unkeyed source-derived identifier."""
+    return (
+        "policy-private-"
+        + fingerprint(
+            {
+                "provider": "microsoft-intune-apple",
+                "resource_family": resource_family,
+                "id": source_id,
+            }
+        )[7:31]
+    )
 
 
 def _expansion_paths(record: dict[str, JsonValue]) -> tuple[tuple[str, str], ...]:
@@ -452,6 +479,10 @@ def _normalize_expansion(
         "relationship": relationship,
         "platforms": cast(dict[str, JsonValue], parent["properties"])["platforms"],
     }
+    if parent["resource_family"] in _POLICY_RESOURCE_FAMILIES:
+        properties["parent_policy_ref"] = private_policy_reference(
+            parent["resource_family"], parent_id
+        )
     if relationship == "assignments":
         target = item.get("target")
         if not isinstance(target, dict):
@@ -488,7 +519,7 @@ def _normalize_expansion(
     spec = EndpointSpec(
         key=f"{parent['source_endpoint_key']}:{relationship}",
         resource_family=f"{parent['resource_family']}_{relationship}",
-        path=f"/{parent['source_api_version']}/expanded",
+        path=next(path for kind, path in _expansion_paths(parent) if kind == relationship),
         permission=cast(str, parent["required_permission"]),
     )
     return _record(

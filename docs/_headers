@@ -16,5 +16,9 @@
   ! Cache-Control
   Cache-Control: no-store
 
+/assets/data/settings-matrix.json
+  ! Cache-Control
+  Cache-Control: no-store
+
 /assets/*
   Cache-Control: public, max-age=3600, must-revalidate

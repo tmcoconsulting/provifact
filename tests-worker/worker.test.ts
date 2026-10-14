@@ -558,6 +558,10 @@ describe("Worker routes", () => {
       expect(init.body).not.toContain('"claims"');
       expect(init.body).not.toContain('"evidence_references"');
       expect(init.body).not.toContain("synthetic-device-mac");
+      expect(init.body).not.toContain('"setting_key"');
+      expect(init.body).not.toContain('"parent_policy_ref"');
+      expect(init.body).not.toContain('"mappings"');
+      expect(init.body).not.toContain('"change_guidance"');
       return Response.json({
         output: [
           {
@@ -599,6 +603,63 @@ describe("Worker routes", () => {
       },
       verification: { status: "typed_claims_verified" },
     });
+  });
+
+  it("keeps selected-requirement framework identifiers outside model context", async () => {
+    const requirement = missionFixture.requirements.find(
+      (item) => item.rule_id === "system_settings_filevault_enforce",
+    )!;
+    const outboundFetch = vi.fn<typeof fetch>(async (_input, init) => {
+      if (typeof init?.body !== "string") throw new Error("expected JSON body");
+      const body = JSON.parse(init.body) as Record<string, unknown>;
+      const context = JSON.parse(String(body.input)) as {
+        facts: Record<string, unknown>;
+      };
+      expect(context.facts).toMatchObject({
+        requirement_id: requirement.requirement_id,
+        outcome: requirement.outcome,
+      });
+      for (const field of [
+        "mappings",
+        "setting_key",
+        "change_guidance",
+        "parent_policy_ref",
+      ])
+        expect(context.facts).not.toHaveProperty(field);
+      return Response.json({
+        output: [
+          {
+            type: "message",
+            content: [
+              {
+                type: "output_text",
+                text: JSON.stringify({
+                  direct_answer: "Review the published requirement evidence.",
+                  evidence_sufficiency: "verified",
+                  limitations: ["Human review remains required."],
+                  additional_evidence_required: ["Review operating evidence."],
+                  suggested_human_review_questions: [
+                    "Is the intended scope confirmed?",
+                  ],
+                }),
+              },
+            ],
+          },
+        ],
+      });
+    });
+    const response = await handleRequest(
+      assistantRequest("Explain this requirement", missionFixture.snapshot_id, {
+        page: "settings",
+        question: "Explain this requirement",
+        snapshot_id: missionFixture.snapshot_id,
+        selected_evidence_id: requirement.requirement_id,
+      }),
+      environment("openai", { apiKey: TEST_API_KEY }),
+      { outboundFetch },
+    );
+    expect(response.status).toBe(200);
+    expect(outboundFetch).toHaveBeenCalledTimes(1);
   });
 
   it("rejects prohibited model prose before returning an assistant answer", async () => {

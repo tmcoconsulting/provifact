@@ -880,7 +880,6 @@ function requirementFact(requirement: MissionRequirement): JsonValue {
     expected_value: requirement.expected_value ?? null,
     observed_value: requirement.observed_value ?? null,
     assignment_summary: requirement.assignment_summary ?? "not available",
-    mappings: requirement.mappings ?? {},
   };
 }
 

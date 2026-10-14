@@ -97,8 +97,6 @@
       ? values.filter((value) => typeof value === "string")
       : [];
   };
-  const hasMappings = (requirement) =>
-    frameworkColumns.some(({ key }) => frameworkIds(requirement, key).length);
   const hasReviewedProviderMapping = (requirement) =>
     requirement.mapping_review_status === "reviewed" &&
     Array.isArray(requirement.provider_definition_ids) &&
@@ -150,37 +148,10 @@
     return badge;
   };
 
-  const buildAction = (requirement) => {
-    if (requirement.reference_only === true)
+  const buildAction = (row) => {
+    if (row.requirement.reference_only === true)
       return "Baseline owner review: decide whether this reference-profile rule belongs in the TMCO Consulting-approved baseline. If adopted, approve its target, management path, and evidence source before evaluation.";
-    const key = requirement.setting_key || requirement.rule_id;
-    const target = formatValue(requirement.expected_value);
-    const observed = formatValue(requirement.observed_value);
-    switch (requirement.outcome) {
-      case "Aligned":
-        return `No value change indicated. Retain ${key} at ${target}; review scope and operating evidence.`;
-      case "Value drift":
-        return `Human review in Intune: ${key} is ${observed}; the approved target is ${target}. Re-collect after any change.`;
-      case "Assignment drift":
-        return `Review intended assignments and exclusions for ${key}; re-collect after any human change.`;
-      case "Conflicting policy":
-        return `Review overlapping policy sources and effective precedence for ${key}; Provifact will not choose or apply a policy.`;
-      case "Missing from tenant":
-        return `Confirm every reviewed exact provider alias is absent before treating ${key} as missing.`;
-      case "Collection gap":
-        return "Restore the approved read-only evidence source or provide alternate evidence before evaluating this setting.";
-      case "Unsupported value shape":
-        return "Review the collected value shape and add a deterministic parser before evaluating it.";
-      case "Provider mapping not reviewed":
-        return requirement.setting_key &&
-          requirement.setting_key !== "not mapped"
-          ? "Review and approve the exact Intune setting definition ID before this rule enters deterministic evaluation."
-          : "Classify the approved implementation path: Intune Settings Catalog, custom profile, script or agent, or alternate evidence. Then approve a typed target and exact collector mapping.";
-      case "Unsupported by provider":
-        return "Document an approved alternate implementation or evidence path; do not infer provider support.";
-      default:
-        return "Human review is required; Provifact has no Intune write capability.";
-    }
+    return row.change_guidance;
   };
 
   const addDetail = (list, label, value, code = false) => {
@@ -206,6 +177,11 @@
     );
     const list = create("dl", "matrix-detail-list");
     addDetail(list, "Planning state", implementationState(requirement));
+    if (requirement.reference_only !== true) {
+      addDetail(list, "Baseline profile", row.baseline_profile_id, true);
+      addDetail(list, "Benchmark version", row.benchmark_version, true);
+      addDetail(list, "Policy precedence", row.policy_precedence);
+    }
     addDetail(list, "Raw deterministic state", requirement.outcome);
     if (requirement.reference_only === true)
       addDetail(
@@ -282,12 +258,13 @@
     const action = create("section", "matrix-detail-action");
     action.append(
       create("h3", "", "Read-only operator guidance"),
-      create("p", "", buildAction(requirement)),
+      create("p", "", buildAction(row)),
       create("h3", "", "Limitations"),
       create(
         "p",
         "",
-        "This setting-level evidence does not establish organizational compliance or control satisfaction. Provifact cannot write, assign, or remediate Intune. Human review is required.",
+        row.limitations?.join(" ") ||
+          "Reference membership is comparison-only. Targets and evidence require separate human approval. Provifact cannot write, assign, or remediate Intune.",
       ),
     );
     detail.append(heading, label, list, action);
@@ -419,7 +396,7 @@
       );
       if (requestedSnapshot && /^mission-[0-9a-f]{24}$/.test(requestedSnapshot))
         url.searchParams.set("snapshot", requestedSnapshot);
-      const [response, catalogResponse] = await Promise.all([
+      const [response, catalogResponse, matrixResponse] = await Promise.all([
         fetch(url, {
           credentials: "same-origin",
           cache: "no-store",
@@ -430,8 +407,17 @@
           cache: "force-cache",
           headers: { Accept: "application/json" },
         }),
+        fetch("/assets/data/settings-matrix.json", {
+          credentials: "same-origin",
+          cache: "no-store",
+          headers: { Accept: "application/json" },
+        }),
       ]);
       if (
+        !matrixResponse.ok ||
+        !matrixResponse.headers
+          .get("Content-Type")
+          ?.includes("application/json") ||
         !response.ok ||
         !response.headers.get("Content-Type")?.includes("application/json") ||
         !catalogResponse.ok ||
@@ -443,6 +429,10 @@
           "Mission package or baseline catalog could not be loaded",
         );
       const mission = validateMission(await response.json());
+      const matrix = await window.ProvifactMatrix.validate(
+        await matrixResponse.json(),
+        mission,
+      );
       const catalog = await validateCatalog(
         await catalogResponse.json(),
         mission,
@@ -458,38 +448,10 @@
         throw new Error(
           "TMCO Consulting approved profile is missing from the catalog",
         );
-      const findings = new Map(
-        mission.findings
-          .filter(
-            (item) => isRecord(item) && typeof item.requirement_id === "string",
-          )
-          .map((item) => [item.requirement_id, item]),
-      );
-      const resources = new Map(
-        mission.resources
-          .filter(
-            (item) =>
-              isRecord(item) && typeof item.source_evidence_id === "string",
-          )
-          .map((item) => [item.source_evidence_id, item]),
-      );
-      const rows = mission.requirements
-        .filter(
-          (item) =>
-            isRecord(item) &&
-            typeof item.requirement_id === "string" &&
-            typeof item.rule_id === "string" &&
-            typeof item.title === "string" &&
-            typeof item.outcome === "string",
-        )
-        .map((requirement) => ({
-          requirement,
-          finding: findings.get(requirement.requirement_id),
-          resources: (requirement.source_evidence_ids || [])
-            .map((id) => resources.get(id))
-            .filter(Boolean),
-          referenceProfile: null,
-        }));
+      const rows = matrix.rows.map((row) => ({
+        ...row,
+        referenceProfile: null,
+      }));
 
       const profileGroups = new Map();
       for (const catalogProfile of catalog.profiles) {
@@ -753,51 +715,50 @@
         const selectedOutcome = outcome.value;
         const selectedSection = section.value;
         const selectedFramework = framework.value;
-        const filtered = comparisonRows.filter(
-          ({ requirement, resources: evidence }) => {
-            if (mappedOnly.checked && !hasReviewedProviderMapping(requirement))
-              return false;
-            if (
-              selectedOutcome &&
-              implementationState(requirement) !== selectedOutcome
-            )
-              return false;
-            if (selectedSection && requirement.section !== selectedSection)
-              return false;
-            if (
-              selectedFramework === "cis_benchmark" &&
-              requirement.reference_only === true
-            )
-              return false;
-            if (
-              selectedFramework &&
-              selectedFramework !== "cis_benchmark" &&
-              !frameworkIds(requirement, selectedFramework).length
-            )
-              return false;
-            if (!query) return true;
-            return [
-              requirement.title,
-              requirement.rule_id,
-              requirement.setting_key,
-              requirement.outcome,
-              implementationState(requirement),
-              formatValue(requirement.observed_value),
-              formatValue(requirement.expected_value),
-              buildAction(requirement),
-              ...(requirement.provider_definition_ids || []),
-              ...(requirement.source_evidence_ids || []),
-              ...frameworkColumns.flatMap(({ key }) =>
-                frameworkIds(requirement, key),
-              ),
-              ...evidence.flatMap((item) => [item.title, item.resource_family]),
-            ]
-              .filter((value) => typeof value === "string")
-              .join(" ")
-              .toLowerCase()
-              .includes(query);
-          },
-        );
+        const filtered = comparisonRows.filter((row) => {
+          const { requirement, resources: evidence } = row;
+          if (mappedOnly.checked && !hasReviewedProviderMapping(requirement))
+            return false;
+          if (
+            selectedOutcome &&
+            implementationState(requirement) !== selectedOutcome
+          )
+            return false;
+          if (selectedSection && requirement.section !== selectedSection)
+            return false;
+          if (
+            selectedFramework === "cis_benchmark" &&
+            requirement.reference_only === true
+          )
+            return false;
+          if (
+            selectedFramework &&
+            selectedFramework !== "cis_benchmark" &&
+            !frameworkIds(requirement, selectedFramework).length
+          )
+            return false;
+          if (!query) return true;
+          return [
+            requirement.title,
+            requirement.rule_id,
+            requirement.setting_key,
+            requirement.outcome,
+            implementationState(requirement),
+            formatValue(requirement.observed_value),
+            formatValue(requirement.expected_value),
+            buildAction(row),
+            ...(requirement.provider_definition_ids || []),
+            ...(requirement.source_evidence_ids || []),
+            ...frameworkColumns.flatMap(({ key }) =>
+              frameworkIds(requirement, key),
+            ),
+            ...evidence.flatMap((item) => [item.title, item.resource_family]),
+          ]
+            .filter((value) => typeof value === "string")
+            .join(" ")
+            .toLowerCase()
+            .includes(query);
+        });
 
         const head = table.tHead || table.createTHead();
         head.replaceChildren();

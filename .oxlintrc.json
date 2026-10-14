@@ -3,5 +3,12 @@
     "rules": {
         "typescript/no-floating-promises": "error",
         "typescript/no-misused-promises": "error"
-    }
+    },
+    "overrides": [
+        {
+            "files": ["docs/assets/javascripts/*.js"],
+            "env": { "browser": true },
+            "rules": { "no-undef": "error" }
+        }
+    ]
 }

@@ -96,6 +96,11 @@ jobs:
       - name: Run Worker contract tests
         run: npm run test:worker
 
+      - name: Validate the canonical browser matrix contract
+        run: |
+          npm run lint:browser
+          npm run test:browser
+
       - name: Validate generated Worker bindings
         run: npm run worker:types:check
 

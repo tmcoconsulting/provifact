@@ -615,3 +615,21 @@ until an upstream fix is verified. No production compatibility date or model set
 pins are reviewed together. Add the missing npm ecosystem and a daily credential-free full CI
 run to detect advisories even when no commits land. Keep Actions pinned to reviewed Dependabot
 commit SHAs. Live collection and production deployment retain their manual protected gates.
+
+## 2026-10-14 — Preserve private policy lineage and canonical matrix evidence
+
+**Decision:** Add stable private policy join keys and exact private endpoint metadata to normalized
+collection. Keep names, IDs, source-derived join keys, and endpoints outside public/model context.
+Represent overlapping policies separately and effective precedence as unknown. Treat incomplete
+collection or orphan policy relationships as evidence gaps.
+
+**Matrix:** Generate one canonical, fingerprinted public projection from a validated Mission; carry
+approved profile and benchmark version on every row. The frontend consumes these rows and rejects
+mixed snapshots, forged joins, duplicates, private additions, and unapproved profile identity.
+Deployment regenerates the projection from the reviewed live handoff, so synthetic matrix data can
+never be substituted for a live Mission.
+
+**Scope:** TJ explicitly kept CIS Level 2 comparison-only. It already has a separate pinned source
+hash in the catalog; it does not become approved desired state or receive inferred Level 1 results.
+Document the future Access/RBAC, export, retention, logging, and incident boundaries before private
+lineage is stored. No private Worker route or expanded model-context contract is enabled here.

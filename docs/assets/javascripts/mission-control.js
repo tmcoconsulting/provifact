@@ -39,10 +39,6 @@
     requirement.evaluation_included === true
       ? formatValue(requirement.observed_value)
       : "Not deterministically collected";
-  const shortHash = (value) =>
-    typeof value === "string" && value.length > 22
-      ? `${value.slice(0, 20)}…`
-      : formatValue(value);
   const titleCase = (value) =>
     String(value)
       .replaceAll("_", " ")

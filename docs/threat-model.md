@@ -75,6 +75,14 @@ service availability are outside this proof.
 
 ## Review triggers
 
+The canonical matrix is constructed only from a validated public Mission, then scanned and
+snapshot-bound before rendering. A fingerprint detects inconsistent content; it is not a signature
+or proof of source authenticity. Review and deployment provenance remain the publication authority.
+Private policy references and exact source endpoints never enter this projection or model context.
+Missing parents and unavailable assignments retain collection-gap outcomes; policy precedence is
+never inferred. The future private route requires the separate
+[authorization and retention boundary](operations/private-policy-lineage.md).
+
 Update this model before expanding Graph endpoints/settings/permissions, adding a provider,
 enabling a credentialed workflow, changing retention, accepting model tools, adding authentication,
 adding Worker/API routes or BYOK, changing rate/spend controls, provisioning a secret or custom

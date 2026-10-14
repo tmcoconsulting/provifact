@@ -45,6 +45,7 @@ nav:
       - Live Read-Only Collection: operations/live-collection.md
       - Approved Baseline: operations/approved-baseline.md
       - Repository Maintenance: operations/maintenance.md
+      - Private Policy Lineage: operations/private-policy-lineage.md
       - Protected Demo Refresh: operations/demo-refresh.md
       - Cloudflare Worker: operations/cloudflare-worker.md
       - Deployment Models: operations/deployment-models.md
@@ -91,7 +92,8 @@ extra_css:
 extra_javascript:
   - assets/javascripts/mission-control.js?v=20260720-provifact2
   - assets/javascripts/provifact-api.js?v=20260720-provifact2
-  - assets/javascripts/settings-matrix.js?v=20260720-provifact2
+  - assets/javascripts/settings-matrix-contract.js?v=20261014-matrix1
+  - assets/javascripts/settings-matrix.js?v=20261014-matrix2
   - assets/javascripts/assistant-evidence-context.js?v=20260721-readiness1
   - assets/javascripts/share.js?v=20260720-provifact1
 

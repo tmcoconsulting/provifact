@@ -2,7 +2,6 @@
   "use strict";
 
   const STATUS_URL = "/api/status";
-  const MISSION_URL = "/assets/data/mission-control.json";
   const HISTORY_KEY = "provifact-assistant-history-v2";
   const MAX_HISTORY = 12;
   const EVIDENCE_ID = /^(?:finding|req|gap|mission)-[0-9a-f]{24}$/;

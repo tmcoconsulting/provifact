@@ -37,9 +37,12 @@ Public CI never performs live collection.
 - [x] Pair the FileVault assistant task with deterministic package context without expanding model egress
 - [x] Load a fingerprinted comparison catalog for 16 public mSCP technical profiles while keeping
       company approval and deterministic evidence scope separate
-- [ ] Preserve a reviewed parent-policy reference in the private normalized model so an authenticated
-      deployment can show the actual Intune policy that supplied each setting
-- [ ] Define the data-classification, authorization, and retention rules for friendly tenant policy names
+- [x] Preserve stable private parent-policy lineage, provider/API/endpoint metadata, and conflicting
+      sources without choosing effective precedence
+- [x] Define classification, authorization, export, logging, incident, and retention boundaries for
+      friendly policy names; private authenticated routes remain a separately reviewed deployment
+- [x] Generate a snapshot-bound canonical public matrix with benchmark version on each row and
+      reject stale, forged, private, or unapproved-profile additions before rendering
 - [ ] Approve any additional profile as company desired state only through a separate human-reviewed
       baseline change; comparison membership alone never enters the deterministic denominator
 - [ ] Work through the visible 94-rule backlog and expand exact reviewed provider mappings only when
