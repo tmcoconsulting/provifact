@@ -44,6 +44,7 @@ nav:
       - Local Demo: operations/demo-mode.md
       - Live Read-Only Collection: operations/live-collection.md
       - Approved Baseline: operations/approved-baseline.md
+      - Repository Maintenance: operations/maintenance.md
       - Protected Demo Refresh: operations/demo-refresh.md
       - Cloudflare Worker: operations/cloudflare-worker.md
       - Deployment Models: operations/deployment-models.md

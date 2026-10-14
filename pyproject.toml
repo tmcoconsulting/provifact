@@ -1,5 +1,5 @@
 [build-system]
-requires = ["hatchling==1.31.0"]
+requires = ["hatchling==1.32.4"]
 build-backend = "hatchling.build"
 
 [project]
@@ -25,22 +25,22 @@ evidenceops = "evidenceops.cli:main"
 
 [project.optional-dependencies]
 ai = [
-  "certifi==2026.6.17",
+  "certifi==2026.7.22",
 ]
 live = [
-  "msal==1.37.0",
+  "msal==1.39.0",
 ]
 dev = [
   "bandit==1.9.4",
   "mkdocs==1.6.1",
   "mkdocs-material==9.7.7",
-  "msal==1.37.0",
-  "mypy==2.3.0",
+  "msal==1.39.0",
+  "mypy==2.4.0",
   "pip-audit==2.10.1",
-  "pre-commit==4.6.0",
+  "pre-commit==4.7.0",
   "pytest==9.1.1",
   "pytest-cov==7.1.0",
-  "ruff==0.15.22",
+  "ruff==0.17.0",
 ]
 
 [project.urls]

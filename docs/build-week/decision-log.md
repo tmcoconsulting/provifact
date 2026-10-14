@@ -591,3 +591,27 @@ The two artifact PRs failed only because the security tests correctly required t
 changing the workflow and its exact-pin assertions in one trusted-source change preserves that
 fail-closed control. No workflow permission, trigger, environment boundary, artifact path, or
 retention rule changes.
+
+## 2026-10-14 — Restore dependency validation and maintain all ecosystems
+
+**Decision:** Refresh exact Python direct pins and the resolved environment together. Upgrade
+cryptography to 50.0.2, PyJWT to 2.15.1, urllib3 to 2.8.0, and virtualenv to 21.14.7, including its
+compatible python-discovery dependency. MSAL 1.39.0 accepts cryptography below 51. Regenerate the
+lock with all required transitive packages and validate the installed environment with `pip check`.
+
+**Why:** The previous audit reported 27 vulnerability entries across four packages and blocked
+every unrelated dependency PR. No audit findings are suppressed. Updated Ruff and mypy retain
+the existing explicit rules and strict typing contract; Material for MkDocs remains the site stack.
+
+**Worker tooling:** Follow Cloudflare's
+[documented Vitest plugin migration](https://developers.cloudflare.com/workers/testing/vitest-integration/migration-guides/migrate-to-vitest-plugin/),
+replace the retired pool package with `@cloudflare/vitest-plugin` 1.4.2, update lint/format/Wrangler
+tooling, and regenerate runtime declarations using the pinned Wrangler. Vitest 4.1.11 remains the
+latest release that passes from the project's space-containing path. Vitest 5.0.4 was tested and
+failed inside workerd with a URL-encoded space in the cache path; Dependabot defers that major
+until an upstream fix is verified. No production compatibility date or model setting changes.
+
+**Maintenance:** Group Python environment, workflow action, and npm tooling updates so coupled
+pins are reviewed together. Add the missing npm ecosystem and a daily credential-free full CI
+run to detect advisories even when no commits land. Keep Actions pinned to reviewed Dependabot
+commit SHAs. Live collection and production deployment retain their manual protected gates.
