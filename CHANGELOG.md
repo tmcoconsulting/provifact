@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-10-14
+
+- Refresh the exact Python environment and Worker toolchain, resolving known dependency
+  vulnerabilities and blocked update PRs.
+- Migrate to Cloudflare's supported Vitest plugin and retain the compatible Vitest 4 release.
+- Group Dependabot updates for Python, GitHub Actions, and npm; add daily credential-free CI.
+
 ## 2026-07-21 — Build Week submission readiness
 
 - Added final source, baseline-approval, protected-refresh, recording, YouTube, Devpost, site-audit,

@@ -13,6 +13,9 @@ updates:
       - python
     commit-message:
       prefix: deps
+    groups:
+      python-environment:
+        patterns: ["*"]
 
   - package-ecosystem: github-actions
     directory: /
@@ -27,3 +30,28 @@ updates:
       - github-actions
     commit-message:
       prefix: ci
+    groups:
+      workflow-actions:
+        patterns: ["*"]
+
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: "15:00"
+      timezone: America/Denver
+    open-pull-requests-limit: 5
+    labels:
+      - dependencies
+      - javascript
+    commit-message:
+      prefix: deps
+    groups:
+      worker-tooling:
+        patterns: ["*"]
+    # Vitest 5 currently fails Cloudflare workerd tests in paths containing spaces.
+    # Revisit with an upstream fix and a successful run from this workspace path.
+    ignore:
+      - dependency-name: vitest
+        versions: [">=5.0.0 <6.0.0"]

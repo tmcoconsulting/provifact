@@ -5,7 +5,7 @@
     "types": [
       "node",
       "./worker-configuration.d.ts",
-      "@cloudflare/vitest-pool-workers/types"
+      "@cloudflare/vitest-plugin/types"
     ]
   },
   "include": ["tests-worker/**/*.ts", "vitest.config.ts"]
