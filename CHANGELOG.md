@@ -6,6 +6,10 @@
   vulnerabilities and blocked update PRs.
 - Migrate to Cloudflare's supported Vitest plugin and retain the compatible Vitest 4 release.
 - Group Dependabot updates for Python, GitHub Actions, and npm; add daily credential-free CI.
+- Preserve private policy lineage and fail closed on incomplete or orphaned policy evidence.
+- Generate a canonical snapshot-bound public matrix with benchmark version, reviewed joins,
+  deterministic guidance, and browser contract checks. Keep CIS Level 2 comparison-only.
+- Exclude untyped framework identifiers from Assistant model context.
 
 ## 2026-07-21 — Build Week submission readiness
 

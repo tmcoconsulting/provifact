@@ -32,6 +32,11 @@ are not requested or are rejected before public construction.
 Deterministic pseudonyms are used only where correlation is necessary. They are HMAC-derived with
 runtime key material of at least 32 bytes. Provifact never persists that key.
 
+Private policy names, exact source endpoints, assignment scope, and stable private policy join keys
+are confidential tenant context. They remain in the owner-only normalized boundary and are excluded
+from public/model context. See the
+[policy-lineage classification, authorization, and export contract](operations/private-policy-lineage.md).
+
 ## Lifecycle and retention
 
 | Stage | Location | Retention |

@@ -29,6 +29,7 @@ from evidenceops.evidence import (
     write_private_package,
     write_public_package,
 )
+from evidenceops.evidence.matrix import build_public_matrix
 from evidenceops.evidence.mission import (
     build_public_mission_snapshot,
     load_public_mission_snapshot,
@@ -70,6 +71,7 @@ STATIC_DEMO_FILENAMES: Final = {
     "phase1-rejected-verification.json",
     "demo-summary.json",
     "mission-control.json",
+    "settings-matrix.json",
 }
 APPLE_DELEGATED_SCOPES: Final = tuple(
     f"https://graph.microsoft.com/{permission}"
@@ -209,7 +211,9 @@ def _run_mission_demo(output_directory: Path) -> None:
     if destination.exists() and any(destination.iterdir()):
         raise ValueError("Mission demo output directory must not exist or must be empty")
     destination.mkdir(mode=0o755, parents=True, exist_ok=True)
-    _write_new_json(destination / "mission-control.json", build_mission_demo())
+    mission = build_mission_demo()
+    _write_new_json(destination / "mission-control.json", mission)
+    _write_new_json(destination / "settings-matrix.json", build_public_matrix(mission))
     print(f"synthetic Mission Control demo complete: {destination}")
 
 
@@ -353,13 +357,15 @@ def _synthetic_artifacts() -> dict[str, EvidenceObject]:
     narrative = build_offline_narrative(public)
     verification = verify_narrative(narrative, public)
     rejected_verification = verify_narrative(_rejected_fixture(narrative), public)
+    mission = build_mission_demo()
     return {
         "phase1-public-evidence.json": public,
         "phase1-fixture-narrative.json": narrative,
         "phase1-verification.json": verification,
         "phase1-rejected-verification.json": rejected_verification,
         "demo-summary.json": _demo_summary(public, narrative, verification, rejected_verification),
-        "mission-control.json": build_mission_demo(),
+        "mission-control.json": mission,
+        "settings-matrix.json": build_public_matrix(mission),
     }
 
 

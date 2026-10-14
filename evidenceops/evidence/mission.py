@@ -34,7 +34,7 @@ from evidenceops.providers.apple import AppleIntuneCollection, summarize_devices
 from evidenceops.sanitization import assert_public_safe
 
 MISSION_SCHEMA_VERSION: Final = "2.1.0"
-MISSION_ALGORITHM_VERSION: Final = "evidenceops-mission-drift-v2.1.0"
+MISSION_ALGORITHM_VERSION: Final = "evidenceops-mission-drift-v2.2.0"
 PUBLICATION_POLICY_VERSION: Final = "evidenceops-mission-public-v1.0.0"
 FRESHNESS_SECONDS: Final = 86_400
 MAX_PUBLIC_MISSION_BYTES: Final = 512 * 1024
@@ -349,7 +349,9 @@ def _evaluate_requirements(
         used.update(parent_ids)
         outcome: DriftOutcome
         observed: JsonValue
-        if not candidates and not _settings_catalog_is_complete(collection):
+        if not _settings_catalog_is_complete(collection) or not parent_ids.issubset(
+            parents_by_evidence_id
+        ):
             outcome, observed = DriftOutcome.COLLECTION_GAP, "collection incomplete"
         else:
             outcome, observed = _deterministic_outcome(
@@ -596,6 +598,11 @@ def _settings_catalog_is_complete(collection: AppleIntuneCollection) -> bool:
         if gap.get("source_endpoint_key") in {"settings-catalog", "settings_catalog:settings"}
     ]
     if relevant_gaps:
+        return False
+    if any(
+        gap.get("source_endpoint_key") == "settings_catalog:assignments"
+        for gap in collection.collection_gaps
+    ):
         return False
     parent_count = sum(
         record["resource_family"] == "settings_catalog" for record in collection.records

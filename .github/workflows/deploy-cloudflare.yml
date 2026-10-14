@@ -126,6 +126,9 @@ jobs:
         run: |
           test "$(find build/publication-handoff -mindepth 1 -print | wc -l | tr -d ' ')" = "1"
           python scripts/promote_live_mission.py build/publication-handoff/mission-control.json
+          python scripts/build_public_matrix.py \
+            --mission docs/assets/data/mission-control.json \
+            --output docs/assets/data/settings-matrix.json
           python scripts/check_public_artifacts.py build/publication-handoff
           python scripts/check_secrets.py
           actual_snapshot_id="$(jq -r '.snapshot_id' docs/assets/data/mission-control.json)"

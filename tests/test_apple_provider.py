@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import inspect
+import json
 from datetime import UTC, datetime
 from typing import cast
 
@@ -20,6 +21,51 @@ from evidenceops.providers import (
 from evidenceops.providers import apple as apple_module
 
 NOW = datetime(2026, 7, 19, 15, 0, tzinfo=UTC)
+
+
+def test_private_policy_lineage_survives_rename_and_collection_time_without_public_disclosure() -> (
+    None
+):
+    reader, paths = _catalog()
+    first = AppleIntuneProvider(reader, now=lambda: NOW).collect()
+    reader.collections[paths["settings-catalog"]][0]["name"] = "Confidential policy renamed"
+    later = NOW.replace(hour=16)
+    second = AppleIntuneProvider(reader, now=lambda: later).collect()
+    first_parent = next(
+        record for record in first.records if record["resource_family"] == "settings_catalog"
+    )
+    second_parent = next(
+        record for record in second.records if record["resource_family"] == "settings_catalog"
+    )
+    private_ref = cast(dict[str, JsonValue], first_parent["properties"])["private_policy_ref"]
+    properties = cast(dict[str, JsonValue], second_parent["properties"])
+    assert properties["private_policy_ref"] == private_ref
+    assert properties["private_display_name"] == "Confidential policy renamed"
+    assert first_parent["evidence_id"] != second_parent["evidence_id"]
+    setting = next(
+        record
+        for record in second.records
+        if record["resource_family"] == "settings_catalog_settings"
+    )
+    setting_properties = cast(dict[str, JsonValue], setting["properties"])
+    assert setting_properties["parent_policy_ref"] == private_ref
+    assert (
+        setting_properties["private_source_endpoint"]
+        == "/beta/deviceManagement/configurationPolicies/synthetic-settings-policy/settings"
+    )
+    assert setting["source_api_version"] == "beta"
+    mission = build_public_mission_snapshot(
+        second, pseudonym_key=b"k" * 32, synthetic=False, source_git_commit="a" * 40
+    )
+    serialized = json.dumps(mission)
+    for excluded in (
+        "Confidential policy renamed",
+        "synthetic-settings-policy",
+        "private-group-source-id",
+        "private_source_endpoint",
+        "policy-private-",
+    ):
+        assert excluded not in serialized
 
 
 class FakeReader:

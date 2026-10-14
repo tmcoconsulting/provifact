@@ -42,7 +42,7 @@
       "system_settings_screensaver_password_enforce"
     ],
     "previous_collection_timestamp_utc": "2026-07-18T15:00:00Z",
-    "previous_snapshot_id": "mission-80de3b10d7d49548fac7e806",
+    "previous_snapshot_id": "mission-aa9abde265a1f9cd4428dafc",
     "resolved_drift": [],
     "unchanged_requirements": [
       "audit_acls_files_configure",
@@ -144,7 +144,7 @@
   },
   "collection": {
     "collected_at_utc": "2026-07-19T15:00:00Z",
-    "deterministic_algorithm_version": "evidenceops-mission-drift-v2.1.0",
+    "deterministic_algorithm_version": "evidenceops-mission-drift-v2.2.0",
     "endpoint_statuses": [
       {
         "key": "managed-devices",
@@ -295,7 +295,7 @@
       "state": "current"
     },
     "provider": "synthetic-microsoft-intune-apple",
-    "provider_version": "2.1.0",
+    "provider_version": "2.2.0",
     "source_git_commit": "synthetic-mission-reviewed-commit"
   },
   "collection_gaps": [
@@ -310,7 +310,7 @@
       "source_endpoint_key": "app-protection-policies"
     }
   ],
-  "content_fingerprint": "sha256:fab7cd0192389b4edda06fee69f1c160e8bcb5fc69533f2a58308843a59f202d",
+  "content_fingerprint": "sha256:42c7a8ad468960006dcdfd4e896d903e04c91296466b8198fc5c1daec587773c",
   "data_mode": "SYNTHETIC DEMO DATA",
   "devices": {
     "by_compliance_state": {
@@ -3430,7 +3430,7 @@
     }
   ],
   "schema_version": "2.1.0",
-  "snapshot_id": "mission-fab7cd0192389b4edda06fee",
+  "snapshot_id": "mission-42c7a8ad468960006dcdfd4e",
   "unmapped_objects": [
     {
       "action_expected": "No posture action is inferred from inventory alone.",
