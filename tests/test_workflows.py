@@ -92,7 +92,7 @@ def test_privileged_workflows_are_main_only_and_environment_protected() -> None:
     assert "npm run deploy:production" in deploy
     assert "ref: ${{ github.sha }}" in deploy
     assert "actions: read" in deploy
-    assert "actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c" in deploy
+    assert "actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333" in deploy
     assert "run-id: ${{ inputs.sanitized_audit_run_id }}" in deploy
     assert "expected_source_snapshot_id:" in deploy
     assert "EXPECTED_SOURCE_SNAPSHOT_ID: ${{ inputs.expected_source_snapshot_id }}" in deploy
@@ -179,7 +179,7 @@ def test_prior_live_publication_is_validated_and_never_private() -> None:
     assert "prior_sanitized_audit_run_id:" in audit
     assert "PRIOR_SANITIZED_AUDIT_RUN_ID: ${{ inputs.prior_sanitized_audit_run_id }}" in audit
     assert 'if [[ ! "$PRIOR_SANITIZED_AUDIT_RUN_ID" =~ ^[0-9]{1,20}$ ]]' in audit
-    assert "actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c" in audit
+    assert "actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333" in audit
     assert "evidenceops-sanitized-mission-${{ inputs.prior_sanitized_audit_run_id }}" in audit
     assert "run-id: ${{ inputs.prior_sanitized_audit_run_id }}" in audit
     assert "path: build/previous-public" in audit
