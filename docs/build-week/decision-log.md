@@ -608,7 +608,7 @@ the existing explicit rules and strict typing contract; Material for MkDocs rema
 replace the retired pool package with `@cloudflare/vitest-plugin` 1.4.2, update lint/format/Wrangler
 tooling, and regenerate runtime declarations using the pinned Wrangler. Vitest 4.1.11 remains the
 latest release that passes from the project's space-containing path. Vitest 5.0.4 was tested and
-failed inside workerd with an encoded `TMCO%20Consulting` cache path; Dependabot defers that major
+failed inside workerd with a URL-encoded space in the cache path; Dependabot defers that major
 until an upstream fix is verified. No production compatibility date or model setting changes.
 
 **Maintenance:** Group Python environment, workflow action, and npm tooling updates so coupled
