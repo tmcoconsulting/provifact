@@ -644,3 +644,13 @@ python-discovery, tomlkit, and virtualenv minor or patch releases together.
 without introducing runtime dependencies. Preserve exact pins, the existing lint/type rules,
 Material for MkDocs, and unsuppressed dependency audits. Validate the complete locked environment
 with `pip check` and the repository's Python, documentation, public-artifact, and Worker checks.
+
+## 2026-10-20 — Refresh the paired CodeQL action pins
+
+**Decision:** Update CodeQL initialization and analysis together to the verified upstream
+`6f2ac81f5cd81fe351a197ba0b00d91d03cd2aee` commit on the existing v4 release line.
+
+**Why:** Keep both language analyses on the same maintained action revision. Preserve immutable
+commit references, the existing language matrix and build mode, least-privilege permissions, and
+all triggers and protected production boundaries. Validate both CodeQL analyses and repository CI
+for the final pull-request head before merging.
