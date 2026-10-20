@@ -25,7 +25,7 @@ evidenceops = "evidenceops.cli:main"
 
 [project.optional-dependencies]
 ai = [
-  "certifi==2026.7.22",
+  "certifi==2026.10.19",
 ]
 live = [
   "msal==1.39.0",

@@ -654,3 +654,16 @@ with `pip check` and the repository's Python, documentation, public-artifact, an
 commit references, the existing language matrix and build mode, least-privilege permissions, and
 all triggers and protected production boundaries. Validate both CodeQL analyses and repository CI
 for the final pull-request head before merging.
+
+## 2026-10-20 — Refresh the certifi trust bundle
+
+**Decision:** Update certifi from 2026.7.22 to 2026.10.19 in the AI extra and resolved
+Python environment, preserving exact pins and unsuppressed dependency audits.
+
+**Why:** The main-branch dependency audit reports GHSA-6q48-6c7w-9gw2 against the old
+bundle. The upstream release removes the emSign ECC Root CA - G3 certificate while
+preserving the unaffected emSign roots; the certificate lookup API is unchanged.
+This intentionally changes trust for chains anchored only to the removed root. Validate
+the complete Python environment, documentation/public artifacts, Worker/browser tests,
+and both CodeQL analyses. Live collection and production deployment retain their
+separate manual protected gates.
