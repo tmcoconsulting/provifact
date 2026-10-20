@@ -634,6 +634,18 @@ hash in the catalog; it does not become approved desired state or receive inferr
 Document the future Access/RBAC, export, retention, logging, and incident boundaries before private
 lineage is stored. No private Worker route or expanded model-context contract is enabled here.
 
+## 2026-10-20 — Refresh compatible Worker test and packaging patches
+
+**Decision:** Update `@cloudflare/vitest-plugin` to 1.4.4, Vitest to 4.1.12, and Wrangler to
+4.151.1 together, including the plugin's matching Miniflare patch and resolved test packages.
+Keep exact direct pins and the complete integrity-pinned npm lock.
+
+**Why:** Maintain the supported Vitest 4 integration and matching Cloudflare test/packaging tools.
+The lock deduplicates existing transitive packages without adding package names or changing the
+registry, runtime compatibility date, bindings, or model configuration. Validate installation,
+security audits, Worker/browser tests, generated declarations, and all three packaging dry runs
+from a checkout path containing spaces. The Vitest 5 compatibility hold remains in place.
+
 ## 2026-10-20 — Refresh the pinned Python development environment
 
 **Decision:** Update Ruff to 0.17.1 in both the direct development extra and resolved lock.

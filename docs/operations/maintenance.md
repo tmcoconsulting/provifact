@@ -28,7 +28,7 @@ completed fixes, failures, and decisions needed, and stays quiet when nothing ch
 
 ## Compatibility holds
 
-Vitest remains at 4.1.11 with the supported `@cloudflare/vitest-plugin` integration. A test of
+Vitest remains at 4.1.12 with the supported `@cloudflare/vitest-plugin` integration. A test of
 Vitest 5.0.4 failed inside workerd when the project path contained spaces: an encoded `%20` cache
 path was treated as a filesystem path. Dependabot defers Vitest 5 until an upstream fix passes
 the tests from the actual project path. Review this hold rather than assuming the ignored major
