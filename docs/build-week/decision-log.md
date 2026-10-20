@@ -633,3 +633,14 @@ never be substituted for a live Mission.
 hash in the catalog; it does not become approved desired state or receive inferred Level 1 results.
 Document the future Access/RBAC, export, retention, logging, and incident boundaries before private
 lineage is stored. No private Worker route or expanded model-context contract is enabled here.
+
+## 2026-10-20 — Refresh the pinned Python development environment
+
+**Decision:** Update Ruff to 0.17.1 in both the direct development extra and resolved lock.
+Refresh the compatible distlib, filelock, platformdirs, pluggy, pymdown-extensions,
+python-discovery, tomlkit, and virtualenv minor or patch releases together.
+
+**Why:** Keep linting, test plugins, documentation extensions, and environment creation current
+without introducing runtime dependencies. Preserve exact pins, the existing lint/type rules,
+Material for MkDocs, and unsuppressed dependency audits. Validate the complete locked environment
+with `pip check` and the repository's Python, documentation, public-artifact, and Worker checks.
