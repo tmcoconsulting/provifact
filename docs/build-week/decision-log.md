@@ -679,3 +679,18 @@ This intentionally changes trust for chains anchored only to the removed root. V
 the complete Python environment, documentation/public artifacts, Worker/browser tests,
 and both CodeQL analyses. Live collection and production deployment retain their
 separate manual protected gates.
+
+## 2026-10-22 — Patch the resolved virtualenv development dependency
+
+**Decision:** Update the resolved `virtualenv` pin from 21.14.8 to 21.14.9. It remains a
+transitive development dependency of pre-commit; direct dependency pins stay unchanged.
+
+**Why:** The October 22 scheduled CI audit reports CVE-2026-113722 against 21.14.8 and lists
+21.14.9 as the fixed version. The upstream patch hardens environment creation, activation,
+seed-cache handling and helper import paths. Keep the audit enabled without suppressions.
+Validate dependency resolution and the complete Python, documentation/public-artifact,
+Worker/browser and CodeQL checks on this pull request. No live collection, production
+configuration or deployment change is included.
+
+**Evidence:** [Failed scheduled audit](https://github.com/tmcoconsulting/provifact/actions/runs/39828054629)
+and [upstream virtualenv release](https://github.com/pypa/virtualenv/releases/tag/21.14.9).
