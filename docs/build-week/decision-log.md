@@ -713,3 +713,8 @@ runs and both CodeQL analyses on the final head. No live collection or deploymen
 **Evidence:** [Fresh failed audit](https://github.com/tmcoconsulting/provifact/actions/runs/40102514592),
 [virtualenv release](https://github.com/pypa/virtualenv/releases/tag/21.14.10) and
 [filelock release](https://github.com/tox-dev/filelock/releases/tag/4.2.1).
+
+
+### October 24, 2026 Worker dependency audit refresh
+
+The fresh CI audit on the recovered patch passed Python auditing but exposed new Undici and Zod advisories in development tooling. Update the pinned Cloudflare Vitest plugin to 1.4.7 and Wrangler to 4.152.0. The plugin's Zod dependency has moved to major 4; apply its compatible 4.6.7 security patch, without overriding a Zod 3 consumer to Zod 4. Pin patched Undici 7.30.1 and 8.12.2 within their existing major versions. Regenerate Worker declarations for the updated Wrangler. Do not suppress advisories, downgrade tooling to audit-suggested obsolete versions, collect live tenant data or deploy production as part of this maintenance.
