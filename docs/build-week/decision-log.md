@@ -694,3 +694,22 @@ configuration or deployment change is included.
 
 **Evidence:** [Failed scheduled audit](https://github.com/tmcoconsulting/provifact/actions/runs/39828054629)
 and [upstream virtualenv release](https://github.com/pypa/virtualenv/releases/tag/21.14.9).
+
+## 2026-10-24 — Complete the development-environment security repair
+
+**Decision:** Advance the resolved development dependencies to virtualenv 21.14.10 and
+filelock 4.2.1. Keep direct pins, audit thresholds and all production boundaries unchanged.
+
+**Why:** The fresh PR validation audit reports CVE-2026-113713 for virtualenv 21.14.9
+and six filelock findings for 4.2.0. The virtualenv patch preserves temporary seed
+packages after cleanup; filelock hardens lock-file ownership, symlink handling and
+locking lifecycle behavior. Both are patch releases compatible with pre-commit's
+declared dependency ranges. The repository uses local system-language hooks.
+
+**Validation:** Require the locked installation, unsuppressed Python/npm audits, complete
+Python and Worker/browser suites, documentation/public-artifact checks, packaging dry
+runs and both CodeQL analyses on the final head. No live collection or deployment.
+
+**Evidence:** [Fresh failed audit](https://github.com/tmcoconsulting/provifact/actions/runs/40102514592),
+[virtualenv release](https://github.com/pypa/virtualenv/releases/tag/21.14.10) and
+[filelock release](https://github.com/tox-dev/filelock/releases/tag/4.2.1).
