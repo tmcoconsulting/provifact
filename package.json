@@ -26,13 +26,13 @@
         "validate:worker": "npm run format:check && npm run lint:worker && npm run lint:browser && npm run typecheck:worker && npm run test:worker && npm run test:browser && npm run worker:types:check && npm run worker:dry-run && npm run worker:dry-run:preview && npm run worker:dry-run:production"
     },
     "devDependencies": {
-        "@cloudflare/vitest-plugin": "1.4.4",
+        "@cloudflare/vitest-plugin": "1.4.7",
         "@types/node": "26.6.5",
-        "oxlint": "1.88.0",
-        "oxlint-tsgolint": "7.0.2004",
+        "oxlint": "1.89.0",
+        "oxlint-tsgolint": "7.0.2005",
         "prettier": "3.9.10",
         "typescript": "7.0.2",
         "vitest": "4.1.12",
-        "wrangler": "4.151.1"
+        "wrangler": "4.152.0"
     }
 }
