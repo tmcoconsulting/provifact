@@ -74,5 +74,5 @@ tomlkit==0.15.2
 trove-classifiers==2026.9.21.13
 typing_extensions==4.16.0
 urllib3==2.8.0
-virtualenv==21.14.10
+virtualenv==21.14.13
 watchdog==6.0.0

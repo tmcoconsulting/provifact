@@ -718,3 +718,21 @@ runs and both CodeQL analyses on the final head. No live collection or deploymen
 ### October 24, 2026 Worker dependency audit refresh
 
 The fresh CI audit on the recovered patch passed Python auditing but exposed new Undici and Zod advisories in development tooling. Update the pinned Cloudflare Vitest plugin to 1.4.7 and Wrangler to 4.152.0. The plugin's Zod dependency has moved to major 4; apply its compatible 4.6.7 security patch, without overriding a Zod 3 consumer to Zod 4. Pin patched Undici 7.30.1 and 8.12.2 within their existing major versions. Regenerate Worker declarations for the updated Wrangler. Do not suppress advisories, downgrade tooling to audit-suggested obsolete versions, collect live tenant data or deploy production as part of this maintenance.
+
+## 2026-10-26 — Refresh the virtualenv activation security patch
+
+**Decision:** Advance the resolved virtualenv development pin from 21.14.10 to 21.14.13,
+retaining filelock 4.2.1 and the existing Worker security repairs in this proposal.
+
+**Why:** The upstream patch fixes further shell-prompt command evaluation and exclusive-create
+handling for environment redirects and wheel records. It remains a transitive development
+dependency of pre-commit; direct pins and production behavior are unchanged. The standalone
+Dependabot proposal #73 still fails its Python audit because main retains filelock 4.2.0.
+Keep that proposal open until the complete repair is validated and merged or otherwise resolved.
+
+**Validation:** Require locked installation, dependency consistency, unsuppressed audits and the
+complete repository CI, including Python, documentation/public-artifact, Worker/browser,
+packaging dry runs and CodeQL checks, for the new head. No live collection or deployment.
+
+**Evidence:** [Upstream release](https://github.com/pypa/virtualenv/releases/tag/21.14.13) and
+[Dependabot validation](https://github.com/tmcoconsulting/provifact/actions/runs/40297725924).
