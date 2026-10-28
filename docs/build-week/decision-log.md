@@ -679,3 +679,102 @@ This intentionally changes trust for chains anchored only to the removed root. V
 the complete Python environment, documentation/public artifacts, Worker/browser tests,
 and both CodeQL analyses. Live collection and production deployment retain their
 separate manual protected gates.
+
+## 2026-10-22 — Patch the resolved virtualenv development dependency
+
+**Decision:** Update the resolved `virtualenv` pin from 21.14.8 to 21.14.9. It remains a
+transitive development dependency of pre-commit; direct dependency pins stay unchanged.
+
+**Why:** The October 22 scheduled CI audit reports CVE-2026-113722 against 21.14.8 and lists
+21.14.9 as the fixed version. The upstream patch hardens environment creation, activation,
+seed-cache handling and helper import paths. Keep the audit enabled without suppressions.
+Validate dependency resolution and the complete Python, documentation/public-artifact,
+Worker/browser and CodeQL checks on this pull request. No live collection, production
+configuration or deployment change is included.
+
+**Evidence:** [Failed scheduled audit](https://github.com/tmcoconsulting/provifact/actions/runs/39828054629)
+and [upstream virtualenv release](https://github.com/pypa/virtualenv/releases/tag/21.14.9).
+
+## 2026-10-24 — Complete the development-environment security repair
+
+**Decision:** Advance the resolved development dependencies to virtualenv 21.14.10 and
+filelock 4.2.1. Keep direct pins, audit thresholds and all production boundaries unchanged.
+
+**Why:** The fresh PR validation audit reports CVE-2026-113713 for virtualenv 21.14.9
+and six filelock findings for 4.2.0. The virtualenv patch preserves temporary seed
+packages after cleanup; filelock hardens lock-file ownership, symlink handling and
+locking lifecycle behavior. Both are patch releases compatible with pre-commit's
+declared dependency ranges. The repository uses local system-language hooks.
+
+**Validation:** Require the locked installation, unsuppressed Python/npm audits, complete
+Python and Worker/browser suites, documentation/public-artifact checks, packaging dry
+runs and both CodeQL analyses on the final head. No live collection or deployment.
+
+**Evidence:** [Fresh failed audit](https://github.com/tmcoconsulting/provifact/actions/runs/40102514592),
+[virtualenv release](https://github.com/pypa/virtualenv/releases/tag/21.14.10) and
+[filelock release](https://github.com/tox-dev/filelock/releases/tag/4.2.1).
+
+
+### October 24, 2026 Worker dependency audit refresh
+
+The fresh CI audit on the recovered patch passed Python auditing but exposed new Undici and Zod advisories in development tooling. Update the pinned Cloudflare Vitest plugin to 1.4.7 and Wrangler to 4.152.0. The plugin's Zod dependency has moved to major 4; apply its compatible 4.6.7 security patch, without overriding a Zod 3 consumer to Zod 4. Pin patched Undici 7.30.1 and 8.12.2 within their existing major versions. Regenerate Worker declarations for the updated Wrangler. Do not suppress advisories, downgrade tooling to audit-suggested obsolete versions, collect live tenant data or deploy production as part of this maintenance.
+
+## 2026-10-26 — Refresh the virtualenv activation security patch
+
+**Decision:** Advance the resolved virtualenv development pin from 21.14.10 to 21.14.13,
+retaining filelock 4.2.1 and the existing Worker security repairs in this proposal.
+
+**Why:** The upstream patch fixes further shell-prompt command evaluation and exclusive-create
+handling for environment redirects and wheel records. It remains a transitive development
+dependency of pre-commit; direct pins and production behavior are unchanged. The standalone
+Dependabot proposal #73 still fails its Python audit because main retains filelock 4.2.0.
+Keep that proposal open until the complete repair is validated and merged or otherwise resolved.
+
+**Validation:** Require locked installation, dependency consistency, unsuppressed audits and the
+complete repository CI, including Python, documentation/public-artifact, Worker/browser,
+packaging dry runs and CodeQL checks, for the new head. No live collection or deployment.
+
+**Evidence:** [Upstream release](https://github.com/pypa/virtualenv/releases/tag/21.14.13) and
+[Dependabot validation](https://github.com/tmcoconsulting/provifact/actions/runs/40297725924).
+
+## 2026-10-27 — Combine compatible maintenance updates for review
+
+**Decision:** Combine the compatible parts of Dependabot proposals #74–#76 with the
+existing security repair in #72. Refresh certifi to 2026.10.23, Ruff to 0.17.2,
+ast-serialize to 0.13.1, coverage to 7.17.0, filelock to 4.2.4, Markdown to 3.11.2,
+platformdirs to 4.13.5, pycparser to 3.12 and python-discovery to 1.6.4. Keep virtualenv
+21.14.13, the existing same-major Undici/Zod patches and the Vitest 4 compatibility hold.
+Update oxlint to 1.89.0 and oxlint-tsgolint to 7.0.2005 together.
+
+Pin setup-python v7.1.0 to verified commit
+`6d4fd22b20465ccc0f7354476588e8df7c9ca0e0` and both CodeQL v4 actions to
+`9b3254085494b55a0f7c4c2b3d2d52cc712ce370`. Preserve workflow permissions,
+manual production/collection gates, Python/Node versions and every validation step.
+
+**Why:** Independent updates cannot pass the complete audits while main retains the
+other vulnerable pins. One proposal allows validation of the actual combined environment
+without bypassing the separate human approval required to merge #72. The certifi bundle
+comparison removes only emSign Root CA - C1 and emSign ECC Root CA - C3: 120 certificates
+become 118, with no added or changed surviving certificates. TLS verification stays enabled.
+The complete npm lock comparison changes only the two lint packages and their platform
+binaries, adding the relevant libc selection metadata. No application code changes.
+
+**Major upgrade held:** Keep python-dateutil at 2.9.0.post0. Proposal #74 also requests
+3.0.0, which rewrites timezone-file handling, changes nonexistent-time UTC offsets, removes
+`TZPATHS` and adds a `tzdata` dependency. That needs a separately reviewed migration with
+a complete timezone-data lock and downstream documentation/date handling validation.
+The repository has no direct dateutil imports; this does not prove transitive compatibility.
+Do not treat a successful install as migration evidence or merge the major automatically.
+
+**Validation:** Clean locked Python/npm installations, `pip check`, complete required
+Python/docs/public-artifact/security checks, fresh unsuppressed audits, Worker/browser
+validation, regenerated binding consistency, three packaging dry runs and exact-head
+CI/CodeQL. Keep #73–#76 open until their work is applied or explicitly resolved; an
+unmerged proposal is not completion. No live collection or production deployment.
+
+**Evidence:** [Python update #74](https://github.com/tmcoconsulting/provifact/pull/74),
+[action update #75](https://github.com/tmcoconsulting/provifact/pull/75),
+[Worker update #76](https://github.com/tmcoconsulting/provifact/pull/76),
+[dateutil migration notes](https://github.com/dateutil/dateutil/releases/tag/3.0.0),
+[certifi release](https://github.com/certifi/python-certifi/releases/tag/2026.10.23) and
+[setup-python release](https://github.com/actions/setup-python/releases/tag/v7.1.0).
