@@ -1,23 +1,23 @@
 # Fully resolved Phase 1 development environment.
 # Regenerate from the exact direct pins in pyproject.toml and validate on Python 3.12+.
-ast_serialize==0.13.0
+ast_serialize==0.13.1
 babel==2.18.0
 backrefs==8.1
 bandit==1.9.4
 boolean.py==5.0
 CacheControl==0.14.4
-certifi==2026.10.19
+certifi==2026.10.23
 cffi==2.1.1
 cfgv==3.5.0
 charset-normalizer==3.5.2
 click==8.5.0
 colorama==0.4.6
-coverage==7.16.2
+coverage==7.17.0
 cryptography==50.0.2
 cyclonedx-python-lib==11.12.0
 defusedxml==0.7.1
 distlib==0.4.4
-filelock==4.2.1
+filelock==4.2.4
 ghp-import==2.1.0
 hatchling==1.32.4
 identify==2.6.20
@@ -26,7 +26,7 @@ iniconfig==2.3.1
 Jinja2==3.1.6
 librt==0.16.0
 license-expression==30.4.4
-Markdown==3.11.1
+Markdown==3.11.2
 markdown-it-py==4.2.0
 MarkupSafe==3.0.4
 mdurl==0.1.2
@@ -47,11 +47,11 @@ pathspec==1.1.1
 pip-requirements-parser==32.0.1
 pip_api==0.0.35
 pip_audit==2.10.1
-platformdirs==4.13.3
+platformdirs==4.13.5
 pluggy==1.7.0
 pre_commit==4.7.0
 py-serializable==2.1.0
-pycparser==3.11
+pycparser==3.12
 Pygments==2.21.0
 PyJWT==2.15.1
 pymdown-extensions==12.3
@@ -59,12 +59,12 @@ pyparsing==3.3.3
 pytest==9.1.1
 pytest-cov==7.1.0
 python-dateutil==2.9.0.post0
-python-discovery==1.6.3
+python-discovery==1.6.4
 PyYAML==6.0.3
 pyyaml_env_tag==1.1
 requests==2.34.2
 rich==15.0.0
-ruff==0.17.1
+ruff==0.17.2
 six==1.17.0
 sortedcontainers==2.4.0
 stevedore==5.9.1

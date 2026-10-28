@@ -736,3 +736,45 @@ packaging dry runs and CodeQL checks, for the new head. No live collection or de
 
 **Evidence:** [Upstream release](https://github.com/pypa/virtualenv/releases/tag/21.14.13) and
 [Dependabot validation](https://github.com/tmcoconsulting/provifact/actions/runs/40297725924).
+
+## 2026-10-27 — Combine compatible maintenance updates for review
+
+**Decision:** Combine the compatible parts of Dependabot proposals #74–#76 with the
+existing security repair in #72. Refresh certifi to 2026.10.23, Ruff to 0.17.2,
+ast-serialize to 0.13.1, coverage to 7.17.0, filelock to 4.2.4, Markdown to 3.11.2,
+platformdirs to 4.13.5, pycparser to 3.12 and python-discovery to 1.6.4. Keep virtualenv
+21.14.13, the existing same-major Undici/Zod patches and the Vitest 4 compatibility hold.
+Update oxlint to 1.89.0 and oxlint-tsgolint to 7.0.2005 together.
+
+Pin setup-python v7.1.0 to verified commit
+`6d4fd22b20465ccc0f7354476588e8df7c9ca0e0` and both CodeQL v4 actions to
+`9b3254085494b55a0f7c4c2b3d2d52cc712ce370`. Preserve workflow permissions,
+manual production/collection gates, Python/Node versions and every validation step.
+
+**Why:** Independent updates cannot pass the complete audits while main retains the
+other vulnerable pins. One proposal allows validation of the actual combined environment
+without bypassing the separate human approval required to merge #72. The certifi bundle
+comparison removes only emSign Root CA - C1 and emSign ECC Root CA - C3: 120 certificates
+become 118, with no added or changed surviving certificates. TLS verification stays enabled.
+The complete npm lock comparison changes only the two lint packages and their platform
+binaries, adding the relevant libc selection metadata. No application code changes.
+
+**Major upgrade held:** Keep python-dateutil at 2.9.0.post0. Proposal #74 also requests
+3.0.0, which rewrites timezone-file handling, changes nonexistent-time UTC offsets, removes
+`TZPATHS` and adds a `tzdata` dependency. That needs a separately reviewed migration with
+a complete timezone-data lock and downstream documentation/date handling validation.
+The repository has no direct dateutil imports; this does not prove transitive compatibility.
+Do not treat a successful install as migration evidence or merge the major automatically.
+
+**Validation:** Clean locked Python/npm installations, `pip check`, complete required
+Python/docs/public-artifact/security checks, fresh unsuppressed audits, Worker/browser
+validation, regenerated binding consistency, three packaging dry runs and exact-head
+CI/CodeQL. Keep #73–#76 open until their work is applied or explicitly resolved; an
+unmerged proposal is not completion. No live collection or production deployment.
+
+**Evidence:** [Python update #74](https://github.com/tmcoconsulting/provifact/pull/74),
+[action update #75](https://github.com/tmcoconsulting/provifact/pull/75),
+[Worker update #76](https://github.com/tmcoconsulting/provifact/pull/76),
+[dateutil migration notes](https://github.com/dateutil/dateutil/releases/tag/3.0.0),
+[certifi release](https://github.com/certifi/python-certifi/releases/tag/2026.10.23) and
+[setup-python release](https://github.com/actions/setup-python/releases/tag/v7.1.0).
