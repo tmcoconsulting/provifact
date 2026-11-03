@@ -1,5 +1,5 @@
 [build-system]
-requires = ["hatchling==1.32.4"]
+requires = ["hatchling==1.33.0"]
 build-backend = "hatchling.build"
 
 [project]
@@ -33,14 +33,14 @@ live = [
 dev = [
   "bandit==1.9.4",
   "mkdocs==1.6.1",
-  "mkdocs-material==9.7.7",
+  "mkdocs-material==9.8.0",
   "msal==1.39.0",
-  "mypy==2.4.0",
+  "mypy==2.4.1",
   "pip-audit==2.10.1",
   "pre-commit==4.7.0",
-  "pytest==9.1.1",
+  "pytest==9.2.0",
   "pytest-cov==7.1.0",
-  "ruff==0.17.2",
+  "ruff==0.17.3",
 ]
 
 [project.urls]

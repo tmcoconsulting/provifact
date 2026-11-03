@@ -778,3 +778,49 @@ unmerged proposal is not completion. No live collection or production deployment
 [dateutil migration notes](https://github.com/dateutil/dateutil/releases/tag/3.0.0),
 [certifi release](https://github.com/certifi/python-certifi/releases/tag/2026.10.23) and
 [setup-python release](https://github.com/actions/setup-python/releases/tag/v7.1.0).
+
+## 2026-11-03 — Refresh the compatible weekly dependency proposal
+
+**Decision:** Incorporate the compatible updates from replacement Dependabot proposals #78
+and #79 into the existing review proposal #72. Exact-pin Hatchling 1.33.0, Material for
+MkDocs 9.8.0, mypy 2.4.1, pytest 9.2.0 and Ruff 0.17.3. Refresh the resolved development
+pins to filelock 4.2.5, msgpack 1.2.4, nodeenv 1.11.1, platformdirs 4.14.0,
+python-discovery 1.7.0 and virtualenv 21.15.2. Keep python-dateutil 2.9.0.post0;
+its major upgrade and complete timezone-data migration remain separate human review.
+
+Update the Cloudflare Vitest plugin to 1.4.11, Wrangler to 4.156.0, oxlint to 1.90.0
+and Node declarations to 26.6.6. Preserve oxlint-tsgolint 7.0.2005, Vitest 4.1.12 and
+the existing same-major Undici/Zod security overrides. Regenerate Worker declarations
+with the pinned Wrangler. Workflow permissions, checks and protected manual gates stay
+as reviewed in the earlier proposal.
+
+**Compatibility review:** Material 9.8 raises its minimum to Python 3.11 and raises
+security dependency minimums; this repository uses Python 3.12 and the locked core
+packages meet those minimums. It does not use the removed recommended RSS/redirect
+extras. Keep Material for this milestone; its announced May 5, 2027 end of life is a
+future framework decision, not authorization to migrate. Pytest 9.2 makes additional
+parametrization arguments keyword-only, validates explicit config paths and changes
+plugin-import error reporting. Require successful collection and the complete test suite
+with the existing config and coverage plugin. Oxlint requires tsgolint 7.0.2005, which
+is already pinned. Validate the Cloudflare runtime and bundling changes from the actual
+checkout path containing spaces, including regenerated types and every packaging dry run.
+
+**Why:** The standalone Python update still fails npm auditing on main's old Cloudflare
+lock; the Worker update still fails Python auditing on main's old filelock/virtualenv.
+Their compatible updates require validation together with the existing security repair.
+Dependabot closed #74 and #76 when creating #78 and #79; that replacement does not mean
+the work has been applied to main. Keep remaining proposals open until applied or
+explicitly resolved. Merging #72 still requires TJ's separate approval.
+
+**Validation:** Clean locked installs, exact Python lock consistency, `pip check`, all
+AGENTS checks, deterministic demo rebuild, both unsuppressed audits, complete
+Worker/browser validation, generated binding consistency and three packaging dry runs.
+Require passing CI and CodeQL on the final committed head. No live collection or deployment.
+
+**Evidence:** [Python update #78](https://github.com/tmcoconsulting/provifact/pull/78),
+[Worker update #79](https://github.com/tmcoconsulting/provifact/pull/79),
+[Material release](https://github.com/squidfunk/mkdocs-material/releases/tag/9.8.0),
+[pytest release](https://github.com/pytest-dev/pytest/releases/tag/9.2.0),
+[virtualenv release](https://github.com/pypa/virtualenv/releases/tag/21.15.2),
+[Wrangler release](https://github.com/cloudflare/workers-sdk/releases/tag/wrangler%404.156.0)
+and [oxlint release](https://github.com/oxc-project/oxc/releases/tag/oxlint_v1.90.0).
