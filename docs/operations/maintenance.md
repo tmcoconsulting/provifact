@@ -22,9 +22,24 @@ disable vulnerability audits to make a PR pass.
 5. Verify main-branch CI after merge and check that the expected security alerts resolve.
 
 The daily Codex maintenance monitor investigates new issues, PR feedback, failed CI, and dependency
-alerts. Routine validated Dependabot updates may be merged within its standing authorization;
-other changes and major migrations are prepared for human review. It reports meaningful changes,
-completed fixes, failures, and decisions needed, and stays quiet when nothing changes.
+alerts. Routine validated Dependabot updates and agent-authored focused fixes may be merged within
+TJ's standing routine-maintenance authorization, confirmed November 3, 2026. Review the complete diff,
+install the exact locks, and require all applicable repository checks, meaningful tests,
+unsuppressed security audits and exact-head CI to pass. There must be no blocking feedback,
+and every branch protection and required review must be satisfied. Use the allowed merge
+method with an expected-head-SHA guard and verify main after merging. Routine eligible
+changes do not need another human confirmation solely because an agent authored the PR.
+
+This authorization covers compatible patch/minor dependency and tooling updates,
+documentation and test maintenance, and narrow bug fixes that preserve existing product,
+data-handling and security contracts. Major upgrades and migrations remain for separate
+human review with explicit compatibility evidence. Production, live collection, account or
+security configuration, permissions, approved baselines and data-egress/provider-contract
+changes retain their separate approval gates. Passing tests do not authorize those changes.
+Never disable or bypass branch protections, required checks or automatic action review.
+
+The monitor reports meaningful changes, completed fixes, failures and decisions needed, and stays
+quiet when nothing changes.
 
 ## Compatibility holds
 

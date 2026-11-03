@@ -824,3 +824,20 @@ Require passing CI and CodeQL on the final committed head. No live collection or
 [virtualenv release](https://github.com/pypa/virtualenv/releases/tag/21.15.2),
 [Wrangler release](https://github.com/cloudflare/workers-sdk/releases/tag/wrangler%404.156.0)
 and [oxlint release](https://github.com/oxc-project/oxc/releases/tag/oxlint_v1.90.0).
+
+## 2026-11-03 — Authorize validated routine maintenance merges
+
+**Decision:** Apply TJ's conditional standing approval to routine maintenance PRs regardless
+of whether Dependabot or an agent authored them. Keep complete diff review, locked installs,
+all applicable required checks and meaningful tests, unsuppressed audits, current-head CI,
+blocking-feedback review and branch protections as merge gates. Use an expected-head-SHA
+guard and verify main after merging. The daily automation records the same authorization.
+
+**Boundary:** Major upgrades still need compatibility/migration evidence and separate review.
+Production collection/deployment, account/security configuration, permissions, baselines and
+data-egress/provider-contract changes remain separately gated. Do not weaken or bypass
+GitHub protections or automatic action review. This is a bounded maintenance authorization,
+not a rule that passing tests permit every change.
+
+**Source:** TJ explicitly approved the prepared merge and requested conditional automatic
+approval for checked, validated and passing maintenance on November 3, 2026.
