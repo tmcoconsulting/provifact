@@ -58,8 +58,8 @@ pymdown-extensions==12.3
 pyparsing==3.3.3
 pytest==9.2.0
 pytest-cov==7.1.0
-python-dateutil==2.9.0.post0
-python-discovery==1.7.0
+python-dateutil==3.0.0
+python-discovery==1.9.0
 PyYAML==6.0.3
 pyyaml_env_tag==1.1
 requests==2.34.2
@@ -75,4 +75,4 @@ trove-classifiers==2026.9.21.13
 typing_extensions==4.16.0
 urllib3==2.8.0
 virtualenv==21.15.2
-watchdog==6.0.0
+watchdog==7.0.0
