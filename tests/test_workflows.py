@@ -11,6 +11,7 @@ def test_executable_workflows_have_no_privileged_pages_chain() -> None:
     assert [path.name for path in workflow_files] == [
         "ci.yml",
         "codeql.yml",
+        "dependabot-auto-merge.yml",
         "deploy-cloudflare.yml",
         "intune-audit.yml",
     ]

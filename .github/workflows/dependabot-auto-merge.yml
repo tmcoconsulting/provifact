@@ -1,0 +1,76 @@
+name: Dependabot auto-merge
+
+# Turns on auto-merge (or merges when auto-merge is unavailable) for Dependabot
+# patch and minor updates only. Major updates are left for a human.
+on:
+  pull_request:
+  schedule:
+    - cron: "17 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  enable:
+    if: github.event_name != 'schedule' && github.actor == 'dependabot[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - name: Fetch Dependabot metadata
+        id: meta
+        uses: dependabot/fetch-metadata@25dd0e34f4fe68f24cc83900b1fe3fe149efef98 # v3.1.0
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Label and queue patch or minor updates
+        if: >-
+          steps.meta.outputs.update-type == 'version-update:semver-patch' ||
+          steps.meta.outputs.update-type == 'version-update:semver-minor'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_URL: ${{ github.event.pull_request.html_url }}
+        run: |
+          set -euo pipefail
+          gh pr edit "$PR_URL" --add-label "automerge-minor-patch" || {
+            gh label create "automerge-minor-patch" --description "Dependabot patch or minor update eligible for auto-merge" --color "0E8A16" || true
+            gh pr edit "$PR_URL" --add-label "automerge-minor-patch"
+          }
+          if gh pr merge --auto --squash "$PR_URL"; then
+            echo "Auto-merge enabled."
+            exit 0
+          fi
+          echo "Auto-merge is not available on this repository. The scheduled job will merge once checks pass."
+
+  merge-green:
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - name: Merge labeled Dependabot PRs whose checks passed
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          prs=$(gh pr list --repo "$REPO" --author "app/dependabot" --label "automerge-minor-patch" --state open --json number,url --jq '.[].url')
+          if [ -z "$prs" ]; then
+            echo "No eligible open PRs."
+            exit 0
+          fi
+          for url in $prs; do
+            echo "Considering $url"
+            if gh pr checks "$url" >/tmp/checks.txt; then
+              gh pr merge --squash "$url"
+              echo "Merged $url"
+            else
+              echo "Checks not all green for $url:"
+              cat /tmp/checks.txt || true
+            fi
+          done
