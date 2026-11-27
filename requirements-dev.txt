@@ -73,6 +73,7 @@ tomli_w==1.2.0
 tomlkit==0.15.2
 trove-classifiers==2026.9.21.13
 typing_extensions==4.16.0
+tzdata==2026.6
 urllib3==2.8.0
 virtualenv==21.15.9
 watchdog==7.1.0
