@@ -841,3 +841,35 @@ not a rule that passing tests permit every change.
 
 **Source:** TJ explicitly approved the prepared merge and requested conditional automatic
 approval for checked, validated and passing maintenance on November 3, 2026.
+
+## 2026-11-27 — Complete the python-dateutil 4.0 and tzdata migration review
+
+**Decision:** Lift the python-dateutil 2.9.0.post0 hold recorded on 2026-10-27 and
+2026-11-03, and accept Dependabot proposal #88 including python-dateutil 4.0.0.
+Pin the new runtime timezone-data dependency at tzdata 2026.6 in `requirements-dev.txt`
+so the IANA database is fully locked rather than resolved unpinned.
+
+**Why the earlier hold no longer blocks this upgrade:** Dateutil 3.0 and 4.0 still
+change timezone-file handling, drop `TZPATHS`, and change UTC offsets for nonexistent
+times under PEP 495. That behavior difference is real: `America/Denver` on the spring
+2026 DST gap (`2026-03-08 02:30`) is `-06:00` on 2.9.0.post0 and `-07:00` on 4.0.0.
+This repository has no direct `dateutil` imports. The only locked consumer is
+`ghp-import` 2.1.0 (`python-dateutil >= 2.8.1`), which calls `dateutil.tz.tzlocal()`
+to format the current local UTC offset for GitHub Pages commit timestamps. That path
+does not parse ISO timestamps or construct nonexistent civil times. No other locked
+package (including pandas, botocore, or arrow) depends on dateutil. `pip check` is
+clean, and Python 3.12 already satisfies the 4.0 runtime requirement (3.11+).
+
+**Validation:** Clean locked Python 3.12 and Node 22 installs matching CI, `pip check`,
+the complete Phase 1 and Worker public validation suite on both `main` and this branch
+(ruff format/lint, mypy, pytest 254 passed and 1 skipped on both, static-demo rebuild,
+Bandit, secret scan, pip-audit, npm audit, `mkdocs build --strict`, public-artifact
+scan, Worker format/lint/types, Worker and browser tests, generated binding check and
+packaging dry runs). `tz.tzlocal()` and `America/Denver` standard/daylight offsets
+match 2.9 for existing times. Require passing CI and CodeQL on the final committed
+head before merge. No live collection or production deployment.
+
+**Evidence:** [Python environment #88](https://github.com/tmcoconsulting/provifact/pull/88),
+the earlier hold in [maintenance #72](https://github.com/tmcoconsulting/provifact/pull/72),
+[dateutil 3.0.0](https://github.com/dateutil/dateutil/releases/tag/3.0.0) and
+[dateutil 4.0.0](https://github.com/dateutil/dateutil/releases/tag/4.0.0).
